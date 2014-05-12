@@ -30,27 +30,7 @@ public class ChessMove {
         if (moveString.length() == 4) {
             PieceType type = PieceType.valueOf("" + moveString.charAt(0));
             PieceColor color = PieceColor.valueOf("" + moveString.charAt(1));
-            switch (type) {
-                case b:
-                    this.piece = new Bishop(color, PieceStatus.ALIVE);
-                    break;
-                case k:
-                    this.piece = new King(color, PieceStatus.ALIVE);
-                    break;
-                case n:
-                    this.piece = new Knight(color, PieceStatus.ALIVE);
-                    break;
-                case p:
-                default:
-                    this.piece = new Pawn(color, PieceStatus.ALIVE);
-                    break;
-                case q:
-                    this.piece = new Queen(color, PieceStatus.ALIVE);
-                    break;
-                case r:
-                    this.piece = new Rook(color, PieceStatus.ALIVE);
-                    break;
-            }
+            this.piece = PieceFactory.CreatePiece(type, color);
             this.srcLoc = BoardLocation.none;
             this.destLoc = BoardLocation.valueOf("" + moveString.substring(2));
             this.type = MoveType.ADD;
