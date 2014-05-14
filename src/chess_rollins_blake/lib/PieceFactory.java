@@ -5,18 +5,18 @@ public class PieceFactory {
     public static Piece CreatePiece(PieceType type, PieceColor color) {
         switch (type) {
             case b:
-                return new Bishop(color, PieceStatus.ALIVE);
+                return new Bishop(color);
             case k:
-                return new King(color, PieceStatus.ALIVE);
+                return new King(color);
             case n:
-                return new Knight(color, PieceStatus.ALIVE);
+                return new Knight(color);
             case p:
             default:
-                return new Pawn(color, PieceStatus.ALIVE);
+                return new Pawn(color);
             case q:
-                return new Queen(color, PieceStatus.ALIVE);
+                return new Queen(color);
             case r:
-                return new Rook(color, PieceStatus.ALIVE);
+                return new Rook(color);
         }
     }
 }

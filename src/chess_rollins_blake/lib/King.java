@@ -2,8 +2,8 @@ package chess_rollins_blake.lib;
 
 public class King extends Piece {
 
-    public King(PieceColor color, PieceStatus status) {
-        super(color, status);
+    public King(PieceColor color) {
+        super(color);
         super.type = PieceType.k;
     }
 

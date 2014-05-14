@@ -2,8 +2,8 @@ package chess_rollins_blake.lib;
 
 public class Bishop extends Piece {
 
-    public Bishop(PieceColor color, PieceStatus status) {
-        super(color, status);
+    public Bishop(PieceColor color) {
+        super(color);
         super.type = PieceType.b;
     }
 

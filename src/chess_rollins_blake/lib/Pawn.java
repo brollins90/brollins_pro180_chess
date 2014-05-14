@@ -2,8 +2,8 @@ package chess_rollins_blake.lib;
 
 public class Pawn extends Piece {
 
-    public Pawn(PieceColor color, PieceStatus status) {
-        super(color, status);
+    public Pawn(PieceColor color) {
+        super(color);
         super.type = PieceType.p;
     }
 
@@ -30,6 +30,7 @@ public class Pawn extends Piece {
             // check for the diag
         }
         
+        isValid = true;
         return isValid;
     }
 

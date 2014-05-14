@@ -12,16 +12,26 @@ public class ConsoleView extends ChessView {
     public ConsoleView() {
         System.out.println("Welcome to the Console Chess.\n");
     }
-
-    @Override
-    public void update() {
+//
+//    @Override
+//    public void update() {
+//        printMessage();
+//        printBoard();
+//    }
+    
+    public void update(Observable obs, Object obj) {
+        System.out.println(obj);
         printBoard();
     }
 
-    public void printBoard() {
-        if (this.model.message != null) {
-            System.out.println(this.model.message);
+    public void printMessage() {
+        if (this.model.getMessage() != null) {
+            System.out.println(this.model.getMessage());
         }
+
+    }
+
+    public void printBoard() {
         String retString = "  ____________________\n";
         for (int rowIndex = 7; rowIndex > -1; rowIndex--) {
 

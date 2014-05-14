@@ -2,8 +2,8 @@ package chess_rollins_blake.lib;
 
 public class Queen extends Piece {
 
-    public Queen(PieceColor color, PieceStatus status) {
-        super(color, status);
+    public Queen(PieceColor color) {
+        super(color);
         super.type = PieceType.q;
     }
 

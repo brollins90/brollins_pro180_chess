@@ -7,9 +7,9 @@ public abstract class Piece {
     protected PieceType type;
     //private BoardLocation loc;
     
-    public Piece(PieceColor color, PieceStatus status/*, PieceType type, BoardLocation startLocation*/) {
+    public Piece(PieceColor color/*, PieceStatus status/*, PieceType type, BoardLocation startLocation*/) {
         this.color = color;
-        this.status = status;
+        this.status = PieceStatus.ALIVE;
 //        this.type = type;
         //this.loc = startLocation;
     }

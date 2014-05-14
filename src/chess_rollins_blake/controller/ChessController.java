@@ -7,7 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import chess_rollins_blake.lib.ChessMove;
-import chess_rollins_blake.lib.MoveFactory;
+import chess_rollins_blake.lib.ChessFactory;
+import chess_rollins_blake.model.ChessException;
 import chess_rollins_blake.model.ChessModel;
 import chess_rollins_blake.view.ChessView;
 
@@ -16,9 +17,7 @@ public class ChessController implements java.awt.event.ActionListener {
     private ChessModel model;
     protected ChessView view;
 
-    public ChessController() {
-//        System.out.println("ChessController()");
-    }
+    public ChessController() {}
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
@@ -34,31 +33,32 @@ public class ChessController implements java.awt.event.ActionListener {
         this.view = v;
     }
 
-    public void loadModelFromFile(String filePath) {
-                
+    public void loadFromFile(String filePath) {
+
         if (filePath != null) {
             BufferedReader br = null;
             try {
                 String path = filePath;
-                //System.out.println(path);
+                // System.out.println(path);
                 br = new BufferedReader(new FileReader(path));
 
                 String line = "";
                 while ((line = br.readLine()) != null) {
-                    // System.out.println(line);
-                    ChessMove thisMove = MoveFactory.CreateMove(line);
-                    if (thisMove != null) {
-                        model.addMove(thisMove);
-                        this.view.update();
-                        this.model.message = "";
-                    }
-                    //
-                    // String[] parts = line.split(",");
-                    // if (parts.length == 4) {
-                    // this.add(parts[0], parts[1], parts[2], parts[3], false);
-                    // } else {
-                    // // System.out.println("Bad line.  Skipping");
-                    // }
+                     //System.out.println(line);
+//
+//                    try {
+//                        if (model.addMove(line)) {
+//                            this.view.update();
+//                            this.model.clearMessage();
+//                        }
+//                    } catch (ChessException e) {
+//                        this.model.message = "ERROR: " + e.getMessage();
+//                        this.view.update();
+//                        this.model.message = "";
+//                    }
+                    
+                    model.addMove(line);
+                    
                 }
 
                 br.close();

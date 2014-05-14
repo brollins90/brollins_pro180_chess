@@ -12,7 +12,6 @@ public class ChessMove {
     public Piece piece;
     public String moveString;
     public ChessMove subMove;
-    public Piece capturedPiece;
     public boolean capturedAPiece;
     public MoveType type;
     public String message;
@@ -21,55 +20,38 @@ public class ChessMove {
         moveString = moveString.toLowerCase();
         this.message = moveString + "\n";
         this.capturedAPiece = false;
-        this.capturedPiece = null;
         this.moveString = moveString;
         this.piece = null;
         this.subMove = null;
 
-
-        if (moveString.length() == 4) {
-            PieceType type = PieceType.valueOf("" + moveString.charAt(0));
-            PieceColor color = PieceColor.valueOf("" + moveString.charAt(1));
-            this.piece = PieceFactory.CreatePiece(type, color);
-            this.srcLoc = BoardLocation.none;
-            this.destLoc = BoardLocation.valueOf("" + moveString.substring(2));
-            this.type = MoveType.ADD;
-            this.message += "Created a new Piece at " + this.destLoc + " color: " + this.piece.getColor() + " type: " + this.piece.getType() + ".\n";
-        } else if (moveString.length() == 11) {
-            this.srcLoc = BoardLocation.valueOf("" + moveString.substring(0, 2));
-            this.destLoc = BoardLocation.valueOf("" + moveString.substring(3, 5));
-            this.subMove = new ChessMove(moveString.substring(6));
-            this.type = MoveType.MOVE;
-            this.message += "Moved a piece from " + this.srcLoc + " to " + this.destLoc + " and includes the next move.\n";
-        } else /* if (moveString.length() = 5 or 6 */{
-            this.srcLoc = BoardLocation.valueOf("" + moveString.substring(0, 2));
-            this.destLoc = BoardLocation.valueOf("" + moveString.substring(3, 5));
-            this.type = MoveType.MOVE;
-            if (moveString.contains("*")) {
-                this.capturedPiece = null;
-                this.capturedAPiece = true;
-                this.type = MoveType.CAPTURE;
-            }
-            this.message += "Moved a piece from " + this.srcLoc + " to " + this.destLoc + ".\n";
-            if (this.capturedAPiece) {
-                this.message += " and captured a piece\n";
-            }
-        }
-    }
-
-    public static boolean validateSyntax(String testString) {
-
-        Pattern p = Pattern.compile("(\\w{4})|(\\w{2} \\w{2}\\*+)|(\\w{2} \\w{2} \\w{2} \\w{2})");
-        Matcher m = p.matcher(testString);
-        boolean b = m.matches();
-
-        return b;
-    }
-
-    public static boolean validateMove(String testString, PieceList pieces) {
-
-
-
-        return true;
+//
+//        if (moveString.length() == 4) {
+////            PieceType type = PieceType.valueOf("" + moveString.charAt(0));
+////            PieceColor color = PieceColor.valueOf("" + moveString.charAt(1));
+////            this.piece = PieceFactory.CreatePiece(type, color);
+////            this.srcLoc = BoardLocation.none;
+////            this.destLoc = BoardLocation.valueOf("" + moveString.substring(2));
+////            this.type = MoveType.ADD;
+////            this.message += "Created a new Piece at " + this.destLoc + " color: " + this.piece.getColor() + " type: " + this.piece.getType() + ".\n";
+//        } else if (moveString.length() == 11) {
+////            this.srcLoc = BoardLocation.valueOf("" + moveString.substring(0, 2));
+////            this.destLoc = BoardLocation.valueOf("" + moveString.substring(3, 5));
+////            this.subMove = new MovingMove(moveString.substring(6));
+////            this.type = MoveType.MOVE;
+////            this.message += "Moved a piece from " + this.srcLoc + " to " + this.destLoc + " and includes the next move.\n";
+//        } else /* if (moveString.length() = 5 or 6 */{
+//            this.srcLoc = BoardLocation.valueOf("" + moveString.substring(0, 2));
+//            this.destLoc = BoardLocation.valueOf("" + moveString.substring(3, 5));
+//            this.type = MoveType.MOVE;
+//            if (moveString.contains("*")) {
+//                this.capturedPiece = null;
+//                this.capturedAPiece = true;
+//                this.type = MoveType.CAPTURE;
+//            }
+//            this.message += "Moved a piece from " + this.srcLoc + " to " + this.destLoc + ".\n";
+//            if (this.capturedAPiece) {
+//                this.message += " and captured a piece\n";
+//            }
+//        }
     }
 }

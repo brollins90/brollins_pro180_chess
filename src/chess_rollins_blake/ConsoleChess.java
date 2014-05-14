@@ -8,11 +8,13 @@ public class ConsoleChess {
 
     public static void main(String[] args) {
         
+        args = new String[1];
+        args[0] = "chess02.txt";
         ConsoleChess c = new ConsoleChess();
-        c.playChess();
+        c.playChess(args);
     }
     
-    public void playChess() {
+    public void playChess(String[] args) {
         
         ChessModel model = new ChessModel();
         ConsoleView view = new ConsoleView();
@@ -23,7 +25,7 @@ public class ConsoleChess {
         ChessController controller = new ChessController();
         controller.addModel(model);
         controller.addView(view);
-        controller.loadModelFromFile("chess03.txt");
+        controller.loadFromFile(args[0]);
         
         view.addController(controller);
         
