@@ -9,41 +9,52 @@ import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.Piece;
 import chess_rollins_blake.lib.PieceStatus;
 
-public class PieceList implements Iterable<Map.Entry<BoardLocation, Piece>> {
+public class PieceList /*implements Iterable<Map.Entry<BoardLocation, Piece>> */{
 
-    Map<BoardLocation, Piece> pieces;
+//    Map<BoardLocation, Piece> pieces;
+    
+    final int BOARD_SIZE = 8;
+    
+    Piece boardArray[][];
     
     public PieceList() {
-        pieces = new TreeMap<BoardLocation, Piece>();
+        //pieces = new TreeMap<BoardLocation, Piece>();
+        boardArray = new Piece[BOARD_SIZE][BOARD_SIZE];
     }
     
     public boolean add(BoardLocation loc, Piece p) {
-        this.pieces.put(loc, p);
+        this.boardArray[loc.getRow()][loc.getColumn()] = p;
+        return true;
+    }
+    
+    public boolean capturePiece(BoardLocation loc) {
+        get(loc).setStatus(PieceStatus.CAPTURED);
         return true;
     }
     
     public Piece get(BoardLocation loc) {
-        return this.pieces.get(loc);
+        return this.boardArray[loc.getRow()][loc.getColumn()];
     }
     
-    public boolean capturePiece(BoardLocation loc) {
-        pieces.get(loc).setStatus(PieceStatus.CAPTURED);
+    public boolean remove(BoardLocation loc) {
+        this.boardArray[loc.getRow()][loc.getColumn()] = null;
         return true;
     }
     
     public boolean move(BoardLocation src, BoardLocation dest) {
-        Piece temp = pieces.get(src);
-        pieces.remove(src);
-        pieces.put(dest, temp);
+        Piece temp = get(src);
+        remove(src);
+        add(dest, temp);
         return true;
     }
     
     public int size() {
-        return this.pieces.size();
+        return 64;
+//        return this.pieces.size();
     }
-
-    @Override
-    public Iterator<Entry<BoardLocation, Piece>> iterator() {
-        return this.pieces.entrySet().iterator();
-    }
+//
+//    @Override
+//    public Iterator<Entry<BoardLocation, Piece>> iterator() {
+//        return this.pieces.entrySet().iterator();
+//    }
 }
