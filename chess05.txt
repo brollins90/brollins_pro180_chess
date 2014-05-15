@@ -1,0 +1,10 @@
+qle1
+e1 e5
+e5 a5
+klb5
+a5 b5
+a5 e5
+a5 b6
+b6 b5
+b6 c5
+c5 a5

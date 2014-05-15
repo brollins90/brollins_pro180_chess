@@ -48,8 +48,12 @@ public class PieceList /*implements Iterable<Map.Entry<BoardLocation, Piece>> */
         return true;
     }
     
+    public int getBoardSize() {
+        return BOARD_SIZE;
+    }
+    
     public int size() {
-        return 64;
+        return BOARD_SIZE * BOARD_SIZE;
 //        return this.pieces.size();
     }
 //

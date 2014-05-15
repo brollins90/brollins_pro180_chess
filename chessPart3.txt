@@ -1,0 +1,28 @@
+rla1
+nlb1
+blc1
+qld1
+kle1
+blf1
+nlg1
+rlh1
+rda8
+ndb8
+bdc8
+qdd8
+kde8
+bdf8
+ndg8
+rdh8
+a1 a3
+a3 b2
+b1 b2
+b1 c3
+c1 d2
+a3 b3
+d1 d2
+d1 d3
+e1 e2
+e2 e4
+e2 f2
+f2 g3

@@ -185,16 +185,16 @@ public class ChessModel extends java.util.Observable {
         // errorMessage += "ERROR: The move was not valid.\n";
         // }
 
-//        if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.pieces.get(m.srcLoc).canCollide()) {
-//            ArrayList<BoardLocation> locsToCheck = getLocationsBetween(m.srcLoc, m.destLoc);
-//            for (BoardLocation l : locsToCheck) {
-//                System.out.println(l);
-//                if (isValid && this.pieces.get(l) != null) {
-//                    isValid = false;
-//                    errorMessage += "ERROR: The movement collided.\n";
-//                }
-//            }
-//        }
+        if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.pieces.get(m.srcLoc).canCollide()) {
+            ArrayList<BoardLocation> locsToCheck = getLocationsBetween(m.srcLoc, m.destLoc);
+            for (BoardLocation l : locsToCheck) {
+                System.out.println(l);
+                if (isValid && this.pieces.get(l) != null) {
+                    isValid = false;
+                    errorMessage += "ERROR: The movement collided.\n";
+                }
+            }
+        }
 
         m.message += errorMessage;
         // System.out.println(errorMessage);
@@ -210,18 +210,27 @@ public class ChessModel extends java.util.Observable {
         int diff = 0;
         
         if (src.getColumn() == dest.getColumn()) {
-            diff = dest.getRow() - src.getRow();                     
+            diff = dest.getRow() - src.getRow();  
+            if (diff > 0) {
+                for (int j = 1; j < diff; j++) {
+                    locs.add(BoardLocation.values()[(src.getColumn() * this.pieces.getBoardSize()) + (src.getRow() + j)]);
+                }
+            } else {
+                for (int j = -1; j > diff; j--) {
+                    locs.add(BoardLocation.values()[(src.getColumn() * this.pieces.getBoardSize()) + (src.getRow() + j)]);
+                }
+            }                   
         }
         if (src.getRow() == dest.getRow()) {
             diff = dest.getColumn() - src.getColumn();
-        }
-        if (diff > 0) {
-            for (int j = 1; j < diff; j++) {
-                locs.add(BoardLocation.values()[(src.getColumn() * 8) + (src.getRow() + j)]);
-            }
-        } else {
-            for (int j = -1; j > diff; j--) {
-                locs.add(BoardLocation.values()[((src.getColumn() + j) * 8) + (src.getRow())]);
+            if (diff > 0) {
+                for (int j = 1; j < diff; j++) {
+                    locs.add(BoardLocation.values()[((src.getColumn() + j) * this.pieces.getBoardSize()) + (src.getRow())]);
+                }
+            } else {
+                for (int j = -1; j > diff; j--) {
+                    locs.add(BoardLocation.values()[((src.getColumn() + j) * this.pieces.getBoardSize()) + (src.getRow())]);
+                }
             }
         }
         return locs;
