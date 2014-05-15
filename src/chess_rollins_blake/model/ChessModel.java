@@ -14,7 +14,7 @@ import chess_rollins_blake.lib.PieceColor;
 
 public class ChessModel extends java.util.Observable {
 
-    public PieceList pieces;
+    public ChessBoard pieces;
     private Stack<ChessMove> moves;
     private Stack<ChessMove> movesRedo;
     private String message;
@@ -24,7 +24,7 @@ public class ChessModel extends java.util.Observable {
      * Creates a ChessModel
      */
     public ChessModel() {
-        this.pieces = new PieceList();
+        this.pieces = new ChessBoard();
         this.moves = new Stack<>();
         this.movesRedo = new Stack<>();
         this.message = "";

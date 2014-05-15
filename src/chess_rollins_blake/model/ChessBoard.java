@@ -9,7 +9,7 @@ import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.Piece;
 import chess_rollins_blake.lib.PieceStatus;
 
-public class PieceList /*implements Iterable<Map.Entry<BoardLocation, Piece>> */{
+public class ChessBoard{
 
 //    Map<BoardLocation, Piece> pieces;
     
@@ -17,7 +17,7 @@ public class PieceList /*implements Iterable<Map.Entry<BoardLocation, Piece>> */
     
     Piece boardArray[][];
     
-    public PieceList() {
+    public ChessBoard() {
         //pieces = new TreeMap<BoardLocation, Piece>();
         boardArray = new Piece[BOARD_SIZE][BOARD_SIZE];
     }
