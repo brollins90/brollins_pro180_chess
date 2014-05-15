@@ -32,6 +32,10 @@ public class ChessController implements java.awt.event.ActionListener {
     public void addView(ChessView v) {
         this.view = v;
     }
+    
+    public boolean addMove(String moveString) {
+        return model.addMove(moveString);
+    }
 
     public void loadFromFile(String filePath) {
 
@@ -44,20 +48,8 @@ public class ChessController implements java.awt.event.ActionListener {
 
                 String line = "";
                 while ((line = br.readLine()) != null) {
-                     //System.out.println(line);
-//
-//                    try {
-//                        if (model.addMove(line)) {
-//                            this.view.update();
-//                            this.model.clearMessage();
-//                        }
-//                    } catch (ChessException e) {
-//                        this.model.message = "ERROR: " + e.getMessage();
-//                        this.view.update();
-//                        this.model.message = "";
-//                    }
-                    
-                    model.addMove(line);
+                    System.out.println(line);
+                    addMove(line);
                     
                 }
 

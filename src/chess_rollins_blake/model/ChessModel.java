@@ -1,12 +1,13 @@
 package chess_rollins_blake.model;
 
+import java.util.ArrayList;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import chess_rollins_blake.lib.BoardLocation;
-import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.ChessFactory;
+import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
 import chess_rollins_blake.lib.Piece;
 import chess_rollins_blake.lib.PieceColor;
@@ -37,10 +38,13 @@ public class ChessModel extends java.util.Observable {
      * @return If the Move was successfully added
      */
     public boolean addMove(String moveString) {
+        // System.out.println("Adding: " + moveString);
         boolean moveAdded = false;
         MoveType movesType = this.validateSyntax(moveString);
+        // System.out.println("type: " + movesType);
         if (movesType != null) {
             ChessMove currentMove = ChessFactory.CreateMove(movesType, moveString);
+            // System.out.println("created");
             if (validateMove(currentMove)) {
                 moves.push(currentMove);
                 boolean executed = executeMove(currentMove);
@@ -51,6 +55,8 @@ public class ChessModel extends java.util.Observable {
                 } else {
                     moveAdded = true;
                 }
+            } else {
+                setMessage(currentMove.message);
             }
         }
         return moveAdded;
@@ -75,6 +81,7 @@ public class ChessModel extends java.util.Observable {
      */
     public boolean executeMove(ChessMove currentMove) {
 
+        // System.out.println("executing: " + currentMove.moveString);
         boolean moveExecuted = false;
 
         if (currentMove.type == MoveType.ADD) {
@@ -99,8 +106,9 @@ public class ChessModel extends java.util.Observable {
 
     /**
      * Returns the piece at the BoardLocation
-     * @param loc   The location on the board
-     * @return  The piece at the location or null if the location is empty
+     * 
+     * @param loc The location on the board
+     * @return The piece at the location or null if the location is empty
      */
     public Piece getPiece(BoardLocation loc) {
         return pieces.get(loc);
@@ -145,6 +153,7 @@ public class ChessModel extends java.util.Observable {
         boolean isValid = true;
         String errorMessage = "";
 
+
         if (isValid && m.type == MoveType.ADD && this.pieces.get(m.destLoc) != null) {
             isValid = false;
             errorMessage += "ERROR: The destination already has a piece.\n";
@@ -153,34 +162,70 @@ public class ChessModel extends java.util.Observable {
             isValid = false;
             errorMessage += "ERROR: The source is empty.\n";
         }
-        if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.pieces.get(m.srcLoc).getColor() != this.currentTurn) {
-            isValid = false;
-            errorMessage += "ERROR: Wrong player's turn.\n";
-        }
-        if (isValid && m.type == MoveType.CAPTURE && this.pieces.get(m.destLoc) == null) {
-            isValid = false;
-            errorMessage += "ERROR: The destination is empty.\n";
-        }
-        if (isValid && m.type == MoveType.MOVE && this.pieces.get(m.destLoc) != null) {
+        // if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.pieces.get(m.srcLoc).getColor() != this.currentTurn) {
+        // isValid = false;
+        // errorMessage += "ERROR: Wrong player's turn.\n";
+        // }
+        // if (isValid && m.type == MoveType.CAPTURE && this.pieces.get(m.destLoc) == null) {
+        // isValid = false;
+        // errorMessage += "ERROR: The destination is empty.\n";
+        // }
+        if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.pieces.get(m.destLoc) != null) {
             isValid = false;
             errorMessage += "ERROR: The destination is not empty.\n";
         }
 
-        if (isValid && m.type == MoveType.MOVE && !this.pieces.get(m.srcLoc).isValidMove(m.srcLoc, m.destLoc, false)) {
+        if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && !this.pieces.get(m.srcLoc).isValidMovement(m.srcLoc, m.destLoc/* , false */)) {
             isValid = false;
             errorMessage += "ERROR: The move was not valid.\n";
         }
 
-        if (isValid && m.type == MoveType.CAPTURE && !this.pieces.get(m.srcLoc).isValidMove(m.srcLoc, m.destLoc, true)) {
-            isValid = false;
-            errorMessage += "ERROR: The move was not valid.\n";
-        }
+        // if (isValid && m.type == MoveType.CAPTURE && !this.pieces.get(m.srcLoc).isValidMovement(m.srcLoc, m.destLoc/* , true */)) {
+        // isValid = false;
+        // errorMessage += "ERROR: The move was not valid.\n";
+        // }
 
+//        if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.pieces.get(m.srcLoc).canCollide()) {
+//            ArrayList<BoardLocation> locsToCheck = getLocationsBetween(m.srcLoc, m.destLoc);
+//            for (BoardLocation l : locsToCheck) {
+//                System.out.println(l);
+//                if (isValid && this.pieces.get(l) != null) {
+//                    isValid = false;
+//                    errorMessage += "ERROR: The movement collided.\n";
+//                }
+//            }
+//        }
 
+        m.message += errorMessage;
+        // System.out.println(errorMessage);
         if (isValid && m.subMove != null) {
             return validateMove(m.subMove);
         }
         return isValid;
+    }
+
+    public ArrayList<BoardLocation> getLocationsBetween(BoardLocation src, BoardLocation dest) {
+        ArrayList<BoardLocation> locs = new ArrayList<>();
+        
+        int diff = 0;
+        
+        if (src.getColumn() == dest.getColumn()) {
+            diff = dest.getRow() - src.getRow();                     
+        }
+        if (src.getRow() == dest.getRow()) {
+            diff = dest.getColumn() - src.getColumn();
+        }
+        if (diff > 0) {
+            for (int j = 1; j < diff; j++) {
+                locs.add(BoardLocation.values()[(src.getColumn() * 8) + (src.getRow() + j)]);
+            }
+        } else {
+            for (int j = -1; j > diff; j--) {
+                locs.add(BoardLocation.values()[((src.getColumn() + j) * 8) + (src.getRow())]);
+            }
+        }
+        return locs;
+        
     }
 
     public MoveType validateSyntax(String moveString) {

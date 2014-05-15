@@ -5,11 +5,13 @@ public abstract class Piece {
     protected PieceColor color;
     protected PieceStatus status;
     protected PieceType type;
+    protected boolean canCollideOnMove;
     //private BoardLocation loc;
     
     public Piece(PieceColor color/*, PieceStatus status/*, PieceType type, BoardLocation startLocation*/) {
         this.color = color;
         this.status = PieceStatus.ALIVE;
+        this.canCollideOnMove = false;
 //        this.type = type;
         //this.loc = startLocation;
     }
@@ -38,6 +40,10 @@ public abstract class Piece {
         return this.type.name();
     }
     
-    public abstract boolean isValidMove(BoardLocation src, BoardLocation dest, boolean willCapture);
+    public boolean canCollide() {
+        return this.canCollideOnMove;
+    }
+    
+    public abstract boolean isValidMovement(BoardLocation src, BoardLocation dest);
     
 }

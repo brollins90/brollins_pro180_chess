@@ -21,10 +21,10 @@ public enum BoardLocation {
     none;
     
     public int getColumn() {
-        return this.ordinal() % 8;
+        return this.ordinal() / 8;
     }
     
     public int getRow() {
-        return this.ordinal() / 8;
+        return this.ordinal() % 8;
     }
 }

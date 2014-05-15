@@ -8,9 +8,20 @@ public class King extends Piece {
     }
 
     @Override
-    public boolean isValidMove(BoardLocation src, BoardLocation dest, boolean willCapture) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean isValidMovement(BoardLocation src, BoardLocation dest) {
+        boolean isValid = false;
+
+        if ((dest.getColumn() == src.getColumn()) && (Math.abs(dest.getRow() - src.getRow()) == 1)) {
+            isValid = true;
+        }
+        if ((dest.getRow() == src.getRow()) && (Math.abs(dest.getColumn() - src.getColumn()) == 1)) {
+            isValid = true;
+        }
+        if (Math.abs(dest.getColumn() - src.getColumn()) == Math.abs(dest.getRow() - src.getRow()) && ((Math.abs(dest.getColumn() - src.getColumn()) == 1) || ((Math.abs(dest.getRow() - src.getRow()) == 1)))) {
+            isValid = true;
+        }
+        
+        return isValid;        
     }
 
 }

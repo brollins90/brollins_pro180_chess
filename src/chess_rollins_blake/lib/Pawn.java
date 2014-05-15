@@ -5,10 +5,11 @@ public class Pawn extends Piece {
     public Pawn(PieceColor color) {
         super(color);
         super.type = PieceType.p;
+        this.canCollideOnMove = true;
     }
 
     @Override
-    public boolean isValidMove(BoardLocation src, BoardLocation dest, boolean willCapture) {
+    public boolean isValidMovement(BoardLocation src, BoardLocation dest) {
         boolean isValid = false;
         
         int pawnStartRow = (super.color == PieceColor.l) ? 1 : 6;
@@ -25,10 +26,10 @@ public class Pawn extends Piece {
         if (pawnCurRow == pawnStartRow && moveVal == 2) {
             isValid = true;
         }
-        
-        if (willCapture) {
-            // check for the diag
-        }
+//        
+//        if (willCapture) {
+//            // check for the diag
+//        }
         
         isValid = true;
         return isValid;
