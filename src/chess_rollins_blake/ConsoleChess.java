@@ -1,6 +1,7 @@
 package chess_rollins_blake;
 
 import chess_rollins_blake.controller.ChessController;
+import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.model.ChessModel;
 import chess_rollins_blake.view.ConsoleView;
 
@@ -16,6 +17,7 @@ public class ConsoleChess {
     
     public void playChess(String[] args) {
         
+        try {
         ChessModel model = new ChessModel();
         ConsoleView view = new ConsoleView();
         
@@ -30,6 +32,10 @@ public class ConsoleChess {
         view.addController(controller);
         
         //view.printBoard();
+        } catch (ChessException e) {
+            System.out.println("There was a problem with the chess game... Sorry");
+            e.printStackTrace();
+        }
         
     }
 }

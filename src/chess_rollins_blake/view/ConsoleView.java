@@ -33,11 +33,11 @@ public class ConsoleView extends ChessView {
 
     public void printBoard() {
         String retString = "  ____________________\n";
-        for (int rowIndex = this.model.pieces.getBoardSize() - 1; rowIndex > -1; rowIndex--) {
+        for (int rowIndex = this.model.currentBoard.getBoardSize() - 1; rowIndex > -1; rowIndex--) {
 
             retString += (rowIndex + 1) + " | ";
-            for (int colIndex = 0; colIndex < this.model.pieces.getBoardSize(); colIndex++) {
-                retString += pieceString(this.model.getPiece(BoardLocation.values()[colIndex * this.model.pieces.getBoardSize() + rowIndex])) + " ";
+            for (int colIndex = 0; colIndex < this.model.currentBoard.getBoardSize(); colIndex++) {
+                retString += pieceString(this.model.getPiece(BoardLocation.values()[colIndex * this.model.currentBoard.getBoardSize() + rowIndex])) + " ";
 
             }
             retString += " |\n";

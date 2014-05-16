@@ -1,18 +1,11 @@
 package chess_rollins_blake.model;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.Piece;
 import chess_rollins_blake.lib.PieceStatus;
 
 public class ChessBoard{
-
-//    Map<BoardLocation, Piece> pieces;
-    
+   
     final int BOARD_SIZE = 8;
     
     Piece boardArray[][];

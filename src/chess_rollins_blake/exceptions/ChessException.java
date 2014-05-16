@@ -1,6 +1,6 @@
-package chess_rollins_blake.model;
+package chess_rollins_blake.exceptions;
 
-public class ChessException extends Exception {
+public class ChessException extends RuntimeException {
 
     public ChessException() {
         super();

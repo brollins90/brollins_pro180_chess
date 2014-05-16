@@ -6,9 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.ChessFactory;
-import chess_rollins_blake.model.ChessException;
 import chess_rollins_blake.model.ChessModel;
 import chess_rollins_blake.view.ChessView;
 
@@ -22,7 +22,6 @@ public class ChessController implements java.awt.event.ActionListener {
     @Override
     public void actionPerformed(ActionEvent arg0) {
         // TODO Auto-generated method stub
-
     }
 
     public void addModel(ChessModel m) {
@@ -32,9 +31,9 @@ public class ChessController implements java.awt.event.ActionListener {
     public void addView(ChessView v) {
         this.view = v;
     }
-    
-    public boolean addMove(String moveString) {
-        return model.addMove(moveString);
+
+    public void addMove(String moveString) {
+        this.model.addMove(moveString);
     }
 
     public void loadFromFile(String filePath) {
@@ -43,25 +42,26 @@ public class ChessController implements java.awt.event.ActionListener {
             BufferedReader br = null;
             try {
                 String path = filePath;
-                // System.out.println(path);
                 br = new BufferedReader(new FileReader(path));
 
                 String line = "";
                 while ((line = br.readLine()) != null) {
-                    System.out.println(line);
-                    addMove(line);
-                    
+                    // System.out.println(line);
+                    try {
+                        addMove(line);
+                    } catch (ChessException e) {
+                        this.model.setMessage(e.getMessage());
+                    }
                 }
-
                 br.close();
 
             } catch (FileNotFoundException e) {
-                System.out.println("Unable to open the file at: " + filePath);
+                throw new ChessException("Unable to open the file at: " + filePath);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new ChessException("IOException when trying to read the file at: " + filePath);
             }
         } else {
-            System.out.println("The file is not set...");
+            throw new ChessException("The filepath is not set");
         }
 
     }
