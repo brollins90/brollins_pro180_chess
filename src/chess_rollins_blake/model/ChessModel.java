@@ -51,9 +51,9 @@ public class ChessModel extends java.util.Observable {
                 setMessage(currentMove.message);
                 if (!executed) {
                     moves.pop();
-                    moveAdded = false;
-                } else {
-                    moveAdded = true;
+                    moveAdded = !executed;
+                } else {         // moveAdded = executed
+                    moveAdded = executed;
                 }
             } else {
                 setMessage(currentMove.message);
@@ -158,18 +158,17 @@ public class ChessModel extends java.util.Observable {
             isValid = false;
             errorMessage += "ERROR: The destination already has a piece.\n";
         }
+        
         if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.pieces.get(m.srcLoc) == null) {
             isValid = false;
             errorMessage += "ERROR: The source is empty.\n";
         }
+        
         // if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.pieces.get(m.srcLoc).getColor() != this.currentTurn) {
         // isValid = false;
         // errorMessage += "ERROR: Wrong player's turn.\n";
         // }
-        // if (isValid && m.type == MoveType.CAPTURE && this.pieces.get(m.destLoc) == null) {
-        // isValid = false;
-        // errorMessage += "ERROR: The destination is empty.\n";
-        // }
+
         if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.pieces.get(m.destLoc) != null) {
             isValid = false;
             errorMessage += "ERROR: The destination is not empty.\n";
@@ -179,11 +178,6 @@ public class ChessModel extends java.util.Observable {
             isValid = false;
             errorMessage += "ERROR: The move was not valid.\n";
         }
-
-        // if (isValid && m.type == MoveType.CAPTURE && !this.pieces.get(m.srcLoc).isValidMovement(m.srcLoc, m.destLoc/* , true */)) {
-        // isValid = false;
-        // errorMessage += "ERROR: The move was not valid.\n";
-        // }
 
         if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.pieces.get(m.srcLoc).canCollide()) {
             ArrayList<BoardLocation> locsToCheck = getLocationsBetween(m.srcLoc, m.destLoc);
