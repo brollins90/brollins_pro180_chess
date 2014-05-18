@@ -53,7 +53,7 @@ public class ChessModel extends java.util.Observable {
                 moves.pop();
             } finally {
                 setMessage(currentMove.message);
-                
+
             }
         } else {
             throw new InvalidMoveException("The move action was not valid for '" + moveString + "'");
@@ -78,29 +78,20 @@ public class ChessModel extends java.util.Observable {
      * @param currentMove The Move to execute
      * @return If the move was successfully executed
      */
-    public boolean executeMove(ChessMove currentMove) {
-
-        // System.out.println("executing: " + currentMove.moveString);
-        boolean moveExecuted = false;
+    public void executeMove(ChessMove currentMove) {
 
         if (currentMove.type == MoveType.ADD) {
-            // System.out.println("Adding piece");
-            moveExecuted = currentBoard.add(currentMove.destLoc, currentMove.piece);
+            this.currentBoard.add(currentMove.destLoc, currentMove.piece);
         } else if (currentMove.type == MoveType.CAPTURE) {
-            // System.out.println("captured piece");
             this.currentBoard.capturePiece(currentMove.destLoc);
-            moveExecuted = this.currentBoard.move(currentMove.srcLoc, currentMove.destLoc);
+            currentBoard.move(currentMove.srcLoc, currentMove.destLoc);
         } else if (currentMove.type == MoveType.MOVE) {
-            // System.out.println("moving piece");
-            moveExecuted = this.currentBoard.move(currentMove.srcLoc, currentMove.destLoc);
+            this.currentBoard.move(currentMove.srcLoc, currentMove.destLoc);
         }
-        if (moveExecuted && currentMove.subMove != null) {
-            moveExecuted = executeMove(currentMove.subMove);
+        if (currentMove.subMove != null) {
+            executeMove(currentMove.subMove);
         }
-        if (moveExecuted) {
-            switchTurn();
-        }
-        return moveExecuted;
+        switchTurn();
     }
 
     /**
@@ -155,36 +146,41 @@ public class ChessModel extends java.util.Observable {
 
         if (isValid && m.type == MoveType.ADD && this.currentBoard.get(m.destLoc) != null) {
             isValid = false;
-            errorMessage += "ERROR: The destination already has a piece.\n";
+            errorMessage += "ERROR: " + m.moveString +" - The destination already has a piece.\n";
         }
 
         if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.currentBoard.get(m.srcLoc) == null) {
             isValid = false;
-            errorMessage += "ERROR: The source is empty.\n";
+            errorMessage += "ERROR: " + m.moveString +" - The source is empty.\n";
         }
 
-        // if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.pieces.get(m.srcLoc).getColor() != this.currentTurn) {
-        // isValid = false;
-        // errorMessage += "ERROR: Wrong player's turn.\n";
-        // }
+         if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.currentBoard.get(m.srcLoc).getColor() != this.currentTurn) {
+         isValid = false;
+         errorMessage += "ERROR: " + m.moveString +" - Wrong player's turn.\n";
+         }
 
-        if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.currentBoard.get(m.destLoc) != null) {
-            isValid = false;
-            errorMessage += "ERROR: The destination is not empty.\n";
-        }
+         if (isValid && (m.type == MoveType.MOVE) && this.currentBoard.get(m.destLoc) != null) {
+             isValid = false;
+             errorMessage += "ERROR: " + m.moveString +" - The destination is not empty, cannot Move.\n";
+         }
+
+         if (isValid && (m.type == MoveType.CAPTURE) && this.currentBoard.get(m.destLoc) == null) {
+             isValid = false;
+             errorMessage += "ERROR: " + m.moveString +" - The destination is empty, cannot Capture.\n";
+         }
 
         if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && !this.currentBoard.get(m.srcLoc).isValidMovement(m.srcLoc, m.destLoc/* , false */)) {
             isValid = false;
-            errorMessage += "ERROR: The move was not valid.\n";
+            errorMessage += "ERROR: " + m.moveString +" - The move was not valid.\n";
         }
 
         if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.currentBoard.get(m.srcLoc).canCollide()) {
             ArrayList<BoardLocation> locsToCheck = getLocationsBetween(m.srcLoc, m.destLoc);
             for (BoardLocation l : locsToCheck) {
-                System.out.println(l);
+                //System.out.println(l);
                 if (isValid && this.currentBoard.get(l) != null) {
                     isValid = false;
-                    errorMessage += "ERROR: The movement collided.\n";
+                    errorMessage += "ERROR: " + m.moveString +" - The movement collided.\n";
                 }
             }
         }
@@ -193,6 +189,9 @@ public class ChessModel extends java.util.Observable {
         // System.out.println(errorMessage);
         if (isValid && m.subMove != null) {
             return validateMove(m.subMove);
+        }
+        if (!isValid) {
+            throw new InvalidMoveException(errorMessage);
         }
         return isValid;
     }

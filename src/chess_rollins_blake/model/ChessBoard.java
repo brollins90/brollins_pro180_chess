@@ -1,57 +1,72 @@
 package chess_rollins_blake.model;
 
+import chess_rollins_blake.exceptions.InvalidMoveException;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.Piece;
 import chess_rollins_blake.lib.PieceStatus;
 
-public class ChessBoard{
-   
+public class ChessBoard {
+
     final int BOARD_SIZE = 8;
-    
-    Piece boardArray[][];
-    
+    private Piece boardArray[][];
+
     public ChessBoard() {
-        //pieces = new TreeMap<BoardLocation, Piece>();
         boardArray = new Piece[BOARD_SIZE][BOARD_SIZE];
     }
-    
-    public boolean add(BoardLocation loc, Piece p) {
-        this.boardArray[loc.getRow()][loc.getColumn()] = p;
-        return true;
+
+    public void add(BoardLocation loc, Piece p) {
+        if (this.get(loc) == null) {
+            set(loc, p);
+        } else {
+            throw new InvalidMoveException("Failed to add piece, there is already a Piece at " + loc);
+        }
     }
-    
-    public boolean capturePiece(BoardLocation loc) {
-        get(loc).setStatus(PieceStatus.CAPTURED);
-        return true;
+
+    public void capturePiece(BoardLocation loc) {
+        // get(loc).setStatus(PieceStatus.CAPTURED);
+        if (this.get(loc) != null) {
+            remove(loc);
+        } else {
+            throw new InvalidMoveException("Failed to capture piece, there is no Piece to capture at " + loc);
+        }
     }
-    
+
     public Piece get(BoardLocation loc) {
         return this.boardArray[loc.getRow()][loc.getColumn()];
     }
-    
-    public boolean remove(BoardLocation loc) {
-        this.boardArray[loc.getRow()][loc.getColumn()] = null;
-        return true;
+
+    private void set(BoardLocation loc, Piece p) {
+        // if (this.get(loc) == null) {
+        this.boardArray[loc.getRow()][loc.getColumn()] = p;
+        // } else {
+        // throw new InvalidMoveException("Failed to set piece, there is already a Piece at " + loc);
+        // }
     }
-    
-    public boolean move(BoardLocation src, BoardLocation dest) {
-        Piece temp = get(src);
-        remove(src);
-        add(dest, temp);
-        return true;
+
+    public void remove(BoardLocation loc) {
+        this.set(loc, null);
     }
-    
+
+    public void move(BoardLocation src, BoardLocation dest) {
+        if (get(src) != null) {
+            Piece tempPiece = get(src);
+            remove(src);
+            set(dest, tempPiece);
+        } else {
+            throw new InvalidMoveException("Failed to move piece, there is no Piece at " + src);
+        }
+    }
+
     public int getBoardSize() {
         return BOARD_SIZE;
     }
-    
+
     public int size() {
         return BOARD_SIZE * BOARD_SIZE;
-//        return this.pieces.size();
     }
-//
-//    @Override
-//    public Iterator<Entry<BoardLocation, Piece>> iterator() {
-//        return this.pieces.entrySet().iterator();
-//    }
+    //
+    // @Override
+    // public Iterator<Entry<BoardLocation, Piece>> iterator() {
+    // return this.pieces.entrySet().iterator();
+    // }
 }

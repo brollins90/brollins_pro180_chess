@@ -2,9 +2,12 @@ package chess_rollins_blake.lib;
 
 public class King extends Piece {
 
+    private boolean hasBeenInCheck;
+    
     public King(PieceColor color) {
         super(color);
         super.type = PieceType.k;
+        this.hasBeenInCheck = false;
     }
 
     @Override
