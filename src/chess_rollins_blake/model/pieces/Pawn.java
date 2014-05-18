@@ -1,4 +1,8 @@
-package chess_rollins_blake.lib;
+package chess_rollins_blake.model.pieces;
+
+import chess_rollins_blake.lib.BoardLocation;
+import chess_rollins_blake.lib.PieceColor;
+import chess_rollins_blake.lib.PieceType;
 
 public class Pawn extends Piece {
 

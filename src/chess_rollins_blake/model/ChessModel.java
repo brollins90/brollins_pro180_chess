@@ -8,11 +8,10 @@ import java.util.regex.Pattern;
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.exceptions.InvalidMoveException;
 import chess_rollins_blake.lib.BoardLocation;
-import chess_rollins_blake.lib.ChessFactory;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
-import chess_rollins_blake.lib.Piece;
 import chess_rollins_blake.lib.PieceColor;
+import chess_rollins_blake.model.pieces.Piece;
 
 public class ChessModel extends java.util.Observable {
 

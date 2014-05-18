@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.ChessMove;
-import chess_rollins_blake.lib.ChessFactory;
+import chess_rollins_blake.model.ChessFactory;
 import chess_rollins_blake.model.ChessModel;
 import chess_rollins_blake.view.ChessView;
 

@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Observable;
 
 import chess_rollins_blake.lib.BoardLocation;
-import chess_rollins_blake.lib.Piece;
 import chess_rollins_blake.lib.PieceColor;
 import chess_rollins_blake.lib.PieceType;
+import chess_rollins_blake.model.pieces.Piece;
 
 public class ConsoleViewLarge extends ChessView {
     

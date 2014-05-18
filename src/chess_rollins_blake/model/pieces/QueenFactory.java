@@ -1,4 +1,7 @@
-package chess_rollins_blake.lib;
+package chess_rollins_blake.model.pieces;
+
+import chess_rollins_blake.lib.PieceColor;
+import chess_rollins_blake.lib.PieceCreator;
 
 public class QueenFactory implements PieceCreator {
 
