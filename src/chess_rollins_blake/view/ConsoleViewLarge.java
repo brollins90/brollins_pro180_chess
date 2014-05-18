@@ -1,16 +1,22 @@
 package chess_rollins_blake.view;
 
+import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Observable;
+import java.util.Scanner;
 
+import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.BoardLocation;
+import chess_rollins_blake.lib.MoveType;
 import chess_rollins_blake.lib.PieceColor;
 import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.pieces.Piece;
 
 public class ConsoleViewLarge extends ChessView {
-    
+
     HashMap<PieceType, String> pieceDisplayMap;
+    HashMap<PieceColor, String> pieceColorDisplayMap;
+    Scanner scan;
 
     public ConsoleViewLarge() {
         pieceDisplayMap = new HashMap<>();
@@ -20,15 +26,24 @@ public class ConsoleViewLarge extends ChessView {
         pieceDisplayMap.put(PieceType.p, " Pawn  ");
         pieceDisplayMap.put(PieceType.q, "Queen  ");
         pieceDisplayMap.put(PieceType.r, " Rook  ");
+
+        pieceColorDisplayMap = new HashMap<>();
+        pieceColorDisplayMap.put(PieceColor.d, "Black");
+        pieceColorDisplayMap.put(PieceColor.l, "White");
+
+        scan = new Scanner(System.in);
+
         System.out.println("Welcome to the Console Chess.\n");
     }
-//
-//    @Override
-//    public void update() {
-//        printMessage();
-//        printBoard();
-//    }
-    
+
+
+    //
+    // @Override
+    // public void update() {
+    // printMessage();
+    // printBoard();
+    // }
+
     public void update(Observable obs, Object obj) {
         System.out.println(obj);
         printBoard();
@@ -51,7 +66,7 @@ public class ConsoleViewLarge extends ChessView {
 
             // Create the row numbers
             retString += (rowIndex + 1) + " | ";
-            
+
             // Print each row
             for (int colIndex = 0; colIndex < numberOfCols; colIndex++) {
                 int currentPieceLocation = colIndex * numberOfCols + rowIndex;
@@ -75,6 +90,36 @@ public class ConsoleViewLarge extends ChessView {
             retString += "-------";
         }
         return retString;
+    }
+
+    @Override
+    public void requestInput() {
+        PieceColor curTurn = this.model.getCurrentTurn();
+        System.out.println("-- " + pieceColorDisplayMap.get(curTurn) + " Player's turn--");
+        System.out.println("Please enter the location of the piece you would like to move: ");
+        boolean moveIsValidSyntax = false;
+        String tempCommand = "";
+        while (!moveIsValidSyntax) {
+            tempCommand = readLine();
+            MoveType tempType = this.model.validateSyntax(tempCommand);
+            if (tempType != null) {
+                moveIsValidSyntax = true;
+            } else {
+                System.out.println("The location was not valid.  Try again.");
+            }
+        }
+        
+        ActionEvent event = new ActionEvent(this, 1, tempCommand);
+        try {
+            super.sendRequestToController(event);
+        } catch (ChessException e) {
+            System.out.println(e.getMessage());
+        }
+        
+    }
+
+    private String readLine() {
+        return scan.nextLine();
     }
 
 }

@@ -16,10 +16,10 @@ import chess_rollins_blake.model.pieces.Piece;
 public class ChessModel extends java.util.Observable {
 
     public ChessBoard currentBoard;
-    private Stack<ChessMove> moves;
-    private Stack<ChessMove> movesRedo;
-    private String message;
-    public PieceColor currentTurn;
+    protected Stack<ChessMove> moves;
+    protected Stack<ChessMove> movesRedo;
+    protected String message;
+    protected PieceColor currentTurn;
 
     /**
      * Creates a ChessModel
@@ -91,6 +91,10 @@ public class ChessModel extends java.util.Observable {
             executeMove(currentMove.subMove);
         }
         switchTurn();
+    }
+    
+    public PieceColor getCurrentTurn() {
+        return currentTurn;
     }
 
     /**

@@ -67,4 +67,10 @@ public class ConsoleView extends ChessView {
         return retString;
     }
 
+    @Override
+    public void requestInput() {
+        // TODO Auto-generated method stub
+        // Copy this from large since that is what I want to do first.
+    }
+
 }

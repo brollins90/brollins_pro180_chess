@@ -9,13 +9,13 @@ import chess_rollins_blake.lib.MoveCreator;
 import chess_rollins_blake.lib.MoveType;
 import chess_rollins_blake.lib.MovingMoveFactory;
 import chess_rollins_blake.lib.PieceColor;
-import chess_rollins_blake.lib.PieceCreator;
 import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.pieces.BishopFactory;
 import chess_rollins_blake.model.pieces.KingFactory;
 import chess_rollins_blake.model.pieces.KnightFactory;
 import chess_rollins_blake.model.pieces.PawnFactory;
 import chess_rollins_blake.model.pieces.Piece;
+import chess_rollins_blake.model.pieces.PieceCreator;
 import chess_rollins_blake.model.pieces.QueenFactory;
 import chess_rollins_blake.model.pieces.RookFactory;
 

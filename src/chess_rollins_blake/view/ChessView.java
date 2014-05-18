@@ -1,12 +1,12 @@
 package chess_rollins_blake.view;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Observable;
 
-import chess_rollins_blake.controller.ChessController;
 import chess_rollins_blake.model.ChessModel;
 
-public class ChessView implements java.util.Observer {
+public abstract class ChessView implements java.util.Observer {
     
     protected ChessModel model;
 
@@ -31,5 +31,11 @@ public class ChessView implements java.util.Observer {
     
     public void setModel(ChessModel m) {
         this.model = m;
+    }
+
+    public abstract void requestInput();
+    
+    public void sendRequestToController(ActionEvent e) {
+        c.actionPerformed(e);
     }
 }

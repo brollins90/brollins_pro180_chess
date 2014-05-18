@@ -14,14 +14,24 @@ import chess_rollins_blake.view.ChessView;
 
 public class ChessController implements java.awt.event.ActionListener {
 
-    private ChessModel model;
+    protected ChessModel model;
     protected ChessView view;
+    protected boolean gameIsPlaying;
 
-    public ChessController() {}
+    public ChessController() {
+        this.gameIsPlaying = true;
+
+    }
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
-        // TODO Auto-generated method stub
+        // TODO
+        // Add some obj validation
+
+        String theCommand = arg0.getActionCommand();
+        addMove(theCommand);
+
+
     }
 
     public void addModel(ChessModel m) {
@@ -64,6 +74,14 @@ public class ChessController implements java.awt.event.ActionListener {
             throw new ChessException("The filepath is not set");
         }
 
+    }
+
+    public void acceptUserInput() {
+
+        // Start the game Loop
+        while (this.gameIsPlaying) {
+            this.view.requestInput();
+        }
     }
 
 }

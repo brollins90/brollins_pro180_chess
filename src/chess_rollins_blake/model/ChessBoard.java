@@ -2,7 +2,7 @@ package chess_rollins_blake.model;
 
 import chess_rollins_blake.exceptions.InvalidMoveException;
 import chess_rollins_blake.lib.BoardLocation;
-import chess_rollins_blake.lib.PieceStatus;
+//import chess_rollins_blake.lib.PieceStatus;
 import chess_rollins_blake.model.pieces.Piece;
 
 public class ChessBoard {
