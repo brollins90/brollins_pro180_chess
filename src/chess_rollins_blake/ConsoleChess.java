@@ -4,7 +4,6 @@ import chess_rollins_blake.controller.ChessController;
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.model.ChessModel;
 import chess_rollins_blake.view.ChessView;
-import chess_rollins_blake.view.ConsoleView;
 import chess_rollins_blake.view.ConsoleViewLarge;
 
 /**
@@ -23,7 +22,7 @@ public class ConsoleChess {
     public static void main(String[] args) {
 
         args = new String[1];
-        args[0] = "chess03.txt";
+        args[0] = "chess07.txt";
         ConsoleChess c = new ConsoleChess();
         c.playChess(args);
     }
@@ -45,6 +44,7 @@ public class ConsoleChess {
             ChessModel model = new ChessModel();
             // ChessView view = new ConsoleView();
             ChessView view = new ConsoleViewLarge();
+            // ChessView view = new GUIView();
 
             view.setModel(model);
             model.addObserver(view);
@@ -55,6 +55,7 @@ public class ConsoleChess {
 
             view.addController(controller);
 
+            // controller.loadFromFile("newBoard.txt");
             controller.loadFromFile(args[0]);
             controller.acceptUserInput();
 

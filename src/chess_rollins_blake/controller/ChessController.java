@@ -8,8 +8,6 @@ import java.io.IOException;
 
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.BoardLocation;
-import chess_rollins_blake.lib.ChessMove;
-import chess_rollins_blake.model.ChessFactory;
 import chess_rollins_blake.model.ChessModel;
 import chess_rollins_blake.view.ChessView;
 
@@ -31,11 +29,11 @@ public class ChessController implements java.awt.event.ActionListener {
 
         String theCommand = arg0.getActionCommand();
         switch (arg0.getID()) {
-            case 1:
-            case 3:
+            case 1: // Moving move
+            case 3: // Capture move
                 addMove(theCommand);
                 break;
-            case 2:
+            case 2: // Check available moves
                 this.model.setAvailableMoves(BoardLocation.valueOf(theCommand));
                 break;
         }

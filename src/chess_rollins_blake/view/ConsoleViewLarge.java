@@ -48,6 +48,13 @@ public class ConsoleViewLarge extends ChessView {
     public void update(Observable obs, Object obj) {
         System.out.println(obj);
         printBoard();
+        if (this.model.getDKingCheck()) {
+            System.out.println("Black King is in check!");
+        }
+        if (this.model.getLKingCheck()) {
+            System.out.println("White King is in check!");
+        }
+        
     }
 
     public void printMessage() {

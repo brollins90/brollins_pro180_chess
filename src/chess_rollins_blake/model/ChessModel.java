@@ -11,6 +11,7 @@ import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
 import chess_rollins_blake.lib.PieceColor;
+import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.pieces.Piece;
 
 public class ChessModel extends java.util.Observable {
@@ -20,7 +21,9 @@ public class ChessModel extends java.util.Observable {
     protected Stack<ChessMove> movesRedo;
     protected String message;
     protected PieceColor currentTurn;
-    protected ArrayList<BoardLocation> availableMoves;
+    protected ArrayList<BoardLocation> availableSources;
+    protected ArrayList<BoardLocation> availableDestinations;
+    protected boolean lKingCheck, dKingCheck;
 
     /**
      * Creates a ChessModel
@@ -31,11 +34,21 @@ public class ChessModel extends java.util.Observable {
         this.movesRedo = new Stack<>();
         this.message = "";
         this.currentTurn = PieceColor.l;
-        this.availableMoves = new ArrayList<>();
+        this.availableSources = new ArrayList<>();
+        lKingCheck = false;
+        dKingCheck = false;
+    }
+    
+    public boolean getLKingCheck() {
+        return this.lKingCheck;
+    }
+    
+    public boolean getDKingCheck() {
+        return this.dKingCheck;
     }
 
     public void setAvailableMoves(BoardLocation loc) {
-        availableMoves.clear();
+        availableSources.clear();
         Piece p = this.getPiece(loc);
 
         // TODO iterator stuff
@@ -45,7 +58,7 @@ public class ChessModel extends java.util.Observable {
             ChessMove currentMovingMove = ChessFactory.CreateMove(MoveType.MOVE, moveString);
             ChessMove currentCapturingMove = ChessFactory.CreateMove(MoveType.CAPTURE, moveString);
             if (validateMove(currentMovingMove) || validateMove(currentCapturingMove)) {
-                availableMoves.add(end);
+                availableSources.add(end);
             }
         }
         // availableMoves.add(BoardLocation.a4);
@@ -53,7 +66,7 @@ public class ChessModel extends java.util.Observable {
     }
 
     public ArrayList<BoardLocation> getAvailableMoves() {
-        return this.availableMoves;
+        return this.availableSources;
     }
 
     /**
@@ -114,9 +127,55 @@ public class ChessModel extends java.util.Observable {
         if (currentMove.getSubMove() != null) {
             executeMove(currentMove.getSubMove());
         }
+
+
+        // Check Check
+        checkKingInCheck(currentTurn);
+//        if (checkKingInCheck(currentTurn)) {
+//            System.out.println(currentTurn + " king is in check!");
+//        } else {
+//
+//            System.out.println(currentTurn + " king is not in check!");
+//        }
+
         if (currentMove.getType() != MoveType.ADD) {
             switchTurn();
         }
+
+
+    }
+
+    void checkKingInCheck(PieceColor kColor) {
+
+        boolean kingIsInCheck = false;
+        BoardLocation kingLoc = null;
+
+        ArrayList<BoardLocation> pieces = new ArrayList<>();
+        for (int i = 0; i < currentBoard.size(); i++) {
+            BoardLocation cur = BoardLocation.values()[i];
+            if (currentBoard.get(cur) != null) {
+                Piece curPiece = currentBoard.get(cur);
+                if (curPiece.getColor() != kColor) {
+                    pieces.add(cur);
+                } else {
+                    if (curPiece.getType() == PieceType.k) {
+                        kingLoc = cur;
+                    }
+                }
+            }
+        }
+        for (BoardLocation l : pieces) {
+            if (validateMove(ChessFactory.CreateMove(MoveType.CAPTURE, l.toString() + " " + kingLoc.toString() + "*"))) {
+                kingIsInCheck = true;
+            }
+        }
+
+        if (kColor == PieceColor.l) {
+            lKingCheck = kingIsInCheck;
+        } else {
+            dKingCheck = kingIsInCheck;
+        }
+
     }
 
     public PieceColor getCurrentTurn() {
