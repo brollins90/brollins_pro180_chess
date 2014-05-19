@@ -15,9 +15,9 @@ import chess_rollins_blake.model.pieces.Piece;
 
 public class ConsoleViewLarge extends ChessView {
 
-    HashMap<PieceType, String> pieceDisplayMap;
-    HashMap<PieceColor, String> pieceColorDisplayMap;
-    Scanner scan;
+    private HashMap<PieceType, String> pieceDisplayMap;
+    private HashMap<PieceColor, String> pieceColorDisplayMap;
+    private Scanner scan;
 
     public ConsoleViewLarge() {
         pieceDisplayMap = new HashMap<>();

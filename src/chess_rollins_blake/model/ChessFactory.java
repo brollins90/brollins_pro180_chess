@@ -27,7 +27,7 @@ public class ChessFactory {
         moveMap.put(MoveType.CAPTURE, new CaptureMoveFactory());
         moveMap.put(MoveType.MOVE, new MovingMoveFactory());
     }
-    
+
     static HashMap<PieceType, PieceCreator> pieceMap = new HashMap<>();
     static {
         pieceMap.put(PieceType.b, new BishopFactory());
@@ -35,7 +35,7 @@ public class ChessFactory {
         pieceMap.put(PieceType.n, new KnightFactory());
         pieceMap.put(PieceType.p, new PawnFactory());
         pieceMap.put(PieceType.q, new QueenFactory());
-        pieceMap.put(PieceType.r, new RookFactory());        
+        pieceMap.put(PieceType.r, new RookFactory());
     }
 
     public static ChessMove CreateMove(MoveType type, String moveString) {

@@ -23,7 +23,7 @@ public class ConsoleChess {
     public static void main(String[] args) {
 
         args = new String[1];
-        args[0] = "chess05.txt";
+        args[0] = "chess03.txt";
         ConsoleChess c = new ConsoleChess();
         c.playChess(args);
     }
@@ -36,12 +36,12 @@ public class ConsoleChess {
     private void playChess(String[] args) {
 
         try {
-            
+
             // TODO
             // Validate the input file
             // Possible take in the view type
-            
-            
+
+
             ChessModel model = new ChessModel();
             // ChessView view = new ConsoleView();
             ChessView view = new ConsoleViewLarge();

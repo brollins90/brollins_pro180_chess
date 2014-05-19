@@ -1,10 +1,7 @@
 package chess_rollins_blake.model;
 
-import java.util.Iterator;
-
 import chess_rollins_blake.exceptions.InvalidMoveException;
 import chess_rollins_blake.lib.BoardLocation;
-//import chess_rollins_blake.lib.PieceStatus;
 import chess_rollins_blake.model.pieces.Piece;
 
 public class ChessBoard {
@@ -25,7 +22,6 @@ public class ChessBoard {
     }
 
     public void capturePiece(BoardLocation loc) {
-        // get(loc).setStatus(PieceStatus.CAPTURED);
         if (this.get(loc) != null) {
             remove(loc);
         } else {
@@ -38,11 +34,7 @@ public class ChessBoard {
     }
 
     private void set(BoardLocation loc, Piece p) {
-        // if (this.get(loc) == null) {
         this.boardArray[loc.getRow()][loc.getColumn()] = p;
-        // } else {
-        // throw new InvalidMoveException("Failed to set piece, there is already a Piece at " + loc);
-        // }
     }
 
     public void remove(BoardLocation loc) {

@@ -23,8 +23,8 @@ public class Knight extends Piece {
                 isValid = (Math.abs(dest.getRow() - src.getRow())) == 1 ? true : false;
                 break;
         }
-        
-        return isValid;        
+
+        return isValid;
     }
 
 }

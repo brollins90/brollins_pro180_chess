@@ -15,7 +15,7 @@ public class Bishop extends Piece {
     @Override
     public boolean isValidMovement(BoardLocation src, BoardLocation dest, boolean capturing) {
         boolean isValid = true;
-        
+
         if (isValid && (src == dest)) {
             isValid = false;
         }

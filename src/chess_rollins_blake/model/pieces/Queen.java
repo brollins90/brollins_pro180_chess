@@ -25,8 +25,8 @@ public class Queen extends Piece {
         if (Math.abs(dest.getColumn() - src.getColumn()) == Math.abs(dest.getRow() - src.getRow())) {
             isValid = true;
         }
-        
-        return isValid;        
+
+        return isValid;
     }
 
 }

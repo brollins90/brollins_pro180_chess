@@ -75,11 +75,11 @@ public class ChessModel extends java.util.Observable {
             } catch (ChessException e) {
                 moves.pop();
             } finally {
-                setMessage(currentMove.message);
+                setMessage(currentMove.getMessage());
 
             }
         } else {
-            throw new InvalidMoveException(moveString + " - \nThe move action was not valid for '" + moveString + "'\n" + currentMove.message);
+            throw new InvalidMoveException(moveString + " - \nThe move action was not valid for '" + moveString + "'\n" + currentMove.getMessage());
         }
 
     }
@@ -103,18 +103,18 @@ public class ChessModel extends java.util.Observable {
      */
     public void executeMove(ChessMove currentMove) {
 
-        if (currentMove.type == MoveType.ADD) {
-            this.currentBoard.add(currentMove.destLoc, currentMove.piece);
-        } else if (currentMove.type == MoveType.CAPTURE) {
-            this.currentBoard.capturePiece(currentMove.destLoc);
-            currentBoard.move(currentMove.srcLoc, currentMove.destLoc);
-        } else if (currentMove.type == MoveType.MOVE) {
-            this.currentBoard.move(currentMove.srcLoc, currentMove.destLoc);
+        if (currentMove.getType() == MoveType.ADD) {
+            this.currentBoard.add(currentMove.getDestLoc(), currentMove.getPiece());
+        } else if (currentMove.getType() == MoveType.CAPTURE) {
+            this.currentBoard.capturePiece(currentMove.getDestLoc());
+            currentBoard.move(currentMove.getSrcLoc(), currentMove.getDestLoc());
+        } else if (currentMove.getType() == MoveType.MOVE) {
+            this.currentBoard.move(currentMove.getSrcLoc(), currentMove.getDestLoc());
         }
-        if (currentMove.subMove != null) {
-            executeMove(currentMove.subMove);
+        if (currentMove.getSubMove() != null) {
+            executeMove(currentMove.getSubMove());
         }
-        if (currentMove.type != MoveType.ADD) {
+        if (currentMove.getType() != MoveType.ADD) {
             switchTurn();
         }
     }
@@ -174,62 +174,62 @@ public class ChessModel extends java.util.Observable {
 
         // System.out.println(m.moveString);
 
-        if (isValid && m.type == MoveType.ADD && this.currentBoard.get(m.destLoc) != null) {
+        if (isValid && m.getType() == MoveType.ADD && this.currentBoard.get(m.getDestLoc()) != null) {
             isValid = false;
-            errorMessage += "ERROR: " + m.moveString + " - The destination already has a piece.\n";
+            errorMessage += "ERROR: " + m.getMoveString() + " - The destination already has a piece.\n";
         }
 
-        if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.currentBoard.get(m.srcLoc) == null) {
+        if (isValid && (m.getType() == MoveType.MOVE || m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getSrcLoc()) == null) {
             isValid = false;
-            errorMessage += "ERROR: " + m.moveString + " - The source is empty.\n";
+            errorMessage += "ERROR: " + m.getMoveString() + " - The source is empty.\n";
         }
 
-        if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.currentBoard.get(m.srcLoc).getColor() != this.currentTurn) {
+        if (isValid && (m.getType() == MoveType.MOVE || m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getSrcLoc()).getColor() != this.currentTurn) {
             isValid = false;
-            errorMessage += "ERROR: " + m.moveString + " - Wrong player's turn.\n";
+            errorMessage += "ERROR: " + m.getMoveString() + " - Wrong player's turn.\n";
         }
 
-        if (isValid && (m.type == MoveType.MOVE) && this.currentBoard.get(m.destLoc) != null) {
+        if (isValid && (m.getType() == MoveType.MOVE) && this.currentBoard.get(m.getDestLoc()) != null) {
             isValid = false;
-            errorMessage += "ERROR: " + m.moveString + " - The destination is not empty, cannot Move.\n";
+            errorMessage += "ERROR: " + m.getMoveString() + " - The destination is not empty, cannot Move.\n";
         }
 
-        if (isValid && (m.type == MoveType.CAPTURE) && this.currentBoard.get(m.destLoc) == null) {
+        if (isValid && (m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getDestLoc()) == null) {
             isValid = false;
-            errorMessage += "ERROR: " + m.moveString + " - The destination is empty, cannot Capture.\n";
+            errorMessage += "ERROR: " + m.getMoveString() + " - The destination is empty, cannot Capture.\n";
         }
 
-        if (isValid && (m.type == MoveType.CAPTURE) && this.currentBoard.get(m.destLoc).getColor() == currentTurn) {
+        if (isValid && (m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getDestLoc()).getColor() == currentTurn) {
             isValid = false;
-            errorMessage += "ERROR: " + m.moveString + " - The destination is the same color, cannot Capture.\n";
+            errorMessage += "ERROR: " + m.getMoveString() + " - The destination is the same color, cannot Capture.\n";
         }
 
-        if (isValid && (m.type == MoveType.MOVE) && !this.currentBoard.get(m.srcLoc).isValidMovement(m.srcLoc, m.destLoc, false)) {
+        if (isValid && (m.getType() == MoveType.MOVE) && !this.currentBoard.get(m.getSrcLoc()).isValidMovement(m.getSrcLoc(), m.getDestLoc(), false)) {
             isValid = false;
-            errorMessage += "ERROR: " + m.moveString + " - The move was not valid.\n";
+            errorMessage += "ERROR: " + m.getMoveString() + " - The move was not valid.\n";
         }
 
-        if (isValid && (m.type == MoveType.CAPTURE) && !this.currentBoard.get(m.srcLoc).isValidMovement(m.srcLoc, m.destLoc, true)) {
+        if (isValid && (m.getType() == MoveType.CAPTURE) && !this.currentBoard.get(m.getSrcLoc()).isValidMovement(m.getSrcLoc(), m.getDestLoc(), true)) {
             isValid = false;
-            errorMessage += "ERROR: " + m.moveString + " - The capture was not valid.\n";
+            errorMessage += "ERROR: " + m.getMoveString() + " - The capture was not valid.\n";
         }
 
-        if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.currentBoard.get(m.srcLoc).canCollide()) {
-            ArrayList<BoardLocation> locsToCheck = getLocationsBetween(m.srcLoc, m.destLoc);
+        if (isValid && (m.getType() == MoveType.MOVE || m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getSrcLoc()).canCollide()) {
+            ArrayList<BoardLocation> locsToCheck = getLocationsBetween(m.getSrcLoc(), m.getDestLoc());
             for (BoardLocation l : locsToCheck) {
                 // System.out.println("blake- " + l);
                 if (isValid && this.currentBoard.get(l) != null) {
                     isValid = false;
-                    errorMessage += "ERROR: " + m.moveString + " - The movement collided at " + l.toString() + ".\n";
+                    errorMessage += "ERROR: " + m.getMoveString() + " - The movement collided at " + l.toString() + ".\n";
                     // System.out.println(errorMessage);
                 }
             }
         }
 
-        m.message += errorMessage;
+        m.setMessage(m.getMessage() + errorMessage);
         // System.out.println(errorMessage);
-        if (isValid && m.subMove != null) {
-            return validateMove(m.subMove);
+        if (isValid && m.getSubMove() != null) {
+            return validateMove(m.getSubMove());
         }
         // if (!isValid) {
         // throw new InvalidMoveException(errorMessage);

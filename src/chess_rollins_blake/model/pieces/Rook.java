@@ -22,8 +22,8 @@ public class Rook extends Piece {
         if (dest.getRow() == src.getRow()) {
             isValid = true;
         }
-        
-        return isValid;        
+
+        return isValid;
     }
 
 }
