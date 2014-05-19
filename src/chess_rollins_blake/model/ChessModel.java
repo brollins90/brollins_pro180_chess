@@ -65,7 +65,7 @@ public class ChessModel extends java.util.Observable {
     public void addMove(String moveString) {
         MoveType movesType = this.validateSyntax(moveString);
         if (movesType == null) {
-            throw new InvalidMoveException("The move syntax was not valid for '" + moveString + "'");
+            throw new InvalidMoveException(moveString + " - \nThe move syntax was not valid for '" + moveString + "'");
         }
         ChessMove currentMove = ChessFactory.CreateMove(movesType, moveString);
         if (validateMove(currentMove)) {
@@ -79,7 +79,7 @@ public class ChessModel extends java.util.Observable {
 
             }
         } else {
-            throw new InvalidMoveException("The move action was not valid for '" + moveString + "'");
+            throw new InvalidMoveException(moveString + " - \nThe move action was not valid for '" + moveString + "'\n" + currentMove.message);
         }
 
     }
@@ -114,7 +114,9 @@ public class ChessModel extends java.util.Observable {
         if (currentMove.subMove != null) {
             executeMove(currentMove.subMove);
         }
-        switchTurn();
+        if (currentMove.type != MoveType.ADD) {
+            switchTurn();
+        }
     }
 
     public PieceColor getCurrentTurn() {
@@ -170,21 +172,21 @@ public class ChessModel extends java.util.Observable {
         boolean isValid = true;
         String errorMessage = "";
 
-        //System.out.println(m.moveString);
+        // System.out.println(m.moveString);
 
         if (isValid && m.type == MoveType.ADD && this.currentBoard.get(m.destLoc) != null) {
             isValid = false;
             errorMessage += "ERROR: " + m.moveString + " - The destination already has a piece.\n";
         }
 
-        if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.currentBoard.get(m.srcLoc).getColor() != this.currentTurn) {
-            isValid = false;
-            errorMessage += "ERROR: " + m.moveString + " - Wrong player's turn.\n";
-        }
-
         if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.currentBoard.get(m.srcLoc) == null) {
             isValid = false;
             errorMessage += "ERROR: " + m.moveString + " - The source is empty.\n";
+        }
+
+        if (isValid && (m.type == MoveType.MOVE || m.type == MoveType.CAPTURE) && this.currentBoard.get(m.srcLoc).getColor() != this.currentTurn) {
+            isValid = false;
+            errorMessage += "ERROR: " + m.moveString + " - Wrong player's turn.\n";
         }
 
         if (isValid && (m.type == MoveType.MOVE) && this.currentBoard.get(m.destLoc) != null) {
@@ -219,7 +221,7 @@ public class ChessModel extends java.util.Observable {
                 if (isValid && this.currentBoard.get(l) != null) {
                     isValid = false;
                     errorMessage += "ERROR: " + m.moveString + " - The movement collided at " + l.toString() + ".\n";
-                    //System.out.println(errorMessage);
+                    // System.out.println(errorMessage);
                 }
             }
         }
