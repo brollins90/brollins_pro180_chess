@@ -43,5 +43,5 @@ public abstract class Piece {
         return this.canCollideOnMove;
     }
     
-    public abstract boolean isValidMovement(BoardLocation src, BoardLocation dest);
+    public abstract boolean isValidMovement(BoardLocation src, BoardLocation dest, boolean capturing);
 }

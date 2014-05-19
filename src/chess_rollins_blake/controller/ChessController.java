@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import chess_rollins_blake.exceptions.ChessException;
+import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.model.ChessFactory;
 import chess_rollins_blake.model.ChessModel;
@@ -29,8 +30,15 @@ public class ChessController implements java.awt.event.ActionListener {
         // Add some obj validation
 
         String theCommand = arg0.getActionCommand();
-        addMove(theCommand);
-
+        switch (arg0.getID()) {
+            case 1:
+            case 3:
+                addMove(theCommand);
+                break;
+            case 2:
+                this.model.setAvailableMoves(BoardLocation.valueOf(theCommand));
+                break;
+        }
 
     }
 

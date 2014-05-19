@@ -13,7 +13,7 @@ public class Rook extends Piece {
     }
 
     @Override
-    public boolean isValidMovement(BoardLocation src, BoardLocation dest) {
+    public boolean isValidMovement(BoardLocation src, BoardLocation dest, boolean capturing) {
         boolean isValid = false;
 
         if (dest.getColumn() == src.getColumn()) {

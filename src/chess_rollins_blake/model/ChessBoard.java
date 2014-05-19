@@ -1,5 +1,7 @@
 package chess_rollins_blake.model;
 
+import java.util.Iterator;
+
 import chess_rollins_blake.exceptions.InvalidMoveException;
 import chess_rollins_blake.lib.BoardLocation;
 //import chess_rollins_blake.lib.PieceStatus;
@@ -64,9 +66,4 @@ public class ChessBoard {
     public int size() {
         return BOARD_SIZE * BOARD_SIZE;
     }
-    //
-    // @Override
-    // public Iterator<Entry<BoardLocation, Piece>> iterator() {
-    // return this.pieces.entrySet().iterator();
-    // }
 }

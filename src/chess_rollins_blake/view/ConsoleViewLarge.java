@@ -1,6 +1,7 @@
 package chess_rollins_blake.view;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Scanner;
@@ -99,23 +100,41 @@ public class ConsoleViewLarge extends ChessView {
         System.out.println("Please enter the location of the piece you would like to move: ");
         boolean moveIsValidSyntax = false;
         String tempCommand = "";
+        ActionEvent event = null;
+        MoveType tempType = null;
         while (!moveIsValidSyntax) {
             tempCommand = readLine();
-            MoveType tempType = this.model.validateSyntax(tempCommand);
-            if (tempType != null) {
+            tempType = this.model.validateSyntax(tempCommand);
+
+            if (tempType == MoveType.LOCATION) {
+                event = new ActionEvent(this, 2, tempCommand); // 1- addmove, 2- check loc valid
+                moveIsValidSyntax = true;
+
+            } else if (tempType == MoveType.MOVE) {
+                event = new ActionEvent(this, 1, tempCommand);
+                moveIsValidSyntax = true;
+            } else if (tempType == MoveType.CAPTURE) {
+                event = new ActionEvent(this, 3, tempCommand);
                 moveIsValidSyntax = true;
             } else {
-                System.out.println("The location was not valid.  Try again.");
+                System.out.println("The command was not valid.  Try again.");
             }
         }
-        
-        ActionEvent event = new ActionEvent(this, 1, tempCommand);
+
         try {
             super.sendRequestToController(event);
         } catch (ChessException e) {
             System.out.println(e.getMessage());
         }
-        
+
+        if (tempType == MoveType.LOCATION) {
+            ArrayList<BoardLocation> aMoves = this.model.getAvailableMoves();
+            System.out.println("There are " + aMoves.size() + " vailable moves from " + tempCommand + ":");
+            for (BoardLocation l : aMoves) {
+                System.out.println(l);
+            }
+        }
+
     }
 
     private String readLine() {

@@ -12,7 +12,7 @@ public class Knight extends Piece {
     }
 
     @Override
-    public boolean isValidMovement(BoardLocation src, BoardLocation dest) {
+    public boolean isValidMovement(BoardLocation src, BoardLocation dest, boolean capturing) {
         boolean isValid = false;
 
         switch (Math.abs(dest.getColumn() - src.getColumn())) {
