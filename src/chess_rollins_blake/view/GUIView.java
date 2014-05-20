@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import chess_rollins_blake.lib.BoardLocation;
+
 public class GUIView extends ChessView {
 
     JPanel[][] cBoard;
@@ -36,6 +38,20 @@ public class GUIView extends ChessView {
     public void requestInput() {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public BoardLocation requestSourcePiece() {
+        return null;
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public BoardLocation requestDestinationPiece(BoardLocation srcLoc) {
+        return null;
+        // TODO Auto-generated method stub
+        
     }
 
 }

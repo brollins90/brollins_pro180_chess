@@ -35,38 +35,74 @@ public class ChessModel extends java.util.Observable {
         this.message = "";
         this.currentTurn = PieceColor.l;
         this.availableSources = new ArrayList<>();
+        this.availableDestinations = new ArrayList<>();
         lKingCheck = false;
         dKingCheck = false;
     }
-    
+
     public boolean getLKingCheck() {
         return this.lKingCheck;
     }
-    
+
     public boolean getDKingCheck() {
         return this.dKingCheck;
     }
 
-    public void setAvailableMoves(BoardLocation loc) {
+    public ArrayList<BoardLocation> getAvailableSources() {
+        return this.availableSources;
+    }
+
+    public void setAvailableSources(PieceColor color) {
         availableSources.clear();
-        Piece p = this.getPiece(loc);
+        // get the pieces that can move
+        for (int i = 0; i < this.currentBoard.size(); i++) {
+            BoardLocation loc = BoardLocation.values()[i];
+            Piece curPiece = this.currentBoard.get(loc);
+            if (curPiece != null && curPiece.getColor() == color) {
+                this.setAvailableDestinations(loc);
+                if (this.availableDestinations.size() > 0) {
+                    availableSources.add(loc);
+                }
+            }
+        }
+    }
+
+    public ArrayList<BoardLocation> getAvailableDestinations() {
+        return this.availableDestinations;
+    }
+
+    public void setAvailableDestinations(BoardLocation srcLoc) {
+        availableDestinations.clear();
+        Piece p = this.getPiece(srcLoc);
 
         // TODO iterator stuff
         for (int i = 0; i < this.currentBoard.size(); i++) {
             BoardLocation end = BoardLocation.values()[i];
-            String moveString = loc.toString() + " " + end.toString();
+            String moveString = srcLoc.toString() + " " + end.toString();
             ChessMove currentMovingMove = ChessFactory.CreateMove(MoveType.MOVE, moveString);
             ChessMove currentCapturingMove = ChessFactory.CreateMove(MoveType.CAPTURE, moveString);
             if (validateMove(currentMovingMove) || validateMove(currentCapturingMove)) {
-                availableSources.add(end);
+                availableDestinations.add(end);
             }
         }
         // availableMoves.add(BoardLocation.a4);
         // availableMoves.add(BoardLocation.b4);
     }
 
-    public ArrayList<BoardLocation> getAvailableMoves() {
-        return this.availableSources;
+    public void addMove(ChessMove m) {
+        if (validateMove(m)) {
+            moves.push(m);
+            try {
+                executeMove(m);
+            } catch (ChessException e) {
+                moves.pop();
+            } finally {
+                setMessage(m.getMessage());
+
+            }
+        } else {
+            throw new InvalidMoveException(m.getMessage());
+        }
     }
 
     /**
@@ -81,20 +117,11 @@ public class ChessModel extends java.util.Observable {
             throw new InvalidMoveException(moveString + " - \nThe move syntax was not valid for '" + moveString + "'");
         }
         ChessMove currentMove = ChessFactory.CreateMove(movesType, moveString);
-        if (validateMove(currentMove)) {
-            moves.push(currentMove);
-            try {
-                executeMove(currentMove);
-            } catch (ChessException e) {
-                moves.pop();
-            } finally {
-                setMessage(currentMove.getMessage());
-
-            }
-        } else {
-            throw new InvalidMoveException(moveString + " - \nThe move action was not valid for '" + moveString + "'\n" + currentMove.getMessage());
+        try {
+            addMove(currentMove);
+        } catch (InvalidMoveException e) {
+            throw new InvalidMoveException(moveString + " - \nThe move action was not valid for '" + moveString + "'\n" + e.getMessage());
         }
-
     }
 
     /**
@@ -131,12 +158,12 @@ public class ChessModel extends java.util.Observable {
 
         // Check Check
         checkKingInCheck(currentTurn);
-//        if (checkKingInCheck(currentTurn)) {
-//            System.out.println(currentTurn + " king is in check!");
-//        } else {
-//
-//            System.out.println(currentTurn + " king is not in check!");
-//        }
+        // if (checkKingInCheck(currentTurn)) {
+        // System.out.println(currentTurn + " king is in check!");
+        // } else {
+        //
+        // System.out.println(currentTurn + " king is not in check!");
+        // }
 
         if (currentMove.getType() != MoveType.ADD) {
             switchTurn();

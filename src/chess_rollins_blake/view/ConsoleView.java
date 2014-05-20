@@ -74,4 +74,18 @@ public class ConsoleView extends ChessView {
         // Copy this from large since that is what I want to do first.
     }
 
+    @Override
+    public BoardLocation requestSourcePiece() {
+        return null;
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public BoardLocation requestDestinationPiece(BoardLocation srcLoc) {
+        return null;
+        // TODO Auto-generated method stub
+        
+    }
+
 }

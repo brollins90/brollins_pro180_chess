@@ -57,7 +57,7 @@ public class ConsoleChess {
 
             // controller.loadFromFile("newBoard.txt");
             controller.loadFromFile(args[0]);
-            controller.acceptUserInput();
+            controller.startGameLoop();
 
             // view.printBoard();
         } catch (ChessException e) {

@@ -46,15 +46,23 @@ public class ConsoleViewLarge extends ChessView {
     // }
 
     public void update(Observable obs, Object obj) {
-        System.out.println(obj);
+        if (obj instanceof String) {
+            System.out.println(obj);
+        } else {
+            System.out.println("ERROR: Invalid message.");
+        }
         printBoard();
         if (this.model.getDKingCheck()) {
             System.out.println("Black King is in check!");
+        } else {
+            System.out.println("Black King is not in check!");
         }
         if (this.model.getLKingCheck()) {
             System.out.println("White King is in check!");
+        } else {
+            System.out.println("White King is not in check!");
         }
-        
+
     }
 
     public void printMessage() {
@@ -112,20 +120,7 @@ public class ConsoleViewLarge extends ChessView {
         while (!moveIsValidSyntax) {
             tempCommand = readLine();
             tempType = this.model.validateSyntax(tempCommand);
-
-            if (tempType == MoveType.LOCATION) {
-                event = new ActionEvent(this, 2, tempCommand); // 1- addmove, 2- check loc valid
-                moveIsValidSyntax = true;
-
-            } else if (tempType == MoveType.MOVE) {
-                event = new ActionEvent(this, 1, tempCommand);
-                moveIsValidSyntax = true;
-            } else if (tempType == MoveType.CAPTURE) {
-                event = new ActionEvent(this, 3, tempCommand);
-                moveIsValidSyntax = true;
-            } else {
-                System.out.println("The command was not valid.  Try again.");
-            }
+            event = new ActionEvent(this, tempType.ordinal(), tempCommand);
         }
 
         try {
@@ -135,14 +130,96 @@ public class ConsoleViewLarge extends ChessView {
         }
 
         if (tempType == MoveType.LOCATION) {
-            ArrayList<BoardLocation> aMoves = this.model.getAvailableMoves();
+            ArrayList<BoardLocation> aMoves = this.model.getAvailableDestinations();
             System.out.println("There are " + aMoves.size() + " vailable moves from " + tempCommand + ":");
             for (BoardLocation l : aMoves) {
                 System.out.println(l);
             }
         }
+    }
+
+
+    @Override
+    public BoardLocation requestSourcePiece() {
+        PieceColor curTurn = this.model.getCurrentTurn();
+        System.out.println("-- " + pieceColorDisplayMap.get(curTurn) + " Player's turn--");
+        System.out.println("Enter the which piece you would like to move?");
+        System.out.print("(");
+        for (int i = 0; i < this.model.getAvailableSources().size(); i++) {
+            System.out.print(this.model.getAvailableSources().get(i));
+            if (i + 1 < this.model.getAvailableSources().size()) {
+                System.out.print(",");
+            }
+        }
+        System.out.println(")");
+
+        boolean validSource = false;
+        BoardLocation loc = null;
+        do {
+            String locationString = readLine();
+            loc = BoardLocation.valueOf(locationString);
+            if (this.model.getAvailableSources().contains(loc)) {
+                validSource = true;
+            } else {
+                System.out.println("Location is not valid.  Enter a new location.");
+            }
+        } while (!validSource);
+
+        ActionEvent event = new ActionEvent(this, MoveType.LOCATION.ordinal(), loc.toString());
+
+        try {
+            super.sendRequestToController(event);
+        } catch (ChessException e) {
+            System.out.println(e.getMessage());
+        }
+        return loc;
+
 
     }
+
+    @Override
+    public BoardLocation requestDestinationPiece(BoardLocation srcLoc) {
+
+        System.out.println("Select destination from: ");
+        System.out.print("(");
+        for (int i = 0; i < this.model.getAvailableDestinations().size(); i++) {
+            System.out.print(this.model.getAvailableDestinations().get(i));
+            if (i + 1 < this.model.getAvailableDestinations().size()) {
+                System.out.print(",");
+            }
+        }
+        System.out.println(")");
+
+        BoardLocation loc = null;
+        boolean moveIsValidSyntax = false;
+        while (!moveIsValidSyntax) {
+            String tempCommand = readLine();
+            loc = BoardLocation.valueOf(tempCommand);
+            if (this.model.getAvailableDestinations().contains(loc)) {
+                moveIsValidSyntax = true;
+            } else {
+                System.out.println(loc.toString() + " is not a valid destination.  Try again.");
+            }
+        }
+        return loc;
+    }
+
+    //
+    // {
+    //
+    // String moveString = srcLoc.toString() + " " + loc.toString();
+    // if (this.model.getPiece(loc) != null) {
+    // moveString += "*";
+    // }
+    // MoveType moveType = this.model.validateSyntax(moveString);
+    // event = new ActionEvent(this, moveType.ordinal(), moveString);
+    //
+    // try {
+    // super.sendRequestToController(event);
+    // } catch (ChessException e) {
+    // System.out.println(e.getMessage());
+    // }
+    // }
 
     private String readLine() {
         return scan.nextLine();

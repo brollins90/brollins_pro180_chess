@@ -8,7 +8,11 @@ import java.io.IOException;
 
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.BoardLocation;
+import chess_rollins_blake.lib.ChessMove;
+import chess_rollins_blake.lib.MoveType;
+import chess_rollins_blake.model.ChessFactory;
 import chess_rollins_blake.model.ChessModel;
+import chess_rollins_blake.model.pieces.Piece;
 import chess_rollins_blake.view.ChessView;
 
 public class ChessController implements java.awt.event.ActionListener {
@@ -23,18 +27,20 @@ public class ChessController implements java.awt.event.ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent arg0) {
+    public void actionPerformed(ActionEvent event) {
         // TODO
         // Add some obj validation
 
-        String theCommand = arg0.getActionCommand();
-        switch (arg0.getID()) {
-            case 1: // Moving move
-            case 3: // Capture move
+        String theCommand = event.getActionCommand();
+        switch (MoveType.values()[event.getID()]) {
+            case ADD:
+                break;
+            case MOVE:
+            case CAPTURE:
                 addMove(theCommand);
                 break;
-            case 2: // Check available moves
-                this.model.setAvailableMoves(BoardLocation.valueOf(theCommand));
+            case LOCATION: // Check available moves
+                this.model.setAvailableDestinations(BoardLocation.valueOf(theCommand));
                 break;
         }
 
@@ -50,6 +56,10 @@ public class ChessController implements java.awt.event.ActionListener {
 
     public void addMove(String moveString) {
         this.model.addMove(moveString);
+    }
+
+    public void addMove(ChessMove m) {
+        this.model.addMove(m);
     }
 
     public void loadFromFile(String filePath) {
@@ -82,11 +92,28 @@ public class ChessController implements java.awt.event.ActionListener {
 
     }
 
-    public void acceptUserInput() {
+    public void startGameLoop() {
 
+        
         // Start the game Loop
         while (this.gameIsPlaying) {
-            this.view.requestInput();
+        
+            // Get all the pieces for this player that have moves.
+            this.model.setAvailableSources(this.model.getCurrentTurn());
+            BoardLocation src = this.view.requestSourcePiece();
+            BoardLocation dest = this.view.requestDestinationPiece(src);
+            
+            String moveString = src + " " + dest;
+            Piece destPiece = this.model.currentBoard.get(dest);
+            if (destPiece != null && destPiece.getColor() != this.model.getCurrentTurn()) {
+                moveString += "*";
+            }
+            
+            ChessMove thisMove = ChessFactory.CreateMove(moveString);
+            this.addMove(moveString);
+            
+            
+            //this.view.requestInput();
         }
     }
 
