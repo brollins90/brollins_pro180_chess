@@ -11,6 +11,7 @@ import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.MoveType;
 import chess_rollins_blake.lib.PieceColor;
 import chess_rollins_blake.lib.PieceType;
+import chess_rollins_blake.model.ChessFactory;
 import chess_rollins_blake.model.pieces.Piece;
 
 public class ConsoleViewLarge extends ChessView {
@@ -119,7 +120,7 @@ public class ConsoleViewLarge extends ChessView {
         MoveType tempType = null;
         while (!moveIsValidSyntax) {
             tempCommand = readLine();
-            tempType = this.model.validateSyntax(tempCommand);
+            tempType = ChessFactory.ValidateMoveString(tempCommand);
             event = new ActionEvent(this, tempType.ordinal(), tempCommand);
         }
 

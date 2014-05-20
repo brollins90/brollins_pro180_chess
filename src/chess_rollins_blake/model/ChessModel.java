@@ -112,7 +112,7 @@ public class ChessModel extends java.util.Observable {
      * @return If the Move was successfully added
      */
     public void addMove(String moveString) {
-        MoveType movesType = this.validateSyntax(moveString);
+        MoveType movesType = ChessFactory.ValidateMoveString(moveString);
         if (movesType == null) {
             throw new InvalidMoveException(moveString + " - \nThe move syntax was not valid for '" + moveString + "'");
         }
@@ -331,6 +331,7 @@ public class ChessModel extends java.util.Observable {
 
             int diff = 0;
 
+            // Vert
             if (src.getColumn() == dest.getColumn()) {
                 diff = dest.getRow() - src.getRow();
                 if (diff > 0) {
@@ -343,6 +344,7 @@ public class ChessModel extends java.util.Observable {
                     }
                 }
             }
+            // Horizontal
             if (src.getRow() == dest.getRow()) {
                 diff = dest.getColumn() - src.getColumn();
                 if (diff > 0) {
@@ -355,49 +357,13 @@ public class ChessModel extends java.util.Observable {
                     }
                 }
             }
+            // Diag
+            if ((Math.abs(dest.getColumn() - src.getColumn())) == Math.abs(dest.getRow() - src.getRow())) {
+                // TODO
+                // need to add the diag collisions
+            }
         }
         return locs;
-
-    }
-
-    public MoveType validateSyntax(String moveString) {
-
-        MoveType returnType = null;
-        // Force lower case
-        moveString = moveString.toLowerCase();
-
-        Pattern ADD_REGEX = Pattern.compile("[kqrbnp][ld][a-h][1-8]");
-        Pattern MOVE_REGEX = Pattern.compile("[a-h][1-8] [a-h][1-8]\\*?");
-        Pattern MOVE2_REGEX = Pattern.compile("[a-h][1-8] [a-h][1-8] [a-h][1-8] [a-h][1-8]");
-        Pattern LOCATION_REGEX = Pattern.compile("[a-h][1-8]");
-        Matcher m;
-
-        // Check the Add regex
-        m = ADD_REGEX.matcher(moveString);
-        if (m.matches()) {
-            returnType = MoveType.ADD;
-        }
-
-        // Check the move regex
-        m = MOVE_REGEX.matcher(moveString);
-        if (m.matches()) {
-            returnType = (moveString.contains("*")) ? MoveType.CAPTURE : MoveType.MOVE;
-        }
-
-        // Check the double move regex
-        m = MOVE2_REGEX.matcher(moveString);
-        if (m.matches()) {
-            returnType = MoveType.MOVE;
-        }
-
-        // Check if it is a valid location request
-        m = LOCATION_REGEX.matcher(moveString);
-        if (m.matches()) {
-            returnType = MoveType.LOCATION;
-        }
-
-        // None of them are valid to return null
-        return returnType;
 
     }
 }
