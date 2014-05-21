@@ -99,13 +99,13 @@ public class ChessController implements java.awt.event.ActionListener {
         while (this.gameIsPlaying) {
         
             // Get all the pieces for this player that have moves.
-            this.model.setAvailableSources(this.model.getCurrentTurn());
+            this.model.setAvailableSources(this.model.isWhiteTurn());
             BoardLocation src = this.view.requestSourcePiece();
             BoardLocation dest = this.view.requestDestinationPiece(src);
             
             String moveString = src + " " + dest;
             Piece destPiece = this.model.currentBoard.get(dest);
-            if (destPiece != null && destPiece.getColor() != this.model.getCurrentTurn()) {
+            if (destPiece != null && destPiece.isWhite() != this.model.isWhiteTurn()) {
                 moveString += "*";
             }
             

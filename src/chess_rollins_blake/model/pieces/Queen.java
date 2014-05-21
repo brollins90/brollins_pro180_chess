@@ -1,13 +1,12 @@
 package chess_rollins_blake.model.pieces;
 
 import chess_rollins_blake.lib.BoardLocation;
-import chess_rollins_blake.lib.PieceColor;
 import chess_rollins_blake.lib.PieceType;
 
 public class Queen extends Piece {
 
-    public Queen(PieceColor color) {
-        super(color);
+    public Queen(boolean isWhite) {
+        super(isWhite);
         super.type = PieceType.q;
         this.canCollideOnMove = true;
     }

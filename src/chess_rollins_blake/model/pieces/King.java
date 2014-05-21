@@ -1,15 +1,14 @@
 package chess_rollins_blake.model.pieces;
 
 import chess_rollins_blake.lib.BoardLocation;
-import chess_rollins_blake.lib.PieceColor;
 import chess_rollins_blake.lib.PieceType;
 
 public class King extends Piece {
 
     private boolean hasBeenInCheck;
     
-    public King(PieceColor color) {
-        super(color);
+    public King(boolean isWhite) {
+        super(isWhite);
         super.type = PieceType.k;
         this.hasBeenInCheck = false;
     }

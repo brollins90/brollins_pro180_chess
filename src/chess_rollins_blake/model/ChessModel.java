@@ -10,7 +10,6 @@ import chess_rollins_blake.exceptions.InvalidMoveException;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
-import chess_rollins_blake.lib.PieceColor;
 import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.pieces.Piece;
 
@@ -20,7 +19,7 @@ public class ChessModel extends java.util.Observable {
     protected Stack<ChessMove> moves;
     protected Stack<ChessMove> movesRedo;
     protected String message;
-    protected PieceColor currentTurn;
+    protected boolean isWhiteTurn;
     protected ArrayList<BoardLocation> availableSources;
     protected ArrayList<BoardLocation> availableDestinations;
     protected boolean lKingCheck, dKingCheck;
@@ -33,7 +32,7 @@ public class ChessModel extends java.util.Observable {
         this.moves = new Stack<>();
         this.movesRedo = new Stack<>();
         this.message = "";
-        this.currentTurn = PieceColor.l;
+        this.isWhiteTurn = true;
         this.availableSources = new ArrayList<>();
         this.availableDestinations = new ArrayList<>();
         lKingCheck = false;
@@ -52,13 +51,13 @@ public class ChessModel extends java.util.Observable {
         return this.availableSources;
     }
 
-    public void setAvailableSources(PieceColor color) {
+    public void setAvailableSources(boolean turnColor) {
         availableSources.clear();
         // get the pieces that can move
         for (int i = 0; i < this.currentBoard.size(); i++) {
             BoardLocation loc = BoardLocation.values()[i];
             Piece curPiece = this.currentBoard.get(loc);
-            if (curPiece != null && curPiece.getColor() == color) {
+            if (curPiece != null && curPiece.isWhite() == turnColor) {
                 this.setAvailableDestinations(loc);
                 if (this.availableDestinations.size() > 0) {
                     availableSources.add(loc);
@@ -157,8 +156,8 @@ public class ChessModel extends java.util.Observable {
 
 
         // Check Check
-        checkKingInCheck(PieceColor.l);
-        checkKingInCheck(PieceColor.d);
+        checkKingInCheck(true);
+        checkKingInCheck(false);
         // if (checkKingInCheck(currentTurn)) {
         // System.out.println(currentTurn + " king is in check!");
         // } else {
@@ -173,7 +172,7 @@ public class ChessModel extends java.util.Observable {
 
     }
 
-    void checkKingInCheck(PieceColor kColor) {
+    void checkKingInCheck(boolean kColor) {
 
         boolean kingIsInCheck = false;
         BoardLocation kingLoc = null;
@@ -183,7 +182,7 @@ public class ChessModel extends java.util.Observable {
             BoardLocation cur = BoardLocation.values()[i];
             Piece curPiece = currentBoard.get(cur);
             if (curPiece != null) {
-                if (curPiece.getColor() != kColor) {
+                if (curPiece.isWhite() != kColor) {
                     otherColorPieces.add(cur);
                 } else {
                     if (curPiece.getType() == PieceType.k) {
@@ -208,7 +207,7 @@ public class ChessModel extends java.util.Observable {
             }
         }
 
-        if (kColor == PieceColor.l) {
+        if (kColor == true) {
             lKingCheck = kingIsInCheck;
         } else {
             dKingCheck = kingIsInCheck;
@@ -216,8 +215,8 @@ public class ChessModel extends java.util.Observable {
 
     }
 
-    public PieceColor getCurrentTurn() {
-        return currentTurn;
+    public boolean isWhiteTurn() {
+        return this.isWhiteTurn;
     }
 
     /**
@@ -248,7 +247,7 @@ public class ChessModel extends java.util.Observable {
     }
 
     private void switchTurn() {
-        this.currentTurn = (this.currentTurn == PieceColor.l) ? PieceColor.d : PieceColor.l;
+        this.isWhiteTurn = !isWhiteTurn;
     }
 
     public boolean undoMove() {
@@ -296,7 +295,7 @@ public class ChessModel extends java.util.Observable {
             errorMessage += "ERROR: " + m.getMoveString() + " - The destination is empty, cannot Capture.\n";
         }
 
-        if (isValid && (m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getSrcLoc()).getColor() == this.currentBoard.get(m.getDestLoc()).getColor()) {
+        if (isValid && (m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getSrcLoc()).isWhite() == this.currentBoard.get(m.getDestLoc()).isWhite()) {
             isValid = false;
             errorMessage += "ERROR: " + m.getMoveString() + " - The destination is the same color, cannot Capture.\n";
         }

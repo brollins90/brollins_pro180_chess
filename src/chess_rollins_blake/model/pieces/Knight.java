@@ -1,13 +1,12 @@
 package chess_rollins_blake.model.pieces;
 
 import chess_rollins_blake.lib.BoardLocation;
-import chess_rollins_blake.lib.PieceColor;
 import chess_rollins_blake.lib.PieceType;
 
 public class Knight extends Piece {
 
-    public Knight(PieceColor color) {
-        super(color);
+    public Knight(boolean isWhite) {
+        super(isWhite);
         super.type = PieceType.n;
     }
 

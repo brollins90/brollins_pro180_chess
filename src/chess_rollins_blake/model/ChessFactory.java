@@ -9,7 +9,6 @@ import chess_rollins_blake.lib.CaptureMove;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
 import chess_rollins_blake.lib.MovingMove;
-import chess_rollins_blake.lib.PieceColor;
 import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.pieces.Bishop;
 import chess_rollins_blake.model.pieces.King;
@@ -26,7 +25,7 @@ public class ChessFactory {
     };
     public interface PieceCreator {
 
-        public Piece create(PieceColor color);
+        public Piece create(boolean isWhite);
     };
 
     static HashMap<MoveType, MoveCreator> moveMap = new HashMap<>();
@@ -55,38 +54,38 @@ public class ChessFactory {
     static {
         pieceMap.put(PieceType.b, new PieceCreator() {
             @Override
-            public Piece create(PieceColor color) {
-                return new Bishop(color);
+            public Piece create(boolean isWhite) {
+                return new Bishop(isWhite);
             }
         });
         pieceMap.put(PieceType.k, new PieceCreator() {
             @Override
-            public Piece create(PieceColor color) {
-                return new King(color);
+            public Piece create(boolean isWhite) {
+                return new King(isWhite);
             }
         });
         pieceMap.put(PieceType.n, new PieceCreator() {
             @Override
-            public Piece create(PieceColor color) {
-                return new Knight(color);
+            public Piece create(boolean isWhite) {
+                return new Knight(isWhite);
             }
         });
         pieceMap.put(PieceType.p, new PieceCreator() {
             @Override
-            public Piece create(PieceColor color) {
-                return new Pawn(color);
+            public Piece create(boolean isWhite) {
+                return new Pawn(isWhite);
             }
         });
         pieceMap.put(PieceType.q, new PieceCreator() {
             @Override
-            public Piece create(PieceColor color) {
-                return new Queen(color);
+            public Piece create(boolean isWhite) {
+                return new Queen(isWhite);
             }
         });
         pieceMap.put(PieceType.r, new PieceCreator() {
             @Override
-            public Piece create(PieceColor color) {
-                return new Rook(color);
+            public Piece create(boolean isWhite) {
+                return new Rook(isWhite);
             }
         });
     }
@@ -99,8 +98,8 @@ public class ChessFactory {
         return moveMap.get(ValidateMoveString(moveString)).create(moveString);
     }
 
-    public static Piece CreatePiece(PieceType type, PieceColor color) {
-        return pieceMap.get(type).create(color);
+    public static Piece CreatePiece(PieceType type, boolean isWhite) {
+        return pieceMap.get(type).create(isWhite);
     }
 
     public static MoveType ValidateMoveString(String moveString) {

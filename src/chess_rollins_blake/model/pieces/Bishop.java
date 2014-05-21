@@ -1,13 +1,12 @@
 package chess_rollins_blake.model.pieces;
 
 import chess_rollins_blake.lib.BoardLocation;
-import chess_rollins_blake.lib.PieceColor;
 import chess_rollins_blake.lib.PieceType;
 
 public class Bishop extends Piece {
 
-    public Bishop(PieceColor color) {
-        super(color);
+    public Bishop(boolean isWhite) {
+        super(isWhite);
         super.type = PieceType.b;
         this.canCollideOnMove = true;
     }

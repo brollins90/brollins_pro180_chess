@@ -9,7 +9,6 @@ import java.util.Scanner;
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.MoveType;
-import chess_rollins_blake.lib.PieceColor;
 import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.ChessFactory;
 import chess_rollins_blake.model.pieces.Piece;
@@ -17,7 +16,7 @@ import chess_rollins_blake.model.pieces.Piece;
 public class ConsoleViewLarge extends ChessView {
 
     private HashMap<PieceType, String> pieceDisplayMap;
-    private HashMap<PieceColor, String> pieceColorDisplayMap;
+    private HashMap<Boolean, String> pieceColorDisplayMap;
     private Scanner scan;
 
     public ConsoleViewLarge() {
@@ -30,8 +29,8 @@ public class ConsoleViewLarge extends ChessView {
         pieceDisplayMap.put(PieceType.r, " Rook  ");
 
         pieceColorDisplayMap = new HashMap<>();
-        pieceColorDisplayMap.put(PieceColor.d, "Black");
-        pieceColorDisplayMap.put(PieceColor.l, "White");
+        pieceColorDisplayMap.put(false, "Black");
+        pieceColorDisplayMap.put(true, "White");
 
         scan = new Scanner(System.in);
 
@@ -102,7 +101,7 @@ public class ConsoleViewLarge extends ChessView {
     private String pieceString(Piece p) {
         String retString = "";
         if (p != null) {
-            retString = (p.getColor() == PieceColor.l) ? pieceDisplayMap.get(p.getType()).toUpperCase() : pieceDisplayMap.get(p.getType()).toLowerCase();
+            retString = (p.isWhite()) ? pieceDisplayMap.get(p.getType()).toUpperCase() : pieceDisplayMap.get(p.getType()).toLowerCase();
         } else {
             retString += "-------";
         }
@@ -111,8 +110,8 @@ public class ConsoleViewLarge extends ChessView {
 
     @Override
     public void requestInput() {
-        PieceColor curTurn = this.model.getCurrentTurn();
-        System.out.println("-- " + pieceColorDisplayMap.get(curTurn) + " Player's turn--");
+        boolean curTurnIsWhite = this.model.isWhiteTurn();
+        System.out.println("-- " + pieceColorDisplayMap.get(curTurnIsWhite) + " Player's turn--");
         System.out.println("Please enter the location of the piece you would like to move: ");
         boolean moveIsValidSyntax = false;
         String tempCommand = "";
@@ -142,8 +141,8 @@ public class ConsoleViewLarge extends ChessView {
 
     @Override
     public BoardLocation requestSourcePiece() {
-        PieceColor curTurn = this.model.getCurrentTurn();
-        System.out.println("-- " + pieceColorDisplayMap.get(curTurn) + " Player's turn--");
+        boolean curTurnIsWhite = this.model.isWhiteTurn();
+        System.out.println("-- " + pieceColorDisplayMap.get(curTurnIsWhite) + " Player's turn--");
         System.out.println("Enter the which piece you would like to move?");
         System.out.print("(");
         for (int i = 0; i < this.model.getAvailableSources().size(); i++) {
