@@ -158,7 +158,7 @@ public class ConsoleViewLarge extends ChessView {
         BoardLocation loc = null;
         do {
             String locationString = readLine();
-            loc = BoardLocation.valueOf(locationString);
+            loc = BoardLocation.valueOf(locationString.trim());
             if (this.model.getAvailableSources().contains(loc)) {
                 validSource = true;
             } else {

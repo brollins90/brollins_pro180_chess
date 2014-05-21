@@ -157,7 +157,8 @@ public class ChessModel extends java.util.Observable {
 
 
         // Check Check
-        checkKingInCheck(currentTurn);
+        checkKingInCheck(PieceColor.l);
+        checkKingInCheck(PieceColor.d);
         // if (checkKingInCheck(currentTurn)) {
         // System.out.println(currentTurn + " king is in check!");
         // } else {
@@ -177,13 +178,13 @@ public class ChessModel extends java.util.Observable {
         boolean kingIsInCheck = false;
         BoardLocation kingLoc = null;
 
-        ArrayList<BoardLocation> pieces = new ArrayList<>();
+        ArrayList<BoardLocation> otherColorPieces = new ArrayList<>();
         for (int i = 0; i < currentBoard.size(); i++) {
             BoardLocation cur = BoardLocation.values()[i];
-            if (currentBoard.get(cur) != null) {
-                Piece curPiece = currentBoard.get(cur);
+            Piece curPiece = currentBoard.get(cur);
+            if (curPiece != null) {
                 if (curPiece.getColor() != kColor) {
-                    pieces.add(cur);
+                    otherColorPieces.add(cur);
                 } else {
                     if (curPiece.getType() == PieceType.k) {
                         kingLoc = cur;
@@ -191,9 +192,19 @@ public class ChessModel extends java.util.Observable {
                 }
             }
         }
-        for (BoardLocation l : pieces) {
-            if (validateMove(ChessFactory.CreateMove(MoveType.CAPTURE, l.toString() + " " + kingLoc.toString() + "*"))) {
-                kingIsInCheck = true;
+        if (kingLoc != null) {
+            System.out.println("Checking for check");
+            System.out.println("King color is: " + kColor);
+            System.out.println("There are " + otherColorPieces.size() + " piece for the other player");
+            for (BoardLocation l : otherColorPieces) {
+                System.out.println("Piece at: " + l);
+                String moveString = l.toString() + " " + kingLoc.toString() + "*";
+                if (validateMove(ChessFactory.CreateMove(MoveType.CAPTURE, moveString))) {
+                    System.out.println("has checked the king");
+                    kingIsInCheck = true;
+                } else {
+                    System.out.println("no check");
+                }
             }
         }
 
@@ -269,11 +280,11 @@ public class ChessModel extends java.util.Observable {
             isValid = false;
             errorMessage += "ERROR: " + m.getMoveString() + " - The source is empty.\n";
         }
-
-        if (isValid && (m.getType() == MoveType.MOVE || m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getSrcLoc()).getColor() != this.currentTurn) {
-            isValid = false;
-            errorMessage += "ERROR: " + m.getMoveString() + " - Wrong player's turn.\n";
-        }
+        //
+        // if (isValid && (m.getType() == MoveType.MOVE || m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getSrcLoc()).getColor() != this.currentTurn) {
+        // isValid = false;
+        // errorMessage += "ERROR: " + m.getMoveString() + " - Wrong player's turn.\n";
+        // }
 
         if (isValid && (m.getType() == MoveType.MOVE) && this.currentBoard.get(m.getDestLoc()) != null) {
             isValid = false;
@@ -285,7 +296,7 @@ public class ChessModel extends java.util.Observable {
             errorMessage += "ERROR: " + m.getMoveString() + " - The destination is empty, cannot Capture.\n";
         }
 
-        if (isValid && (m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getDestLoc()).getColor() == currentTurn) {
+        if (isValid && (m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getSrcLoc()).getColor() == this.currentBoard.get(m.getDestLoc()).getColor()) {
             isValid = false;
             errorMessage += "ERROR: " + m.getMoveString() + " - The destination is the same color, cannot Capture.\n";
         }
