@@ -53,4 +53,8 @@ public class ChessMove {
     public void setMessage(String message) {
         this.message = message;
     }
+    
+    public void setSubmove(ChessMove sub) {
+        this.subMove = sub;
+    }
 }

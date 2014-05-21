@@ -36,7 +36,7 @@ public abstract class ChessView implements java.util.Observer {
         this.model = m;
     }
 
-    public abstract void requestInput();
+//    public abstract void requestInput();
 
     public void sendRequestToController(ActionEvent e) {
 

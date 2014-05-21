@@ -8,21 +8,24 @@ import java.util.regex.Pattern;
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.exceptions.InvalidMoveException;
 import chess_rollins_blake.lib.BoardLocation;
+import chess_rollins_blake.lib.CaptureMove;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
+import chess_rollins_blake.lib.MovingMove;
 import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.pieces.Piece;
 
 public class ChessModel extends java.util.Observable {
 
     public ChessBoard currentBoard;
+    protected ArrayList<ChessMove> availableMoves;
     protected Stack<ChessMove> moves;
     protected Stack<ChessMove> movesRedo;
     protected String message;
-    protected boolean isWhiteTurn;
-    protected ArrayList<BoardLocation> availableSources;
-    protected ArrayList<BoardLocation> availableDestinations;
-    protected boolean lKingCheck, dKingCheck;
+    protected boolean whiteTurn;
+//    protected ArrayList<BoardLocation> availableSources;
+//    protected ArrayList<BoardLocation> availableDestinations;
+    protected boolean whiteKingInCheck, blackKingInCheck;
 
     /**
      * Creates a ChessModel
@@ -32,64 +35,213 @@ public class ChessModel extends java.util.Observable {
         this.moves = new Stack<>();
         this.movesRedo = new Stack<>();
         this.message = "";
-        this.isWhiteTurn = true;
-        this.availableSources = new ArrayList<>();
-        this.availableDestinations = new ArrayList<>();
-        lKingCheck = false;
-        dKingCheck = false;
+        this.whiteTurn = true;
+//        this.availableSources = new ArrayList<>();
+//        this.availableDestinations = new ArrayList<>();
+        whiteKingInCheck = false;
+        blackKingInCheck = false;
+        availableMoves = new ArrayList<ChessMove>();
+    }
+    
+    public void setAvailableMoves(ArrayList<ChessMove> moves) {
+        this.availableMoves = moves;
+    }
+    
+    public ArrayList<ChessMove> getAvailableMoves() {
+        return this.availableMoves;
     }
 
-    public boolean getLKingCheck() {
-        return this.lKingCheck;
+    public boolean isWhiteKingInCheck() {
+        return this.whiteKingInCheck;
     }
 
-    public boolean getDKingCheck() {
-        return this.dKingCheck;
+    public boolean isBlackKingInCheck() {
+        return this.blackKingInCheck;
     }
 
-    public ArrayList<BoardLocation> getAvailableSources() {
-        return this.availableSources;
+    public boolean isCurrentInCheck() {
+        return (this.whiteTurn) ? whiteKingInCheck : blackKingInCheck;
     }
 
-    public void setAvailableSources(boolean turnColor) {
-        availableSources.clear();
-        // get the pieces that can move
-        for (int i = 0; i < this.currentBoard.size(); i++) {
-            BoardLocation loc = BoardLocation.values()[i];
-            Piece curPiece = this.currentBoard.get(loc);
-            if (curPiece != null && curPiece.isWhite() == turnColor) {
-                this.setAvailableDestinations(loc);
-                if (this.availableDestinations.size() > 0) {
-                    availableSources.add(loc);
-                }
-            }
+    public boolean isOtherInCheck() {
+        return (this.whiteTurn) ? blackKingInCheck : whiteKingInCheck;
+    }
+//    public ArrayList<BoardLocation> getAvailableSources() {
+//        return this.availableSources;
+//    }
+    
+    
+    public void doturn() {
+
+        // check if current is in check
+        if (isCurrentInCheck()) {
+            
+            // Get out of check
+            
+            
         }
-    }
 
-    public ArrayList<BoardLocation> getAvailableDestinations() {
-        return this.availableDestinations;
     }
-
-    public void setAvailableDestinations(BoardLocation srcLoc) {
-        availableDestinations.clear();
-        Piece p = this.getPiece(srcLoc);
+    
+    public ArrayList<BoardLocation> getAvailableDestinationsFromLocation(BoardLocation loc) {
+        ArrayList<BoardLocation> dests = new ArrayList<BoardLocation>();
+        Piece p = this.getPiece(loc);
 
         // TODO iterator stuff
         for (int i = 0; i < this.currentBoard.size(); i++) {
             BoardLocation end = BoardLocation.values()[i];
-            String moveString = srcLoc.toString() + " " + end.toString();
+            String moveString = loc.toString() + " " + end.toString();
             ChessMove currentMovingMove = ChessFactory.CreateMove(MoveType.MOVE, moveString);
             ChessMove currentCapturingMove = ChessFactory.CreateMove(MoveType.CAPTURE, moveString);
-            if (validateMove(currentMovingMove) || validateMove(currentCapturingMove)) {
-                availableDestinations.add(end);
+            if (validateMove(currentMovingMove, false) || validateMove(currentCapturingMove, false)) {
+                dests.add(end);
             }
         }
-        // availableMoves.add(BoardLocation.a4);
-        // availableMoves.add(BoardLocation.b4);
+        return dests;
+    }
+    
+    public ArrayList<BoardLocation> getLocationsThatCanMove() {
+        ArrayList<BoardLocation> locsThatCanMove = new ArrayList<BoardLocation>();
+        //BoardLocation otherKingLocation = getKingLoc(!whiteTurn);
+        
+        // get the pieces that can move
+        for (int i = 0; i < this.currentBoard.size(); i++) {
+            BoardLocation loc = BoardLocation.values()[i];
+            Piece curPiece = this.currentBoard.get(loc);
+            if (curPiece != null && curPiece.isWhite() == whiteTurn) {
+                
+                ArrayList<BoardLocation> dests = getAvailableDestinationsFromLocation(loc);
+                
+                if (dests.size() > 0) {
+                    locsThatCanMove.add(loc);
+//                    if (whiteTurn) { // white turn
+//                        if (blackKingInCheck) { // and black king is in check, have to kill it
+//                            if (this.availableDestinations.contains(otherKingLocation)) {
+//                                availableSources.add(loc);
+//                            } else {
+//                                // other king is in check, but this piece cannot get to king
+//                            }
+//                        } else {
+//                            // king not in check so we can add
+//                            availableSources.add(loc);
+//                        }
+//                        if (whiteKingInCheck) {
+//                            // if own king is in check, have to stop it.
+//                            // Clone board attempt move and recheck for check
+//                            
+//                        }
+//                    } else {// black turn
+//                        if (whiteKingInCheck) {// and white king is in check, have to kill it
+//                            if (this.availableDestinations.contains(otherKingLocation)) {
+//                                availableSources.add(loc);
+//                            } else {
+//                                // other king is in check, but this piece cannot get to king
+//                            }
+//                        } else {
+//                            // king not in check so we can add
+//                            availableSources.add(loc);
+//                        }
+//                        if (blackKingInCheck) {
+//                            // if own king is in check, have to stop it.
+//                            // Clone board attempt move and recheck for check
+//                            
+//                        }
+//                    }
+                    //availableSources.add(loc);
+                }
+            }
+        }        
+        return locsThatCanMove;
+    }
+    
+
+//    public void setAvailableSources(boolean turnColor) {
+//        availableSources.clear();
+//        BoardLocation otherPlayerKingLocation = getKingLoc(!turnColor);
+//        // get the pieces that can move
+//        for (int i = 0; i < this.currentBoard.size(); i++) {
+//            BoardLocation loc = BoardLocation.values()[i];
+//            Piece curPiece = this.currentBoard.get(loc);
+//            if (curPiece != null && curPiece.isWhite() == turnColor) {
+//                this.setAvailableDestinations(loc);
+//                if (this.availableDestinations.size() > 0) {
+//                    if (turnColor) { // white turn
+//                        if (blackKingInCheck) { // and black king is in check, have to kill it
+//                            if (this.availableDestinations.contains(otherPlayerKingLocation)) {
+//                                availableSources.add(loc);
+//                            } else {
+//                                // other king is in check, but this piece cannot get to king
+//                            }
+//                        } else {
+//                            // king not in check so we can add
+//                            availableSources.add(loc);
+//                        }
+//                        if (whiteKingInCheck) {
+//                            // if own king is in check, have to stop it.
+//                            // Clone board attempt move and recheck for check
+//                            
+//                        }
+//                    } else {// black turn
+//                        if (whiteKingInCheck) {// and white king is in check, have to kill it
+//                            if (this.availableDestinations.contains(otherPlayerKingLocation)) {
+//                                availableSources.add(loc);
+//                            } else {
+//                                // other king is in check, but this piece cannot get to king
+//                            }
+//                        } else {
+//                            // king not in check so we can add
+//                            availableSources.add(loc);
+//                        }
+//                        if (blackKingInCheck) {
+//                            // if own king is in check, have to stop it.
+//                            // Clone board attempt move and recheck for check
+//                            
+//                        }
+//                    }
+//                    //availableSources.add(loc);
+//                }
+//            }
+//        }
+//    }
+
+    private BoardLocation getKingLoc(boolean b) {
+        BoardLocation retLoc = null;
+
+        for (int i = 0; i < this.currentBoard.size(); i++) {
+            BoardLocation cur = BoardLocation.values()[i];
+            Piece curPiece = this.currentBoard.get(cur);
+            if (curPiece != null && curPiece.isWhite() == b && curPiece.getType() == PieceType.k) {
+                retLoc = cur;
+            }
+        }
+
+        return retLoc;
     }
 
+//    public ArrayList<BoardLocation> getAvailableDestinations() {
+//        return this.availableDestinations;
+//    }
+//
+//    public void setAvailableDestinations(BoardLocation srcLoc) {
+//        availableDestinations.clear();
+//        Piece p = this.getPiece(srcLoc);
+//
+//        // TODO iterator stuff
+//        for (int i = 0; i < this.currentBoard.size(); i++) {
+//            BoardLocation end = BoardLocation.values()[i];
+//            String moveString = srcLoc.toString() + " " + end.toString();
+//            ChessMove currentMovingMove = ChessFactory.CreateMove(MoveType.MOVE, moveString);
+//            ChessMove currentCapturingMove = ChessFactory.CreateMove(MoveType.CAPTURE, moveString);
+//            if (validateMove(currentMovingMove, false) || validateMove(currentCapturingMove, false)) {
+//                availableDestinations.add(end);
+//            }
+//        }
+//        // availableMoves.add(BoardLocation.a4);
+//        // availableMoves.add(BoardLocation.b4);
+//    }
+
     public void addMove(ChessMove m) {
-        if (validateMove(m)) {
+        if (validateMove(m, true)) {
             moves.push(m);
             try {
                 executeMove(m);
@@ -172,7 +324,7 @@ public class ChessModel extends java.util.Observable {
 
     }
 
-    void checkKingInCheck(boolean kColor) {
+    public void checkKingInCheck(boolean kColor) {
 
         boolean kingIsInCheck = false;
         BoardLocation kingLoc = null;
@@ -198,7 +350,7 @@ public class ChessModel extends java.util.Observable {
             for (BoardLocation l : otherColorPieces) {
                 System.out.println("Piece at: " + l);
                 String moveString = l.toString() + " " + kingLoc.toString() + "*";
-                if (validateMove(ChessFactory.CreateMove(MoveType.CAPTURE, moveString))) {
+                if (validateMove(ChessFactory.CreateMove(MoveType.CAPTURE, moveString), false)) {
                     System.out.println("has checked the king");
                     kingIsInCheck = true;
                 } else {
@@ -208,15 +360,15 @@ public class ChessModel extends java.util.Observable {
         }
 
         if (kColor == true) {
-            lKingCheck = kingIsInCheck;
+            whiteKingInCheck = kingIsInCheck;
         } else {
-            dKingCheck = kingIsInCheck;
+            blackKingInCheck = kingIsInCheck;
         }
 
     }
 
     public boolean isWhiteTurn() {
-        return this.isWhiteTurn;
+        return this.whiteTurn;
     }
 
     /**
@@ -247,11 +399,30 @@ public class ChessModel extends java.util.Observable {
     }
 
     private void switchTurn() {
-        this.isWhiteTurn = !isWhiteTurn;
+        this.whiteTurn = !whiteTurn;
     }
 
     public boolean undoMove() {
         ChessMove m = moves.pop();
+        
+        ChessMove undo = null;
+        if (m instanceof MovingMove) {
+            undo = ChessFactory.CreateMove(m.getDestLoc() + " " + m.getSrcLoc());
+        } else if (m instanceof CaptureMove) {
+            undo = ChessFactory.CreateMove(m.getDestLoc() + " " + m.getSrcLoc());
+            CaptureMove c = (CaptureMove) undo;
+            Piece capturedPiece = c.getCapturedPiece();
+            String readdString = "";
+            readdString += capturedPiece.getType();
+            readdString += (capturedPiece.isWhite()) ? "l" : "d";
+            readdString += m.getDestLoc();
+            undo.setSubmove(ChessFactory.CreateMove(readdString));
+        }
+        
+        executeMove(undo);  
+        
+        
+        
         movesRedo.push(m);
 
         return true;
@@ -264,33 +435,39 @@ public class ChessModel extends java.util.Observable {
         return true;
     }
 
-    private boolean validateMove(ChessMove m) {
+    public boolean locationHasPiece(BoardLocation loc) {
+        return this.currentBoard.get(loc) != null;
+    }
+
+    private boolean validateMove(ChessMove m, boolean turnCheck) {
         boolean isValid = true;
         String errorMessage = "";
 
         // System.out.println(m.moveString);
 
-        if (isValid && m.getType() == MoveType.ADD && this.currentBoard.get(m.getDestLoc()) != null) {
+        if (isValid && m.getType() == MoveType.ADD && locationHasPiece(m.getDestLoc())) {
             isValid = false;
             errorMessage += "ERROR: " + m.getMoveString() + " - The destination already has a piece.\n";
         }
 
-        if (isValid && (m.getType() == MoveType.MOVE || m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getSrcLoc()) == null) {
+        if (isValid && (m.getType() == MoveType.MOVE || m.getType() == MoveType.CAPTURE) && !locationHasPiece(m.getSrcLoc())) {
             isValid = false;
             errorMessage += "ERROR: " + m.getMoveString() + " - The source is empty.\n";
         }
-        //
-        // if (isValid && (m.getType() == MoveType.MOVE || m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getSrcLoc()).getColor() != this.currentTurn) {
-        // isValid = false;
-        // errorMessage += "ERROR: " + m.getMoveString() + " - Wrong player's turn.\n";
-        // }
 
-        if (isValid && (m.getType() == MoveType.MOVE) && this.currentBoard.get(m.getDestLoc()) != null) {
+        if (turnCheck) {
+            if (isValid && (m.getType() == MoveType.MOVE || m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getSrcLoc()).isWhite() != this.isWhiteTurn()) {
+                isValid = false;
+                errorMessage += "ERROR: " + m.getMoveString() + " - Wrong player's turn.\n";
+            }
+        }
+
+        if (isValid && (m.getType() == MoveType.MOVE) && locationHasPiece(m.getDestLoc())) {
             isValid = false;
             errorMessage += "ERROR: " + m.getMoveString() + " - The destination is not empty, cannot Move.\n";
         }
 
-        if (isValid && (m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getDestLoc()) == null) {
+        if (isValid && (m.getType() == MoveType.CAPTURE) && !locationHasPiece(m.getDestLoc())) {
             isValid = false;
             errorMessage += "ERROR: " + m.getMoveString() + " - The destination is empty, cannot Capture.\n";
         }
@@ -325,7 +502,7 @@ public class ChessModel extends java.util.Observable {
         m.setMessage(m.getMessage() + errorMessage);
         // System.out.println(errorMessage);
         if (isValid && m.getSubMove() != null) {
-            return validateMove(m.getSubMove());
+            return validateMove(m.getSubMove(), true);
         }
         // if (!isValid) {
         // throw new InvalidMoveException(errorMessage);
