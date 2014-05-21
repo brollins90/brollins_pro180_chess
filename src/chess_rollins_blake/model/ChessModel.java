@@ -2,8 +2,6 @@ package chess_rollins_blake.model;
 
 import java.util.ArrayList;
 import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.exceptions.InvalidMoveException;
@@ -297,7 +295,9 @@ public class ChessModel extends java.util.Observable {
         if (currentMove.getType() == MoveType.ADD) {
             this.currentBoard.add(currentMove.getDestLoc(), currentMove.getPiece());
         } else if (currentMove.getType() == MoveType.CAPTURE) {
-            this.currentBoard.capturePiece(currentMove.getDestLoc());
+            CaptureMove currentAsCapture = (CaptureMove) currentMove;
+            Piece capturedPiece = this.currentBoard.capturePiece(currentAsCapture.getDestLoc());
+            currentAsCapture.setPieceCaptured(capturedPiece);
             currentBoard.move(currentMove.getSrcLoc(), currentMove.getDestLoc());
         } else if (currentMove.getType() == MoveType.MOVE) {
             this.currentBoard.move(currentMove.getSrcLoc(), currentMove.getDestLoc());
@@ -344,17 +344,17 @@ public class ChessModel extends java.util.Observable {
             }
         }
         if (kingLoc != null) {
-            System.out.println("Checking for check");
-            System.out.println("King color is: " + kColor);
-            System.out.println("There are " + otherColorPieces.size() + " piece for the other player");
+            //System.out.println("Checking for check");
+            //System.out.println("King color is: " + kColor);
+            //System.out.println("There are " + otherColorPieces.size() + " piece for the other player");
             for (BoardLocation l : otherColorPieces) {
-                System.out.println("Piece at: " + l);
+                //System.out.println("Piece at: " + l);
                 String moveString = l.toString() + " " + kingLoc.toString() + "*";
                 if (validateMove(ChessFactory.CreateMove(MoveType.CAPTURE, moveString), false)) {
-                    System.out.println("has checked the king");
+                    //System.out.println("has checked the king");
                     kingIsInCheck = true;
                 } else {
-                    System.out.println("no check");
+                    //System.out.println("no check");
                 }
             }
         }
@@ -406,18 +406,19 @@ public class ChessModel extends java.util.Observable {
         ChessMove m = moves.pop();
         
         ChessMove undo = null;
-        if (m instanceof MovingMove) {
+        if (m instanceof CaptureMove) {
             undo = ChessFactory.CreateMove(m.getDestLoc() + " " + m.getSrcLoc());
-        } else if (m instanceof CaptureMove) {
-            undo = ChessFactory.CreateMove(m.getDestLoc() + " " + m.getSrcLoc());
-            CaptureMove c = (CaptureMove) undo;
+            CaptureMove c = (CaptureMove) m;
             Piece capturedPiece = c.getCapturedPiece();
             String readdString = "";
             readdString += capturedPiece.getType();
             readdString += (capturedPiece.isWhite()) ? "l" : "d";
             readdString += m.getDestLoc();
             undo.setSubmove(ChessFactory.CreateMove(readdString));
-        }
+        } else
+        if (m instanceof MovingMove) {
+            undo = ChessFactory.CreateMove(m.getDestLoc() + " " + m.getSrcLoc());
+        } 
         
         executeMove(undo);  
         

@@ -21,9 +21,9 @@ public class ChessBoard {
         }
     }
 
-    public void capturePiece(BoardLocation loc) {
+    public Piece capturePiece(BoardLocation loc) {
         if (this.get(loc) != null) {
-            remove(loc);
+            return remove(loc);
         } else {
             throw new InvalidMoveException("Failed to capture piece, there is no Piece to capture at " + loc);
         }
@@ -37,8 +37,10 @@ public class ChessBoard {
         this.boardArray[loc.getRow()][loc.getColumn()] = p;
     }
 
-    public void remove(BoardLocation loc) {
+    public Piece remove(BoardLocation loc) {
+        Piece retPiece = this.get(loc);
         this.set(loc, null);
+        return retPiece;
     }
 
     public void move(BoardLocation src, BoardLocation dest) {

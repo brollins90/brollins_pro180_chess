@@ -142,6 +142,10 @@ public class ConsoleViewLarge extends ChessView {
 
     @Override
     public BoardLocation requestSourcePiece() {
+        printBoard();
+        
+        
+        
         boolean curTurnIsWhite = this.model.isWhiteTurn();
         System.out.println("-- " + pieceColorDisplayMap.get(curTurnIsWhite) + " Player's turn--");
         System.out.println("Enter the which piece you would like to move?");

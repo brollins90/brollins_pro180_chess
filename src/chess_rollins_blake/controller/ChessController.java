@@ -103,59 +103,58 @@ public class ChessController implements java.awt.event.ActionListener {
             // Get all the pieces for this player that have moves.
             ArrayList<BoardLocation> piecesThatCanMove = this.model.getLocationsThatCanMove();
             ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
-            
+
             boolean wasKingInCheck = this.model.isCurrentInCheck();
-            //if (this.model.isCurrentInCheck()) {
-                ArrayList<ChessMove> movesThatCanGetOutOfCheck = new ArrayList<ChessMove>();
-                // current player is in check, we need to get out of it
-                for (BoardLocation pieceThatCanMove : piecesThatCanMove) {
-                    ArrayList<BoardLocation> destinationsForThisPiece = this.model.getAvailableDestinationsFromLocation(pieceThatCanMove);
+            // if (this.model.isCurrentInCheck()) {
+            ArrayList<ChessMove> movesThatCanGetOutOfCheck = new ArrayList<ChessMove>();
+            // current player is in check, we need to get out of it
+            for (BoardLocation pieceThatCanMove : piecesThatCanMove) {
+                ArrayList<BoardLocation> destinationsForThisPiece = this.model.getAvailableDestinationsFromLocation(pieceThatCanMove);
 
-                    for (BoardLocation destination : destinationsForThisPiece) {
+                for (BoardLocation destination : destinationsForThisPiece) {
 
-                        String moveString = pieceThatCanMove + " " + destination;
-                        if (this.model.locationHasPiece(destination)) {
-                            moveString += "*";
+                    String moveString = pieceThatCanMove + " " + destination;
+                    if (this.model.locationHasPiece(destination)) {
+                        moveString += "*";
+                    }
+                    ChessMove testMove = ChessFactory.CreateMove(moveString);
+                    try {
+                        this.addMove(testMove);
+                        this.model.checkKingInCheck(this.model.isWhiteTurn());
+                        if (wasKingInCheck && !this.model.isOtherInCheck()) {
+                            movesThatCanGetOutOfCheck.add(testMove);
                         }
-                        ChessMove testMove = ChessFactory.CreateMove(moveString);
-                        try {
-                            this.addMove(testMove);
-                            this.model.checkKingInCheck(this.model.isWhiteTurn());
-                            if (wasKingInCheck && !this.model.isOtherInCheck()) {
-                                movesThatCanGetOutOfCheck.add(testMove);
-                            }
-                            moves.add(testMove);
-                            this.model.undoMove();
-                        } catch (ChessException e) {
-                            System.out.println("ERROR");
-                        }
-
+                        moves.add(testMove);
+                        this.model.undoMove();
+                    } catch (ChessException e) {
+                        System.out.println("ERROR");
                     }
 
                 }
 
-                
-                
+            }
 
-                this.model.setAvailableMoves(moves);
-                if (wasKingInCheck) {
 
-                    if (movesThatCanGetOutOfCheck.size() == 0) {
-                        System.out.println("Stalemate or checkmate");
-                    }
-                    for (ChessMove m : movesThatCanGetOutOfCheck) {
-                        System.out.println(m.getMoveString());
 
-                    }
+            this.model.setAvailableMoves(moves);
+            if (wasKingInCheck) {
 
-                    this.model.setAvailableMoves(movesThatCanGetOutOfCheck);   
+                if (movesThatCanGetOutOfCheck.size() == 0) {
+                    System.out.println("Stalemate or checkmate");
+                }
+                for (ChessMove m : movesThatCanGetOutOfCheck) {
+                    System.out.println(m.getMoveString());
+
                 }
 
+                this.model.setAvailableMoves(movesThatCanGetOutOfCheck);
+            }
 
 
-            //} // current is not in check
-            //else {
-            //}
+
+            // } // current is not in check
+            // else {
+            // }
 
 
 
