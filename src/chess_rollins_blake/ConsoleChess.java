@@ -7,7 +7,7 @@ import chess_rollins_blake.view.ChessView;
 import chess_rollins_blake.view.ConsoleViewLarge;
 
 /**
- * This is the entry point into my Chess game The game wsa built for the PRO180 class at Neumont University in the Spring quarter of 2014
+ * This is the entry point into my Chess game The game was built for the PRO180 class at Neumont University in the Spring quarter of 2014
  * 
  * @author Blake Rollins Instructor: Steve Halladay
  * 
@@ -23,7 +23,7 @@ public class ConsoleChess {
 
         args = new String[1];
         //args[0] = "Donald Byrne vs Robert James Fischer.txt";
-        args[0] = "newBoard.txt";
+        args[0] = "chess07.txt";
         ConsoleChess c = new ConsoleChess();
         c.playChess(args);
     }

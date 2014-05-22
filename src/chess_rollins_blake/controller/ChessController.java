@@ -120,7 +120,7 @@ public class ChessController implements java.awt.event.ActionListener {
                     ChessMove testMove = ChessFactory.CreateMove(moveString);
                     try {
                         this.addMove(testMove);
-                        this.model.checkKingInCheck(this.model.isWhiteTurn());
+                        this.model.isThisKingInCheck(this.model.isWhiteTurn());
                         if (wasKingInCheck && !this.model.isOtherInCheck()) {
                             movesThatCanGetOutOfCheck.add(testMove);
                         }
