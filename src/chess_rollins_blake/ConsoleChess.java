@@ -22,7 +22,8 @@ public class ConsoleChess {
     public static void main(String[] args) {
 
         args = new String[1];
-        args[0] = "chess07.txt";
+        //args[0] = "Donald Byrne vs Robert James Fischer.txt";
+        args[0] = "newBoard.txt";
         ConsoleChess c = new ConsoleChess();
         c.playChess(args);
     }
