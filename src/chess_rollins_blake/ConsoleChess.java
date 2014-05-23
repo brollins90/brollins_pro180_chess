@@ -1,6 +1,7 @@
 package chess_rollins_blake;
 
 import chess_rollins_blake.controller.ChessController;
+import chess_rollins_blake.controller.GameStatus;
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.model.ChessModel;
 import chess_rollins_blake.view.ChessView;
@@ -23,7 +24,7 @@ public class ConsoleChess {
 
         args = new String[1];
         //args[0] = "Donald Byrne vs Robert James Fischer.txt";
-        args[0] = "chess07.txt";
+        args[0] = "fourMoveCheckMate.txt";
         ConsoleChess c = new ConsoleChess();
         c.playChess(args);
     }
@@ -57,8 +58,12 @@ public class ConsoleChess {
             view.addController(controller);
 
             // controller.loadFromFile("newBoard.txt");
+            controller.loadNewBoard();
             controller.loadFromFile(args[0]);
-            controller.startGameLoop();
+            controller.playChess();
+            
+            
+            
 
             // view.printBoard();
         } catch (ChessException e) {

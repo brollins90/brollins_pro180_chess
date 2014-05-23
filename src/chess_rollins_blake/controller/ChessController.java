@@ -20,10 +20,9 @@ public class ChessController implements java.awt.event.ActionListener {
 
     protected ChessModel model;
     protected ChessView view;
-    protected boolean gameIsPlaying;
+    protected GameStatus currentGameStatus;
 
     public ChessController() {
-        this.gameIsPlaying = true;
 
     }
 
@@ -38,7 +37,7 @@ public class ChessController implements java.awt.event.ActionListener {
                 break;
             case MOVE:
             case CAPTURE:
-                addMove(theCommand);
+                addMove(theCommand, true);
                 break;
             case LOCATION: // Check available moves
                 // this.model.setAvailableDestinations(BoardLocation.valueOf(theCommand));
@@ -55,17 +54,22 @@ public class ChessController implements java.awt.event.ActionListener {
         this.view = v;
     }
 
-    public void addMove(String moveString) {
-        this.model.addMove(moveString);
+    public void addMove(String moveString, boolean updateObservers) {
+        this.model.addMove(moveString, updateObservers);
     }
 
-    public void addMove(ChessMove m) {
-        this.model.addMove(m);
+    public void addMoveWithoutUpdate(ChessMove m) {
+        this.model.addMoveWithoutUpdate(m);
+    }
+
+    public void addMoveWithoutUpdate(String m) {
+        this.model.addMoveWithoutUpdate(m);
     }
 
     public void loadFromFile(String filePath) {
 
         if (filePath != null) {
+            boolean isNewBoard = (filePath.equals("newBoard.txt")) ? true : false;
             BufferedReader br = null;
             try {
                 String path = filePath;
@@ -75,9 +79,9 @@ public class ChessController implements java.awt.event.ActionListener {
                 while ((line = br.readLine()) != null) {
                     // System.out.println(line);
                     try {
-                        addMove(line);
+                        addMove(line, !isNewBoard);
                     } catch (ChessException e) {
-                        this.model.setMessage(e.getMessage());
+                        this.model.setModelStatusMessage(e.getMessage());
                     }
                 }
                 br.close();
@@ -93,11 +97,12 @@ public class ChessController implements java.awt.event.ActionListener {
 
     }
 
-    public void startGameLoop() {
+    public void playChess() {
 
+        this.currentGameStatus = GameStatus.PLAYING;
 
         // Start the game Loop
-        while (this.gameIsPlaying) {
+        while (this.currentGameStatus == GameStatus.PLAYING) {
 
 
             // Get all the pieces for this player that have moves.
@@ -119,7 +124,7 @@ public class ChessController implements java.awt.event.ActionListener {
                     }
                     ChessMove testMove = ChessFactory.CreateMove(moveString);
                     try {
-                        this.addMove(testMove);
+                        this.addMoveWithoutUpdate(testMove);
                         this.model.isThisKingInCheck(this.model.isWhiteTurn());
                         if (wasKingInCheck && !this.model.isOtherInCheck()) {
                             movesThatCanGetOutOfCheck.add(testMove);
@@ -140,7 +145,8 @@ public class ChessController implements java.awt.event.ActionListener {
             if (wasKingInCheck) {
 
                 if (movesThatCanGetOutOfCheck.size() == 0) {
-                    System.out.println("Stalemate or checkmate");
+                    this.currentGameStatus = this.model.isWhiteTurn() ? GameStatus.DARKWIN : GameStatus.LIGHTWIN;
+                    // System.out.println("Stalemate or checkmate");
                 }
                 for (ChessMove m : movesThatCanGetOutOfCheck) {
                     System.out.println(m.getMoveString());
@@ -156,25 +162,31 @@ public class ChessController implements java.awt.event.ActionListener {
             // else {
             // }
 
+            if (this.currentGameStatus == GameStatus.PLAYING) {
 
+                // this.model.setAvailableSources(this.model.isWhiteTurn());
+                BoardLocation src = this.view.requestSourcePiece();
 
-            // this.model.setAvailableSources(this.model.isWhiteTurn());
-            BoardLocation src = this.view.requestSourcePiece();
+                BoardLocation dest = this.view.requestDestinationPiece(src);
 
-            BoardLocation dest = this.view.requestDestinationPiece(src);
+                String moveString = src + " " + dest;
+                Piece destPiece = this.model.currentBoard.get(dest);
+                if (destPiece != null && destPiece.isWhite() != this.model.isWhiteTurn()) {
+                    moveString += "*";
+                }
 
-            String moveString = src + " " + dest;
-            Piece destPiece = this.model.currentBoard.get(dest);
-            if (destPiece != null && destPiece.isWhite() != this.model.isWhiteTurn()) {
-                moveString += "*";
+                ChessMove thisMove = ChessFactory.CreateMove(moveString);
+                this.addMove(moveString, true);
+
             }
-
-            ChessMove thisMove = ChessFactory.CreateMove(moveString);
-            this.addMove(moveString);
-
-
             // this.view.requestInput();
         }
+
+        this.view.printGameStatus(currentGameStatus);
+    }
+
+    public void loadNewBoard() {
+        loadFromFile("newBoard.txt");
     }
 
 }

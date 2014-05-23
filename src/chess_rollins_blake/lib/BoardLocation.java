@@ -27,4 +27,11 @@ public enum BoardLocation {
     public int getRow() {
         return this.ordinal() % 8;
     }
+    
+    public static BoardLocation getLocFromRowAndColumn(int row, int col) {
+        int retVal = 0;
+        retVal += col * 8;
+        retVal += row;
+        return BoardLocation.values()[retVal];
+    }
 }

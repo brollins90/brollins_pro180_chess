@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import chess_rollins_blake.exceptions.InvalidMoveException;
 import chess_rollins_blake.lib.AddMove;
 import chess_rollins_blake.lib.CaptureMove;
 import chess_rollins_blake.lib.ChessMove;
@@ -139,6 +140,11 @@ public class ChessFactory {
         }
 
         // None of them are valid to return null
+        
+        if (returnType == null) {
+            throw new InvalidMoveException(moveString + " - \nThe move syntax was not valid for '" + moveString + "'");
+        }
+        
         return returnType;
 
     }

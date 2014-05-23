@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Observable;
 
+import chess_rollins_blake.controller.GameStatus;
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.model.ChessModel;
@@ -43,6 +44,8 @@ public abstract class ChessView implements java.util.Observer {
         c.actionPerformed(e);
     }
 
+    public abstract void printGameStatus(GameStatus status);
     public abstract BoardLocation requestSourcePiece();
     public abstract BoardLocation requestDestinationPiece(BoardLocation srcLoc);
+    //public abstract void requestContinue();
 }

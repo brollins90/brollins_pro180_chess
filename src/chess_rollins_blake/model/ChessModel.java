@@ -22,6 +22,9 @@ public class ChessModel extends java.util.Observable {
     protected boolean currentlyWhitesTurn;
     protected boolean whiteKingInCheck;
     protected boolean blackKingInCheck;
+//    protected int whitePiecesTaken;
+//    protected int blackPiecesTaken;
+
 
 
     protected ArrayList<ChessMove> availableMoves;
@@ -37,6 +40,8 @@ public class ChessModel extends java.util.Observable {
         this.currentlyWhitesTurn = true;
         this.whiteKingInCheck = false;
         this.blackKingInCheck = false;
+//        this.whitePiecesTaken = 0;
+//        this.blackPiecesTaken = 0;
 
         availableMoves = new ArrayList<ChessMove>();
     }
@@ -47,6 +52,19 @@ public class ChessModel extends java.util.Observable {
 
     public ArrayList<ChessMove> getAvailableMoves() {
         return this.availableMoves;
+    }
+
+
+
+    /**
+     * Adds a piece to the list
+     * 
+     * @param loc The location on the board
+     * @param p The Piece
+     * @return If it was successfully added
+     */
+    public void addPiece(BoardLocation loc, Piece p) {
+        this.currentBoard.add(loc, p);
     }
 
     /**
@@ -66,6 +84,26 @@ public class ChessModel extends java.util.Observable {
             }
         }
         return retLoc;
+    }
+
+    /**
+     * Returns a Collection of all the Locations that contain Pieces for the specified player
+     * 
+     * @param player If the player is White
+     * @return a Collection of all the Locations that contain Pieces for the specified player
+     */
+    public ArrayList<BoardLocation> getPlayersPieces(boolean player) {
+
+        ArrayList<BoardLocation> pieces = new ArrayList<BoardLocation>();
+
+        for (int i = 0; i < currentBoard.size(); i++) {
+            BoardLocation currentLocation = BoardLocation.values()[i];
+            Piece currentPiece = currentBoard.get(currentLocation);
+            if (currentPiece != null && currentPiece.isWhite() == player) {
+                pieces.add(currentLocation);
+            }
+        }
+        return pieces;
     }
 
     /**
@@ -104,6 +142,38 @@ public class ChessModel extends java.util.Observable {
         return (this.currentlyWhitesTurn) ? blackKingInCheck : whiteKingInCheck;
     }
 
+    /**
+     * Returns true if the input player's king is in check
+     * 
+     * @param player The player that we want to to see if is in check
+     * @return if the input player's king is in check
+     */
+    public boolean isThisKingInCheck(boolean player) {
+
+        boolean kingIsInCheck = false;
+        BoardLocation kingLoc = getKingLoc(player);
+        ArrayList<BoardLocation> otherColorPieces = getPlayersPieces(!player);
+
+        if (kingLoc != null) {
+            for (BoardLocation l : otherColorPieces) {
+                String moveString = l.toString() + " " + kingLoc.toString() + "*";
+                if (isMoveValid(ChessFactory.CreateMove(MoveType.CAPTURE, moveString), false)) {
+                    kingIsInCheck = true;
+                }
+            }
+        }
+        return kingIsInCheck;
+    }
+
+    /**
+     * Returns if the current turn is White
+     * 
+     * @return if the current turn is White
+     */
+    public boolean isWhiteTurn() {
+        return this.currentlyWhitesTurn;
+    }
+
 
 
     public ArrayList<BoardLocation> getLocationsThatCanMove() {
@@ -137,7 +207,7 @@ public class ChessModel extends java.util.Observable {
             String moveString = loc.toString() + " " + end.toString();
             ChessMove currentMovingMove = ChessFactory.CreateMove(MoveType.MOVE, moveString);
             ChessMove currentCapturingMove = ChessFactory.CreateMove(MoveType.CAPTURE, moveString);
-            if (validateMove(currentMovingMove, false) || validateMove(currentCapturingMove, false)) {
+            if (isMoveValid(currentMovingMove, false) || isMoveValid(currentCapturingMove, false)) {
                 dests.add(end);
             }
         }
@@ -146,15 +216,25 @@ public class ChessModel extends java.util.Observable {
 
 
 
-    public void addMove(ChessMove m) {
-        if (validateMove(m, true)) {
+    public void addMoveWithoutUpdate(ChessMove m) {
+        addMove(m, false);
+    }
+
+    public void addMoveWithoutUpdate(String m) {
+        addMove(m, false);
+    }
+
+    public void addMove(ChessMove m, boolean updateObservers) {
+        if (isMoveValid(m, true)) {
             movesExecuted.push(m);
             try {
                 executeMove(m);
             } catch (ChessException e) {
                 movesExecuted.pop();
             } finally {
-                setMessage(m.getMessage());
+                if (updateObservers) {
+                    setModelStatusMessage(m.getMessage());
+                }
 
             }
         } else {
@@ -168,28 +248,17 @@ public class ChessModel extends java.util.Observable {
      * @param moveString The String representation of the ChessMove
      * @return If the Move was successfully added
      */
-    public void addMove(String moveString) {
+    public void addMove(String moveString, boolean updateObservers) {
         MoveType movesType = ChessFactory.ValidateMoveString(moveString);
         if (movesType == null) {
             throw new InvalidMoveException(moveString + " - \nThe move syntax was not valid for '" + moveString + "'");
         }
         ChessMove currentMove = ChessFactory.CreateMove(movesType, moveString);
         try {
-            addMove(currentMove);
+            addMove(currentMove, updateObservers);
         } catch (InvalidMoveException e) {
             throw new InvalidMoveException(moveString + " - \nThe move action was not valid for '" + moveString + "'\n" + e.getMessage());
         }
-    }
-
-    /**
-     * Adds a piece to the list
-     * 
-     * @param loc The location on the board
-     * @param p The Piece
-     * @return If it was successfully added
-     */
-    public void addPiece(BoardLocation loc, Piece p) {
-        this.currentBoard.add(loc, p);
     }
 
     /**
@@ -202,11 +271,13 @@ public class ChessModel extends java.util.Observable {
 
         if (currentMove.getType() == MoveType.ADD) {
             this.currentBoard.add(currentMove.getDestLoc(), currentMove.getPiece());
+
         } else if (currentMove.getType() == MoveType.CAPTURE) {
             CaptureMove currentAsCapture = (CaptureMove) currentMove;
             Piece capturedPiece = this.currentBoard.capturePiece(currentAsCapture.getDestLoc());
             currentAsCapture.setPieceCaptured(capturedPiece);
             currentBoard.move(currentMove.getSrcLoc(), currentMove.getDestLoc());
+
         } else if (currentMove.getType() == MoveType.MOVE) {
             this.currentBoard.move(currentMove.getSrcLoc(), currentMove.getDestLoc());
         }
@@ -228,57 +299,9 @@ public class ChessModel extends java.util.Observable {
         if (currentMove.getType() != MoveType.ADD) {
             switchTurn();
         }
-
-
     }
 
-    public ArrayList<BoardLocation> getPlayersPieces(boolean player) {
 
-        ArrayList<BoardLocation> pieces = new ArrayList<BoardLocation>();
-
-        for (int i = 0; i < currentBoard.size(); i++) {
-            BoardLocation currentLocation = BoardLocation.values()[i];
-            Piece currentPiece = currentBoard.get(currentLocation);
-            if (currentPiece != null && currentPiece.isWhite() == player) {
-                pieces.add(currentLocation);
-            }
-        }
-
-        return pieces;
-
-    }
-
-    public boolean isThisKingInCheck(boolean player) {
-
-        boolean kingIsInCheck = false;
-        BoardLocation kingLoc = getKingLoc(player);
-        ArrayList<BoardLocation> otherColorPieces = getPlayersPieces(!player);
-
-        if (kingLoc != null) {
-            for (BoardLocation l : otherColorPieces) {
-                // System.out.println("Piece at: " + l);
-                String moveString = l.toString() + " " + kingLoc.toString() + "*";
-                if (validateMove(ChessFactory.CreateMove(MoveType.CAPTURE, moveString), false)) {
-                    // System.out.println("has checked the king");
-                    kingIsInCheck = true;
-                } else {
-                    // System.out.println("no check");
-                }
-            }
-        }
-
-        return kingIsInCheck;
-        // if (player) {
-        // whiteKingInCheck = kingIsInCheck;
-        // } else {
-        // blackKingInCheck = kingIsInCheck;
-        // }
-
-    }
-
-    public boolean isWhiteTurn() {
-        return this.currentlyWhitesTurn;
-    }
 
     /**
      * Returns the piece at the BoardLocation
@@ -295,7 +318,7 @@ public class ChessModel extends java.util.Observable {
      * 
      * @param newMessage The message to send
      */
-    public void setMessage(String newMessage) {
+    public void setModelStatusMessage(String newMessage) {
         // this.message = newMessage;
         setChanged();
         notifyObservers(newMessage);
@@ -348,7 +371,7 @@ public class ChessModel extends java.util.Observable {
         return this.currentBoard.get(loc) != null;
     }
 
-    private boolean validateMove(ChessMove m, boolean turnCheck) {
+    private boolean isMoveValid(ChessMove m, boolean turnCheck) {
         boolean isValid = true;
         String errorMessage = "";
 
@@ -411,7 +434,7 @@ public class ChessModel extends java.util.Observable {
         m.setMessage(m.getMessage() + errorMessage);
         // System.out.println(errorMessage);
         if (isValid && m.getSubMove() != null) {
-            return validateMove(m.getSubMove(), true);
+            return isMoveValid(m.getSubMove(), true);
         }
         // if (!isValid) {
         // throw new InvalidMoveException(errorMessage);
@@ -457,48 +480,31 @@ public class ChessModel extends java.util.Observable {
             if ((Math.abs(dest.getColumn() - src.getColumn())) == Math.abs(dest.getRow() - src.getRow())) {
                 // TODO
                 // need to add the diag collisions
-                // int testRow = src.getRow();
-                // int testCol = src.getColumn();
-                //
-                // boolean blake = true;
-                //
-                // while (blake) {
-                // if (dest.getColumn() > src.getColumn()) {
-                // // dest is right of src
-                // testCol++;
-                // } else {
-                // // dest is left than src
-                // testCol--;
-                // }
-                // if (dest.getRow() > src.getRow()) {
-                // // dest is above src
-                // testRow++;
-                //
-                // } else {
-                // // dest is below src
-                // testRow--;
-                // }
-                // BoardLocation tempLoc = rowColumnToLoc(testRow, testCol);
-                // if (tempLoc != dest) {
-                // locs.add(tempLoc);
-                // } else {
-                // blake = false;
-                // }
-                //
-                // }
+                int testRow = src.getRow();
+                int testCol = src.getColumn();
 
+                boolean reachedDestination = true;
 
-
+                while (reachedDestination) {
+                    if (dest.getColumn() > src.getColumn()) { // dest is right of src
+                        testCol++;
+                    } else { // dest is left than src
+                        testCol--;
+                    }
+                    if (dest.getRow() > src.getRow()) { // dest is above src
+                        testRow++;
+                    } else { // dest is below src
+                        testRow--;
+                    }
+                    BoardLocation tempLoc = BoardLocation.getLocFromRowAndColumn(testRow, testCol);
+                    if (tempLoc != dest) {
+                        locs.add(tempLoc);
+                    } else {
+                        reachedDestination = false;
+                    }
+                }
             }
         }
         return locs;
-
-    }
-
-    BoardLocation rowColumnToLoc(int row, int col) {
-        int retVal = 0;
-        retVal += col * 8;
-        retVal += row;
-        return BoardLocation.values()[retVal];
     }
 }

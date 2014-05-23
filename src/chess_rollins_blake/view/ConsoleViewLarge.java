@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Observable;
 import java.util.Scanner;
 
+import chess_rollins_blake.controller.GameStatus;
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.ChessMove;
@@ -18,6 +19,7 @@ public class ConsoleViewLarge extends ChessView {
 
     private HashMap<PieceType, String> pieceDisplayMap;
     private HashMap<Boolean, String> pieceColorDisplayMap;
+    private HashMap<GameStatus, String> gameStatusDisplayMap;
     private Scanner scan;
 
     public ConsoleViewLarge() {
@@ -32,6 +34,15 @@ public class ConsoleViewLarge extends ChessView {
         pieceColorDisplayMap = new HashMap<>();
         pieceColorDisplayMap.put(false, "Black");
         pieceColorDisplayMap.put(true, "White");
+
+        gameStatusDisplayMap = new HashMap<GameStatus, String>();
+        gameStatusDisplayMap.put(GameStatus.DARKFORFEIT, pieceColorDisplayMap.get(true) + " player wins because " + pieceColorDisplayMap.get(false) + " player forfeit.");
+        gameStatusDisplayMap.put(GameStatus.DARKWIN, "Checkmate.\n" + pieceColorDisplayMap.get(false) + " player wins.");
+        gameStatusDisplayMap.put(GameStatus.LIGHTFORFEIT, pieceColorDisplayMap.get(false) + " player wins because " + pieceColorDisplayMap.get(true) + " player forfeit.");
+        gameStatusDisplayMap.put(GameStatus.LIGHTWIN, "Checkmate.\n" + pieceColorDisplayMap.get(true) + " player wins.");
+        gameStatusDisplayMap.put(GameStatus.PLAYING, "Game is in progress.");
+        gameStatusDisplayMap.put(GameStatus.STALEMATE, "Tie, Stalemate");
+
 
         scan = new Scanner(System.in);
 
@@ -63,7 +74,15 @@ public class ConsoleViewLarge extends ChessView {
         } else {
             System.out.println("White King is not in check!");
         }
+        System.out.println("");
+        System.out.println("");
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
+        System.out.println("");
 
+    }
+    
+    public void printGameStatus(GameStatus status) {
+        System.out.println(gameStatusDisplayMap.get(status));
     }
 
     public void printMessage() {
@@ -109,55 +128,26 @@ public class ConsoleViewLarge extends ChessView {
         return retString;
     }
 
-//    @Override
-//    public void requestInput() {
-//        boolean curTurnIsWhite = this.model.isWhiteTurn();
-//        System.out.println("-- " + pieceColorDisplayMap.get(curTurnIsWhite) + " Player's turn--");
-//        System.out.println("Please enter the location of the piece you would like to move: ");
-//        boolean moveIsValidSyntax = false;
-//        String tempCommand = "";
-//        ActionEvent event = null;
-//        MoveType tempType = null;
-//        while (!moveIsValidSyntax) {
-//            tempCommand = readLine();
-//            tempType = ChessFactory.ValidateMoveString(tempCommand);
-//            event = new ActionEvent(this, tempType.ordinal(), tempCommand);
-//        }
-//
-//        try {
-//            super.sendRequestToController(event);
-//        } catch (ChessException e) {
-//            System.out.println(e.getMessage());
-//        }
-//
-//        if (tempType == MoveType.LOCATION) {
-//            ArrayList<BoardLocation> aMoves = this.model.getAvailableDestinations();
-//            System.out.println("There are " + aMoves.size() + " vailable moves from " + tempCommand + ":");
-//            for (BoardLocation l : aMoves) {
-//                System.out.println(l);
-//            }
-//        }
-//    }
 
 
     @Override
     public BoardLocation requestSourcePiece() {
         printBoard();
-        
-        
-        
+
+
+
         boolean curTurnIsWhite = this.model.isWhiteTurn();
         System.out.println("-- " + pieceColorDisplayMap.get(curTurnIsWhite) + " Player's turn--");
         System.out.println("Enter the which piece you would like to move?");
-        
+
         ArrayList<ChessMove> moves = this.model.getAvailableMoves();
         HashSet<BoardLocation> srcs = new HashSet<BoardLocation>();
         for (ChessMove m : moves) {
             srcs.add(m.getSrcLoc());
         }
-         
+
         System.out.print("(");
-        
+
         int i = 0;
         for (BoardLocation s : srcs) {
             System.out.print(s.toString());
@@ -166,13 +156,13 @@ public class ConsoleViewLarge extends ChessView {
             }
             i++;
         }
-        
-//        for (int i = 0; i < srcs.size(); i++) {
-//            System.out.print(srcs..get(i).getSrcLoc().toString());
-//            if (i + 1 < srcs.size()) {
-//                System.out.print(",");
-//            }
-//        }
+
+        // for (int i = 0; i < srcs.size(); i++) {
+        // System.out.print(srcs..get(i).getSrcLoc().toString());
+        // if (i + 1 < srcs.size()) {
+        // System.out.print(",");
+        // }
+        // }
         System.out.println(")");
 
         boolean validSource = false;
@@ -210,14 +200,14 @@ public class ConsoleViewLarge extends ChessView {
 
         ArrayList<ChessMove> moves = this.model.getAvailableMoves();
         ArrayList<ChessMove> movesFromSrc = new ArrayList<ChessMove>();
-        
+
         for (ChessMove m : moves) {
             if (m.getSrcLoc() == srcLoc) {
                 movesFromSrc.add(m);
             }
         }
-        
-        
+
+
         System.out.print("(");
         for (int i = 0; i < movesFromSrc.size(); i++) {
             System.out.print(movesFromSrc.get(i).getDestLoc().toString());
@@ -232,7 +222,7 @@ public class ConsoleViewLarge extends ChessView {
         while (!moveIsValidSyntax) {
             String tempCommand = readLine();
             loc = BoardLocation.valueOf(tempCommand.trim());
-            
+
             for (ChessMove m : movesFromSrc) {
                 if (m.getDestLoc() == loc) {
                     moveIsValidSyntax = true;
@@ -245,22 +235,6 @@ public class ConsoleViewLarge extends ChessView {
         return loc;
     }
 
-    //
-    // {
-    //
-    // String moveString = srcLoc.toString() + " " + loc.toString();
-    // if (this.model.getPiece(loc) != null) {
-    // moveString += "*";
-    // }
-    // MoveType moveType = this.model.validateSyntax(moveString);
-    // event = new ActionEvent(this, moveType.ordinal(), moveString);
-    //
-    // try {
-    // super.sendRequestToController(event);
-    // } catch (ChessException e) {
-    // System.out.println(e.getMessage());
-    // }
-    // }
 
     private String readLine() {
         return scan.nextLine();
