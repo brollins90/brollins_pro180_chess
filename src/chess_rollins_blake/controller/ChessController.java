@@ -166,9 +166,15 @@ public class ChessController implements java.awt.event.ActionListener {
             if (this.currentGameStatus == GameStatus.PLAYING) {
 
                 // this.model.setAvailableSources(this.model.isWhiteTurn());
-                BoardLocation src = this.view.requestSourcePiece();
+                BoardLocation src = null;
+                while (src == null) {
+                    src = this.view.requestSourcePiece();
+                }
 
-                BoardLocation dest = this.view.requestDestinationPiece(src);
+                BoardLocation dest = null;
+                while (dest == null) {
+                    dest = this.view.requestDestinationPiece(src);
+                }
 
                 String moveString = src + " " + dest;
                 Piece destPiece = this.model.currentBoard.get(dest);

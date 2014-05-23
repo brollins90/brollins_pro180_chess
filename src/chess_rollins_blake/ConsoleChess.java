@@ -6,6 +6,7 @@ import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.model.ChessModel;
 import chess_rollins_blake.view.ChessView;
 import chess_rollins_blake.view.ConsoleViewLarge;
+import chess_rollins_blake.view.GUIView;
 
 /**
  * This is the entry point into my Chess game The game was built for the PRO180 class at Neumont University in the Spring quarter of 2014
@@ -24,7 +25,8 @@ public class ConsoleChess {
 
         args = new String[1];
         // args[0] = "Donald Byrne vs Robert James Fischer.txt";
-        args[0] = "Garry Kasparov vs Deep Blue.txt";
+        // args[0] = "Garry Kasparov vs Deep Blue_1996.02.10_r1.txt";
+        args[0] = "chess08.txt";
         ConsoleChess c = new ConsoleChess();
         c.playChess(args, true);
     }
@@ -45,8 +47,8 @@ public class ConsoleChess {
 
             ChessModel model = new ChessModel();
             // ChessView view = new ConsoleView();
-            ChessView view = new ConsoleViewLarge();
-            // ChessView view = new GUIView();
+            // ChessView view = new ConsoleViewLarge();
+            GUIView view = new GUIView();
 
             view.setModel(model);
             model.addObserver(view);
@@ -61,6 +63,8 @@ public class ConsoleChess {
                 controller.loadNewBoard();
             }
             controller.loadFromFile(args[0]);
+
+            view.update();
             controller.playChess();
 
 

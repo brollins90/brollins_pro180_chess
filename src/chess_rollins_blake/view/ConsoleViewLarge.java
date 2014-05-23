@@ -17,32 +17,9 @@ import chess_rollins_blake.model.pieces.Piece;
 
 public class ConsoleViewLarge extends ChessView {
 
-    private HashMap<PieceType, String> pieceDisplayMap;
-    private HashMap<Boolean, String> pieceColorDisplayMap;
-    private HashMap<GameStatus, String> gameStatusDisplayMap;
     private Scanner scan;
 
     public ConsoleViewLarge() {
-        pieceDisplayMap = new HashMap<>();
-        pieceDisplayMap.put(PieceType.b, "Bishop ");
-        pieceDisplayMap.put(PieceType.k, " King  ");
-        pieceDisplayMap.put(PieceType.n, "Knight ");
-        pieceDisplayMap.put(PieceType.p, " Pawn  ");
-        pieceDisplayMap.put(PieceType.q, "Queen  ");
-        pieceDisplayMap.put(PieceType.r, " Rook  ");
-
-        pieceColorDisplayMap = new HashMap<>();
-        pieceColorDisplayMap.put(false, "Black");
-        pieceColorDisplayMap.put(true, "White");
-
-        gameStatusDisplayMap = new HashMap<GameStatus, String>();
-        gameStatusDisplayMap.put(GameStatus.DARKFORFEIT, pieceColorDisplayMap.get(true) + " player wins because " + pieceColorDisplayMap.get(false) + " player forfeit.");
-        gameStatusDisplayMap.put(GameStatus.DARKWIN, "Checkmate.\n" + pieceColorDisplayMap.get(false) + " player wins.");
-        gameStatusDisplayMap.put(GameStatus.LIGHTFORFEIT, pieceColorDisplayMap.get(false) + " player wins because " + pieceColorDisplayMap.get(true) + " player forfeit.");
-        gameStatusDisplayMap.put(GameStatus.LIGHTWIN, "Checkmate.\n" + pieceColorDisplayMap.get(true) + " player wins.");
-        gameStatusDisplayMap.put(GameStatus.PLAYING, "Game is in progress.");
-        gameStatusDisplayMap.put(GameStatus.STALEMATE, "Tie, Stalemate");
-
 
         scan = new Scanner(System.in);
 
