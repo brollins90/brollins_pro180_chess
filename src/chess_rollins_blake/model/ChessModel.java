@@ -11,6 +11,7 @@ import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
 import chess_rollins_blake.lib.MovingMove;
 import chess_rollins_blake.lib.PieceType;
+import chess_rollins_blake.model.pieces.King;
 import chess_rollins_blake.model.pieces.Piece;
 
 public class ChessModel extends java.util.Observable {
@@ -225,7 +226,7 @@ public class ChessModel extends java.util.Observable {
     }
 
     public void addMove(ChessMove m, boolean updateObservers) {
-        if (isMoveValid(m, true)) {
+        if (isMoveValid(m, updateObservers)) {
             movesExecuted.push(m);
             try {
                 executeMove(m);
@@ -283,20 +284,15 @@ public class ChessModel extends java.util.Observable {
         }
         if (currentMove.getSubMove() != null) {
             executeMove(currentMove.getSubMove());
+//            switchTurn();
         }
 
 
         // Check Check
         this.whiteKingInCheck = isThisKingInCheck(true);
         this.blackKingInCheck = isThisKingInCheck(false);
-        // if (checkKingInCheck(currentTurn)) {
-        // System.out.println(currentTurn + " king is in check!");
-        // } else {
-        //
-        // System.out.println(currentTurn + " king is not in check!");
-        // }
 
-        if (currentMove.getType() != MoveType.ADD) {
+        if (currentMove.shouldChangeTurn()) {
             switchTurn();
         }
     }
@@ -331,6 +327,7 @@ public class ChessModel extends java.util.Observable {
     }
 
     private void switchTurn() {
+        System.out.println("SWITCHING TURNS: new turn is " + !this.currentlyWhitesTurn);
         this.currentlyWhitesTurn = !currentlyWhitesTurn;
     }
 
@@ -350,7 +347,7 @@ public class ChessModel extends java.util.Observable {
         } else if (m instanceof MovingMove) {
             undo = ChessFactory.CreateMove(m.getDestLoc() + " " + m.getSrcLoc());
         }
-
+        undo.setChangeTurnAfter(false);
         executeMove(undo);
 
 
@@ -409,6 +406,27 @@ public class ChessModel extends java.util.Observable {
             errorMessage += "ERROR: " + m.getMoveString() + " - The destination is the same color, cannot Capture.\n";
         }
 
+//        // Check for a submove, normally used when castling
+//        if (isValid && (m.getType() == MoveType.MOVE) && m.getSubMove() != null) {
+//            
+//            // If it is a king
+//            if (this.currentBoard.get(m.getSrcLoc()).getType() == PieceType.k) {
+//                King currentPiece = (King) this.currentBoard.get(m.getSrcLoc());
+//                
+//                // could be a valid castling move, YAY
+//                if (currentPiece.isValidCastlingMove(m.getSrcLoc(), m.getDestLoc())) {
+//                    
+//                } else {
+//                    isValid = false;
+//                    errorMessage += "ERROR: " + m.getMoveString() + " - the move was not a valid castling move, or my test logic is wrong....\n";
+//                }
+//            } else {
+//                isValid = false;
+//                errorMessage += "ERROR: " + m.getMoveString() + " - I am not sure how I would get here.\n";
+//
+//            }
+//        }
+        
         if (isValid && (m.getType() == MoveType.MOVE) && !this.currentBoard.get(m.getSrcLoc()).isValidMovement(m.getSrcLoc(), m.getDestLoc(), false)) {
             isValid = false;
             errorMessage += "ERROR: " + m.getMoveString() + " - The move was not valid.\n";
@@ -418,7 +436,7 @@ public class ChessModel extends java.util.Observable {
             isValid = false;
             errorMessage += "ERROR: " + m.getMoveString() + " - The capture was not valid.\n";
         }
-
+        
         if (isValid && (m.getType() == MoveType.MOVE || m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getSrcLoc()).canCollide()) {
             ArrayList<BoardLocation> locsToCheck = getLocationsBetween(m.getSrcLoc(), m.getDestLoc());
             for (BoardLocation l : locsToCheck) {

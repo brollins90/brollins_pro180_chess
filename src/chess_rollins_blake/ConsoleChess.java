@@ -23,10 +23,10 @@ public class ConsoleChess {
     public static void main(String[] args) {
 
         args = new String[1];
-        //args[0] = "Donald Byrne vs Robert James Fischer.txt";
-        args[0] = "fourMoveCheckMate.txt";
+        // args[0] = "Donald Byrne vs Robert James Fischer.txt";
+        args[0] = "Garry Kasparov vs Deep Blue.txt";
         ConsoleChess c = new ConsoleChess();
-        c.playChess(args);
+        c.playChess(args, true);
     }
 
     /**
@@ -34,7 +34,7 @@ public class ConsoleChess {
      * 
      * @param args
      */
-    private void playChess(String[] args) {
+    private void playChess(String[] args, boolean loadNewBoardFirst) {
 
         try {
 
@@ -57,13 +57,13 @@ public class ConsoleChess {
 
             view.addController(controller);
 
-            // controller.loadFromFile("newBoard.txt");
-            controller.loadNewBoard();
+            if (loadNewBoardFirst) {
+                controller.loadNewBoard();
+            }
             controller.loadFromFile(args[0]);
             controller.playChess();
-            
-            
-            
+
+
 
             // view.printBoard();
         } catch (ChessException e) {

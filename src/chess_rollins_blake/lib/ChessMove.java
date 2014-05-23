@@ -4,7 +4,7 @@ import chess_rollins_blake.model.pieces.Piece;
 
 public class ChessMove {
 
-    protected boolean capturedAPiece;
+    // protected boolean capturedAPiece;
     protected BoardLocation destLoc;
     protected String message;
     protected String moveString;
@@ -12,49 +12,59 @@ public class ChessMove {
     protected BoardLocation srcLoc;
     protected ChessMove subMove;
     protected MoveType type;
+    protected boolean changeTurnAfter;
 
     public ChessMove(String moveString) {
         moveString = moveString.toLowerCase();
         this.message = moveString + " - ";
-        this.capturedAPiece = false;
+        // this.capturedAPiece = false;
         this.moveString = moveString;
         this.piece = null;
         this.subMove = null;
+        this.changeTurnAfter = true;
     }
-    
+
     public BoardLocation getDestLoc() {
         return this.destLoc;
     }
-    
+
     public String getMessage() {
         return this.message;
     }
-    
+
     public String getMoveString() {
         return this.moveString;
     }
-    
+
     public Piece getPiece() {
         return this.piece;
     }
-    
+
     public BoardLocation getSrcLoc() {
         return this.srcLoc;
     }
-    
+
     public ChessMove getSubMove() {
         return this.subMove;
     }
-    
+
     public MoveType getType() {
         return this.type;
     }
-    
+
     public void setMessage(String message) {
         this.message = message;
     }
-    
+
     public void setSubmove(ChessMove sub) {
         this.subMove = sub;
+    }
+
+    public boolean shouldChangeTurn() {
+        return this.changeTurnAfter;
+    }
+
+    public void setChangeTurnAfter(boolean b) {
+        this.changeTurnAfter = b;
     }
 }

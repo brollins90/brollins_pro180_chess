@@ -8,9 +8,9 @@ public class CaptureMove extends MovingMove {
     
     public CaptureMove(String moveString) {
         super(moveString);
-        this.capturedAPiece = true;
-        this.type = MoveType.CAPTURE;
-        this.message = this.message.substring(0, this.message.length() - 2) + " and captured a piece\n";
+        //super.capturedAPiece = true;
+        super.type = MoveType.CAPTURE;
+        super.message = this.message.substring(0, this.message.length() - 2) + " and captured a piece\n";
     }
     
     public void setPieceCaptured(Piece captured) {

@@ -124,6 +124,7 @@ public class ChessController implements java.awt.event.ActionListener {
                     }
                     ChessMove testMove = ChessFactory.CreateMove(moveString);
                     try {
+                        testMove.setChangeTurnAfter(false);
                         this.addMoveWithoutUpdate(testMove);
                         this.model.isThisKingInCheck(this.model.isWhiteTurn());
                         if (wasKingInCheck && !this.model.isOtherInCheck()) {
@@ -132,7 +133,7 @@ public class ChessController implements java.awt.event.ActionListener {
                         moves.add(testMove);
                         this.model.undoMove();
                     } catch (ChessException e) {
-                        System.out.println("ERROR");
+                        System.out.println("ERROR: " + e.getMessage());
                     }
 
                 }

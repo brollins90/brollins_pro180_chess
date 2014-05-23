@@ -8,11 +8,12 @@ public class AddMove extends ChessMove {
         super(moveString);
         PieceType type = PieceType.valueOf("" + moveString.charAt(0));
         boolean pieceIsWhite = (moveString.charAt(1) == 'l');
-        this.piece = ChessFactory.CreatePiece(type, pieceIsWhite);
-        this.srcLoc = BoardLocation.none;
-        this.destLoc = BoardLocation.valueOf("" + moveString.substring(2));
-        this.type = MoveType.ADD;
-        this.message += "Created a new Piece at " + this.destLoc + " color: " + this.piece.isWhite() + " type: " + this.piece.getType() + ".\n";
+        super.piece = ChessFactory.CreatePiece(type, pieceIsWhite);
+        super.srcLoc = BoardLocation.none;
+        super.destLoc = BoardLocation.valueOf("" + moveString.substring(2));
+        super.type = MoveType.ADD;
+        super.message += "Created a new Piece at " + this.destLoc + " color: " + this.piece.isWhite() + " type: " + this.piece.getType() + ".\n";
+        super.changeTurnAfter = false;
     }
 
 }
