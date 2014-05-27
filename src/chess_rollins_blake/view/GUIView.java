@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Observable;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
@@ -24,73 +25,42 @@ import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
 import chess_rollins_blake.lib.PieceType;
+import chess_rollins_blake.model.ChessModel;
 import chess_rollins_blake.model.pieces.Piece;
 
 public class GUIView extends ChessView {
 
     JButton[][] boardSquares = new JButton[8][8];
-    BufferedImage[][] images = new BufferedImage[2][6];
     JLabel messageLabel, whiteInCheckLabel, blackInCheckLabel;
+    BoardPanel boardPanel;
 
+    private Scanner scan;
 
     public GUIView() {
+
+        scan = new Scanner(System.in);
+
+
         JFrame frame = new JFrame();
         JPanel outerPanel = new JPanel();
-        JPanel boardPanel = new JPanel((new GridLayout(8, 8)));
+        this.boardPanel = new BoardPanel();
+        this.boardPanel.setPreferredSize(new Dimension(600, 600));
 
-        for (int rowIndex = 7; rowIndex >= 0; rowIndex--) {
-            for (int colindex = 0; colindex < 8; colindex++) {
-                JButton temp = new JButton();
-                temp.setMinimumSize(new Dimension(50, 50));
-                boardSquares[rowIndex][colindex] = temp;
-                boardPanel.add(temp);
-                // cBoard[i][j] = new JPanel();
-                // cBoard[i][j].setMinimumSize(new Dimension(50, 50));
-                // outerPanel.add(cBoard[i][j]);
-            }
-        }
-
-        try {
-            BufferedImage bImage = ImageIO.read(new File("Chess_symbols2.PNG"));
-            int colWidth = 63;
-            int rowHeight = 72;
-            int rowNum = 2;
-            int colNum = 6;
-
-            for (int i = 0; i < rowNum; i++) {
-                //System.out.println("i: " + i);
-                for (int j = 0; j < colNum; j++) {
-                    //System.out.println("j: " + j);
-                    int x = j * colWidth;
-                    int y = i * rowHeight;
-                    int w = colWidth;
-                    int h = rowHeight;
-                    //System.out.println("x: " + x + ",y: " + y + ",w: " + w + ",h: " + h);
-                    images[i][j] = bImage.getSubimage(x, y, w, h);
-                }
-            }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        outerPanel.add(new JLabel());
-        outerPanel.add(new JLabel());
-        outerPanel.add(new JLabel());
-        outerPanel.add(new JLabel());
         outerPanel.add(boardPanel);
-        outerPanel.add(new JLabel());
 
+        // White in check
         whiteInCheckLabel = new JLabel();
         outerPanel.add(whiteInCheckLabel);
 
+        // Status
         messageLabel = new JLabel();
         messageLabel.setText("POOP");
         outerPanel.add(messageLabel);
-        
+
+        // Black in check
         blackInCheckLabel = new JLabel();
         outerPanel.add(blackInCheckLabel);
+
 
         frame.add(outerPanel);
 
@@ -99,36 +69,6 @@ public class GUIView extends ChessView {
         // frame.pack();
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
-
-    private ImageIcon getIconFromTypeAndColor(PieceType t, boolean c) {
-        ImageIcon retVal = null;
-
-        int colorInt = (c) ? 0 : 1;
-        switch (t) {
-            case k:
-                retVal = new ImageIcon(images[colorInt][0]);
-                break;
-            case q:
-                retVal = new ImageIcon(images[colorInt][1]);
-                break;
-            case b:
-                retVal = new ImageIcon(images[colorInt][2]);
-                break;
-            case n:
-                retVal = new ImageIcon(images[colorInt][3]);
-                break;
-            case r:
-                retVal = new ImageIcon(images[colorInt][4]);
-                break;
-            case p:
-                retVal = new ImageIcon(images[colorInt][5]);
-                break;
-        }
-
-
-        return retVal;
-
     }
 
     public void update(Observable obs, Object obj) {
@@ -151,39 +91,18 @@ public class GUIView extends ChessView {
     }
 
     public void updateBoard() {
-        // Create the column numbers
-        // String retString = "";
-        // retString += "--|----A---------B---------C---------D---------E---------F---------G---------H----|--\n";
-        int numberOfRows = this.model.currentBoard.getBoardSize();
-        int numberOfCols = this.model.currentBoard.getBoardSize();
-
-        int blackBack = 1;
-        for (int rowIndex = numberOfRows - 1; rowIndex > -1; rowIndex--) {
-            blackBack++;
-            // Print each row
-            for (int colIndex = 0; colIndex < numberOfCols; colIndex++) {
-                blackBack++;
-                int currentPieceLocation = colIndex * numberOfCols + rowIndex;
-                Piece temp = this.model.getPiece(BoardLocation.values()[currentPieceLocation]);
-
-                if (temp != null) {
-                    boardSquares[rowIndex][colIndex].setIcon(getIconFromTypeAndColor(temp.getType(), temp.isWhite()));
-                }
-                if (blackBack % 2 == 0) {
-                    boardSquares[rowIndex][colIndex].setBackground(Color.GRAY);
-                }
-            }
-        }
+        this.boardPanel.updateUI();
     }
 
     @Override
     public BoardLocation requestSourcePiece() {
-        update();
-        
-        
+        boardPanel.setAvailableDestinations(new HashSet<BoardLocation>());
+        // update();
+
+
         boolean curTurnIsWhite = this.model.isWhiteTurn();
         System.out.println("-- " + pieceColorDisplayMap.get(curTurnIsWhite) + " Player's turn--");
-        System.out.println("Enter the which piece you would like to move?");
+        // System.out.println("Enter the which piece you would like to move?");
 
         ArrayList<ChessMove> moves = this.model.getAvailableMoves();
         HashSet<BoardLocation> srcs = new HashSet<BoardLocation>();
@@ -191,39 +110,25 @@ public class GUIView extends ChessView {
             srcs.add(m.getSrcLoc());
         }
 
-        System.out.print("(");
+        boardPanel.setAvailableSources(srcs);
+        update();
 
-        int i = 0;
-        for (BoardLocation s : srcs) {
-            System.out.print(s.toString());
-            if (i + 1 < srcs.size()) {
-                System.out.print(",");
-            }
-            i++;
-        }
 
-        // for (int i = 0; i < srcs.size(); i++) {
-        // System.out.print(srcs..get(i).getSrcLoc().toString());
-        // if (i + 1 < srcs.size()) {
-        // System.out.print(",");
-        // }
-        // }
-        System.out.println(")");
 
         boolean validSource = false;
         BoardLocation loc = null;
         do {
-//            String locationString = readLine();
-//            loc = BoardLocation.valueOf(locationString.trim());
-//
-//            for (BoardLocation l : srcs) {
-//                if (l == loc) {
-//                    validSource = true;
-//                }
-//            }
-//            if (!validSource) {
-//                System.out.println("Location is not valid.  Enter a new location.");
-//            }
+            String locationString = readLine();
+            loc = BoardLocation.valueOf(locationString.trim());
+
+            for (BoardLocation l : srcs) {
+                if (l == loc) {
+                    validSource = true;
+                }
+            }
+            if (!validSource) {
+                System.out.println("Location is not valid.  Enter a new location.");
+            }
         } while (!validSource);
 
         ActionEvent event = new ActionEvent(this, MoveType.LOCATION.ordinal(), loc.toString());
@@ -235,17 +140,63 @@ public class GUIView extends ChessView {
         }
         return loc;
 
-        
-        
-//        return null;
+
+
+        // return null;
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public BoardLocation requestDestinationPiece(BoardLocation srcLoc) {
-        return null;
-        // TODO Auto-generated method stub
+
+
+        // System.out.println("Select destination from: ");
+
+        ArrayList<ChessMove> moves = this.model.getAvailableMoves();
+        ArrayList<ChessMove> movesFromSrc = new ArrayList<ChessMove>();
+        HashSet<BoardLocation> dests = new HashSet<BoardLocation>();
+
+        for (ChessMove m : moves) {
+            if (m.getSrcLoc() == srcLoc) {
+                movesFromSrc.add(m);
+                dests.add(m.getDestLoc());
+            }
+        }
+
+
+        boardPanel.setAvailableDestinations(dests);
+        update();
+
+
+        // System.out.print("(");
+        // for (int i = 0; i < movesFromSrc.size(); i++) {
+        // System.out.print(movesFromSrc.get(i).getDestLoc().toString());
+        // if (i + 1 < movesFromSrc.size()) {
+        // System.out.print(",");
+        // }
+        // }
+        // System.out.println(")");
+
+        BoardLocation loc = null;
+        boolean moveIsValidSyntax = false;
+        while (!moveIsValidSyntax) {
+            String tempCommand = readLine();
+            try {
+                loc = BoardLocation.valueOf(tempCommand.trim());
+            } catch (IllegalArgumentException e) {
+                
+            }
+            for (ChessMove m : movesFromSrc) {
+                if (m.getDestLoc() == loc) {
+                    moveIsValidSyntax = true;
+                }
+            }
+            if (!moveIsValidSyntax) {
+                System.out.println(tempCommand + " is not a valid destination.  Try again.");
+            }
+        }
+        return loc;
 
     }
 
@@ -253,6 +204,16 @@ public class GUIView extends ChessView {
     public void printGameStatus(GameStatus status) {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public void setModel(ChessModel m) {
+        this.model = m;
+        this.boardPanel.setModel(this.model);
+    }
+
+    private String readLine() {
+        return scan.nextLine();
     }
 
 }
