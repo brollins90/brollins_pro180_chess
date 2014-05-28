@@ -14,7 +14,7 @@ import chess_rollins_blake.view.ConsoleViewLarge;
  */
 public class ConsoleChess {
 
-    static boolean DEBUG_ON = true;
+    static boolean DEBUG_ON = false;
 
     public static void debugMessage(String s) {
         if (DEBUG_ON) {

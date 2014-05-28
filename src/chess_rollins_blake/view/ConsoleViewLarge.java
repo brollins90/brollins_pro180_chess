@@ -73,6 +73,10 @@ public class ConsoleViewLarge extends ChessView {
 
     public void printBoard() {
         // Create the column numbers
+
+        BoardLocation tempSource = this.model.getCurrentModelStateLocation();
+        HashSet<BoardLocation> tempDests = this.model.getAvailableDestinationsFromLocation(tempSource);
+
         String retString = "";
         retString += "--|----A---------B---------C---------D---------E---------F---------G---------H----|--\n";
         int numberOfRows = this.model.getBoardRowSize();
@@ -85,8 +89,13 @@ public class ConsoleViewLarge extends ChessView {
             // Print each row
             for (int colIndex = 0; colIndex < numberOfCols; colIndex++) {
                 int currentPieceLocation = colIndex * numberOfCols + rowIndex;
-                retString += pieceString(this.model.getPiece(BoardLocation.values()[currentPieceLocation])) + " | ";
-
+                retString += pieceString(this.model.getPiece(BoardLocation.values()[currentPieceLocation]));
+                if (tempDests.contains(currentPieceLocation)) {
+                    retString += "&";
+                } else {
+                    retString += " ";
+                }
+                retString += " | ";
             }
             // Create the row numbers
             retString += (rowIndex + 1) + "\n";
@@ -102,7 +111,7 @@ public class ConsoleViewLarge extends ChessView {
         if (p != null) {
             retString = (p.isWhite()) ? pieceDisplayMap.get(p.getType()).toUpperCase() : pieceDisplayMap.get(p.getType()).toLowerCase();
         } else {
-            retString += "-------";
+            retString += "------";
         }
         return retString;
     }
@@ -160,6 +169,8 @@ public class ConsoleViewLarge extends ChessView {
         } catch (ChessException e) {
             System.out.println(e.getMessage());
         }
+
+
         return loc;
 
 
@@ -171,23 +182,41 @@ public class ConsoleViewLarge extends ChessView {
         System.out.println("Select destination from: ");
 
         HashSet<ChessMove> moves = this.model.getAvailableMoves();
-        ArrayList<ChessMove> movesFromSrc = new ArrayList<ChessMove>();
+        //ArrayList<ChessMove> movesFromSrc = new ArrayList<ChessMove>();
+        TreeSet<BoardLocation> dests = this.model.getDestsFromMoveCache(srcLoc);
+//        for (ChessMove m : moves) {
+//            srcs.add(m.getSrcLoc());
+//        }
 
-        for (ChessMove m : moves) {
-            if (m.getSrcLoc() == srcLoc) {
-                movesFromSrc.add(m);
-            }
-        }
-        movesFromSrc.sort(null);
-        
         System.out.print("(");
-        for (int i = 0; i < movesFromSrc.size(); i++) {
-            System.out.print(movesFromSrc.get(i).getDestLoc().toString());
-            if (i + 1 < movesFromSrc.size()) {
+
+        int i = 0;
+        for (BoardLocation s : dests) {
+            System.out.print(s.toString());
+            if (i + 1 < dests.size()) {
                 System.out.print(",");
             }
+            i++;
         }
         System.out.println(")");
+        
+        
+//
+//        for (ChessMove m : moves) {
+//            if (m.getSrcLoc() == srcLoc) {
+//                movesFromSrc.add(m);
+//            }
+//        }
+//        movesFromSrc.sort(null);
+//
+//        System.out.print("(");
+//        for (int i = 0; i < movesFromSrc.size(); i++) {
+//            System.out.print(movesFromSrc.get(i).getDestLoc().toString());
+//            if (i + 1 < movesFromSrc.size()) {
+//                System.out.print(",");
+//            }
+//        }
+//        System.out.println(")");
 
         BoardLocation loc = null;
         boolean moveIsValidSyntax = false;
@@ -195,8 +224,8 @@ public class ConsoleViewLarge extends ChessView {
             String tempCommand = readLine();
             loc = BoardLocation.valueOf(tempCommand.trim());
 
-            for (ChessMove m : movesFromSrc) {
-                if (m.getDestLoc() == loc) {
+            for (BoardLocation m : dests) {
+                if (m == loc) {
                     moveIsValidSyntax = true;
                 }
             }

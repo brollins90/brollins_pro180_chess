@@ -24,12 +24,12 @@ public abstract class ChessView implements java.util.Observer {
     public ChessView(ChessModel model) {
         this.model = model;
         pieceDisplayMap = new HashMap<>();
-        pieceDisplayMap.put(PieceType.b, "Bishop ");
-        pieceDisplayMap.put(PieceType.k, " King  ");
-        pieceDisplayMap.put(PieceType.n, "Knight ");
-        pieceDisplayMap.put(PieceType.p, " Pawn  ");
-        pieceDisplayMap.put(PieceType.q, "Queen  ");
-        pieceDisplayMap.put(PieceType.r, " Rook  ");
+        pieceDisplayMap.put(PieceType.b, "Bishop");
+        pieceDisplayMap.put(PieceType.k, " King ");
+        pieceDisplayMap.put(PieceType.n, "Knight");
+        pieceDisplayMap.put(PieceType.p, " Pawn ");
+        pieceDisplayMap.put(PieceType.q, "Queen ");
+        pieceDisplayMap.put(PieceType.r, " Rook ");
 
         pieceColorDisplayMap = new HashMap<>();
         pieceColorDisplayMap.put(false, "Black");

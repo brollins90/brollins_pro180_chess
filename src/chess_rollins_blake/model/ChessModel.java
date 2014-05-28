@@ -3,6 +3,7 @@ package chess_rollins_blake.model;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Stack;
+import java.util.TreeSet;
 
 import chess_rollins_blake.ConsoleChess;
 import chess_rollins_blake.controller.GameStatus;
@@ -25,7 +26,7 @@ public class ChessModel extends java.util.Observable {
     protected String statusMessage;
     protected boolean currentlyWhitesTurn;
 
-    protected BoardLocation currentModelState = BoardLocation.none;
+    protected BoardLocation currentModelStateLocation = BoardLocation.none;
     protected HashSet<ChessMove> availableMovesCache;
     protected HashSet<BoardLocation> availableSourcesCache;
 
@@ -34,10 +35,6 @@ public class ChessModel extends java.util.Observable {
 
     BoardLocation whiteKingLoc = null;
     BoardLocation blackKingLoc = null;
-
-    // protected int whitePiecesTaken;
-    // protected int blackPiecesTaken;
-
 
 
     /**
@@ -51,43 +48,35 @@ public class ChessModel extends java.util.Observable {
         this.currentlyWhitesTurn = true;
         this.whiteKingInCheck = false;
         this.blackKingInCheck = false;
-        // this.whitePiecesTaken = 0;
-        // this.blackPiecesTaken = 0;
-
-        availableMovesCache = new HashSet<ChessMove>();
+        resetView();
     }
-
-    public void resetView() {
-        this.currentModelState = BoardLocation.none;
-        this.availableMovesCache = null;
-        this.availableSourcesCache = null;
-
-        populateAvailableMoves();
-    }
-
-
-    public BoardLocation getCurrentModelState() {
-        return this.currentModelState;
-    }
-
-    public void setCurrentModelState(BoardLocation loc) {
-        if (this.currentModelState != loc) {
-            this.currentModelState = loc;
-            resetView();
+    public HashSet<ChessMove> getAvailableMoves() {
+        if (this.availableMovesCache == null) {
+            populateAvailableMoveCache();
         }
+        return this.availableMovesCache;
     }
 
-    // public void setAvailableMoves(HashSet<ChessMove> moves) {
-    // ConsoleChess.debugMessage("ChessModel.setAvailableMoves()");
-    // this.availableMovesCache = moves;
-    //
-    // this.availableSourcesCache = new HashSet<BoardLocation>();
-    // for (ChessMove m : moves) {
-    // this.availableSourcesCache.add(m.getSrcLoc());
-    // }
-    // }
+//    public HashSet<BoardLocation> getAvailableSources() {
+//        return this.availableSourcesCache;
+//    }
 
-    public void populateAvailableMoves() {
+    public BoardLocation getCurrentModelStateLocation() {
+        return this.currentModelStateLocation;
+    }
+
+    public TreeSet<BoardLocation> getDestsFromMoveCache(BoardLocation sourceLocation) {
+        TreeSet<BoardLocation> destinations = new TreeSet<BoardLocation>();
+
+        for (ChessMove m : this.availableMovesCache) {
+            if (m.getSrcLoc() == sourceLocation) {
+                destinations.add(m.getDestLoc());
+            }
+        }
+        return destinations;
+    }
+
+    private void populateAvailableMoveCache() {
 
         // Get all the pieces for this player that have moves.
         HashSet<BoardLocation> piecesThatCanMove = this.getLocationsThatCanMove();
@@ -111,7 +100,7 @@ public class ChessModel extends java.util.Observable {
                     testMove.setChangeTurnAfter(false);
                     this.addMoveWithoutUpdate(testMove);
                     boolean isKingInCheckNow = this.isThisKingInCheck(this.isWhiteTurn());
-                    if (wasKingInCheck && !isKingInCheckNow) { //!this.model.isOtherInCheck()) {
+                    if (wasKingInCheck && !isKingInCheckNow) { // !this.model.isOtherInCheck()) {
                         movesThatCanGetOutOfCheck.add(testMove);
                     }
                     moves.add(testMove);
@@ -119,61 +108,28 @@ public class ChessModel extends java.util.Observable {
                 } catch (ChessException e) {
                     System.out.println("ERROR: " + e.getMessage());
                 }
-
             }
-
         }
-
-
+        // Set the Collection based on whether or not the king was previously in check
         this.availableMovesCache = (wasKingInCheck) ? movesThatCanGetOutOfCheck : moves;
-////        this.model.setAvailableMoves(moves);
-//        if (wasKingInCheck) {
-//
-//            if (movesThatCanGetOutOfCheck.size() == 0) {
-//                this.currentGameStatus = this.model.isWhiteTurn() ? GameStatus.DARKWIN : GameStatus.LIGHTWIN;
-//                 System.out.println("Stalemate or checkmate");
-//            }else {
-//                System.out.println("game is not over...");
-//            }
-//            System.out.println("king was in check");
-//            for (ChessMove m : movesThatCanGetOutOfCheck) {
-//                System.out.println(m.getMoveString());
-//
-//            }
-//
-//            this.model.setAvailableMoves(movesThatCanGetOutOfCheck);
-//        }
-
 
     }
 
-    private void setAvailableMoves(HashSet<ChessMove> moves) {
-        ConsoleChess.debugMessage("ChessModel.setAvailableMoves()");
-        this.availableMovesCache = moves;
+    public void resetView() {
+        this.currentModelStateLocation = BoardLocation.none;
+        this.availableMovesCache = null;
+        this.availableSourcesCache = null;
+        populateAvailableMoveCache();
+    }
 
-        this.availableSourcesCache = new HashSet<BoardLocation>();
-        for (ChessMove m : moves) {
-            this.availableSourcesCache.add(m.getSrcLoc());
+    public void setCurrentModelStateLocation(BoardLocation loc) {
+        if (this.currentModelStateLocation != loc) {
+            this.currentModelStateLocation = loc;
+            resetView();
         }
     }
-
-    public HashSet<ChessMove> getAvailableMoves() {
-        return this.availableMovesCache;
-    }
-
-    public HashSet<BoardLocation> getAvailableSources() {
-        return this.availableSourcesCache;
-    }
-
-    public void setAvailableSources() {
-
-        this.availableSourcesCache = new HashSet<BoardLocation>();
-        for (ChessMove m : this.availableMovesCache) {
-            this.availableSourcesCache.add(m.getSrcLoc());
-        }
-    }
-
-
+    
+    
 
     /**
      * Adds a piece to the list
@@ -350,16 +306,18 @@ public class ChessModel extends java.util.Observable {
     public HashSet<BoardLocation> getAvailableDestinationsFromLocation(BoardLocation loc) {
         ConsoleChess.debugMessage("ChessModel.getAvailableDestinationsFromLocation()");
         HashSet<BoardLocation> dests = new HashSet<BoardLocation>();
-        Piece p = this.getPiece(loc);
+        if (loc != BoardLocation.none) {
+            Piece p = this.getPiece(loc);
 
-        // TODO iterator stuff
-        for (int i = 0; i < this.currentBoard.getBoardSize(); i++) {
-            BoardLocation end = BoardLocation.values()[i];
-            String moveString = loc.toString() + " " + end.toString();
-            ChessMove currentMovingMove = ChessFactory.CreateMove(MoveType.MOVE, moveString);
-            ChessMove currentCapturingMove = ChessFactory.CreateMove(MoveType.CAPTURE, moveString);
-            if (isMoveValid(currentMovingMove, false) || isMoveValid(currentCapturingMove, false)) {
-                dests.add(end);
+            // TODO iterator stuff
+            for (int i = 0; i < this.currentBoard.getBoardSize(); i++) {
+                BoardLocation end = BoardLocation.values()[i];
+                String moveString = loc.toString() + " " + end.toString();
+                ChessMove currentMovingMove = ChessFactory.CreateMove(MoveType.MOVE, moveString);
+                ChessMove currentCapturingMove = ChessFactory.CreateMove(MoveType.CAPTURE, moveString);
+                if (isMoveValid(currentMovingMove, false) || isMoveValid(currentCapturingMove, false)) {
+                    dests.add(end);
+                }
             }
         }
         return dests;

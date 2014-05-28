@@ -59,7 +59,7 @@ public class BoardPanel extends JPanel {
     public void paint(Graphics g) {
 
         // check the current location
-        BoardLocation tempSource = this.model.getCurrentModelState();
+        BoardLocation tempSource = this.model.getCurrentModelStateLocation();
 
         if (tempSource != prevLoc) {
             prevLoc = tempSource;
