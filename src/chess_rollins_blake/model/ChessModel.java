@@ -1,6 +1,7 @@
 package chess_rollins_blake.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Stack;
 
@@ -50,16 +51,18 @@ public class ChessModel extends java.util.Observable {
 
         availableMoves = new HashSet<ChessMove>();
     }
+
     public BoardLocation getCurrentModelState() {
         return this.currentModelState;
     }
+
     public void setCurrentModelState(BoardLocation loc) {
         this.currentModelState = loc;
         this.availableMoves = null;
         this.availableSources = null;
-        
-        //TODO
-        
+
+        // TODO
+
         // reset everything
     }
 
@@ -129,10 +132,10 @@ public class ChessModel extends java.util.Observable {
      * @param player If the player is White
      * @return a Collection of all the Locations that contain Pieces for the specified player
      */
-    public ArrayList<BoardLocation> getPlayersPieces(boolean player) {
+    public Collection<BoardLocation> getPlayersPieces(boolean player) {
         ConsoleChess.debugMessage("ChessModel.getPlayersPieces()");
 
-        ArrayList<BoardLocation> pieces = new ArrayList<BoardLocation>();
+        Collection<BoardLocation> pieces = new ArrayList<BoardLocation>();
 
         for (int i = 0; i < currentBoard.getBoardSize(); i++) {
             BoardLocation currentLocation = BoardLocation.values()[i];
@@ -191,7 +194,7 @@ public class ChessModel extends java.util.Observable {
 
         boolean kingIsInCheck = false;
         BoardLocation kingLoc = getKingLoc(player);
-        ArrayList<BoardLocation> otherColorPieces = getPlayersPieces(!player);
+        Collection<BoardLocation> otherColorPieces = getPlayersPieces(!player);
 
         if (kingLoc != null) {
             for (BoardLocation l : otherColorPieces) {
@@ -250,16 +253,18 @@ public class ChessModel extends java.util.Observable {
     public HashSet<BoardLocation> getAvailableDestinationsFromLocation(BoardLocation loc) {
         ConsoleChess.debugMessage("ChessModel.getAvailableDestinationsFromLocation()");
         HashSet<BoardLocation> dests = new HashSet<BoardLocation>();
-        Piece p = this.getPiece(loc);
+        if (loc != BoardLocation.none) {
+            Piece p = this.getPiece(loc);
 
-        // TODO iterator stuff
-        for (int i = 0; i < this.currentBoard.getBoardSize(); i++) {
-            BoardLocation end = BoardLocation.values()[i];
-            String moveString = loc.toString() + " " + end.toString();
-            ChessMove currentMovingMove = ChessFactory.CreateMove(MoveType.MOVE, moveString);
-            ChessMove currentCapturingMove = ChessFactory.CreateMove(MoveType.CAPTURE, moveString);
-            if (isMoveValid(currentMovingMove, false) || isMoveValid(currentCapturingMove, false)) {
-                dests.add(end);
+            // TODO iterator stuff
+            for (int i = 0; i < this.currentBoard.getBoardSize(); i++) {
+                BoardLocation end = BoardLocation.values()[i];
+                String moveString = loc.toString() + " " + end.toString();
+                ChessMove currentMovingMove = ChessFactory.CreateMove(MoveType.MOVE, moveString);
+                ChessMove currentCapturingMove = ChessFactory.CreateMove(MoveType.CAPTURE, moveString);
+                if (isMoveValid(currentMovingMove, false) || isMoveValid(currentCapturingMove, false)) {
+                    dests.add(end);
+                }
             }
         }
         return dests;
@@ -488,7 +493,7 @@ public class ChessModel extends java.util.Observable {
         }
 
         if (isValid && (m.getType() == MoveType.MOVE || m.getType() == MoveType.CAPTURE) && this.currentBoard.get(m.getSrcLoc()).canCollide()) {
-            ArrayList<BoardLocation> locsToCheck = getLocationsBetween(m.getSrcLoc(), m.getDestLoc());
+            Collection<BoardLocation> locsToCheck = getLocationsBetween(m.getSrcLoc(), m.getDestLoc());
             for (BoardLocation l : locsToCheck) {
                 // System.out.println("blake- " + l);
                 if (isValid && this.currentBoard.get(l) != null) {
@@ -511,8 +516,8 @@ public class ChessModel extends java.util.Observable {
         return isValid;
     }
 
-    public ArrayList<BoardLocation> getLocationsBetween(BoardLocation src, BoardLocation dest) {
-        ArrayList<BoardLocation> locs = new ArrayList<>();
+    public Collection<BoardLocation> getLocationsBetween(BoardLocation src, BoardLocation dest) {
+        Collection<BoardLocation> locs = new ArrayList<BoardLocation>();
 
         if (src != dest) {
 

@@ -3,7 +3,8 @@ package chess_rollins_blake;
 import chess_rollins_blake.controller.ChessController;
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.model.ChessModel;
-import chess_rollins_blake.view.GUIView;
+import chess_rollins_blake.view.ChessView;
+import chess_rollins_blake.view.ConsoleViewLarge;
 
 /**
  * This is the entry point into my Chess game The game was built for the PRO180 class at Neumont University in the Spring quarter of 2014
@@ -52,8 +53,8 @@ public class ConsoleChess {
 
             ChessModel model = new ChessModel();
             // ChessView view = new ConsoleView(model);
-            // ChessView view = new ConsoleViewLarge(model);
-            GUIView view = new GUIView(model);
+            ChessView view = new ConsoleViewLarge(model);
+            //GUIView view = new GUIView(model);
 
             model.addObserver(view);
 
