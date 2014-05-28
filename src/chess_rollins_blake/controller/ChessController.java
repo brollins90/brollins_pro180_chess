@@ -24,8 +24,8 @@ public class ChessController implements java.awt.event.ActionListener {
 
     int VIEW_WIDTH = 75;
     int VIEW_HEIGHT = 75;
-    
-    
+
+
     protected ChessModel model;
     protected ChessView view;
     protected GameStatus currentGameStatus;
@@ -33,7 +33,7 @@ public class ChessController implements java.awt.event.ActionListener {
     public ChessController(ChessModel model, ChessView view) {
         this.model = model;
         this.view = view;
-        
+
         this.view.addBoardListener(new LocationListener());
         this.view.addBoardMotionListener(new LocationListener());
 
@@ -43,56 +43,56 @@ public class ChessController implements java.awt.event.ActionListener {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            ConsoleChess.debugMessage("mouseClicked");            
+            ConsoleChess.debugMessage("mouseClicked");
         }
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            ConsoleChess.debugMessage("mouseEntered");              
+            ConsoleChess.debugMessage("mouseEntered");
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-            ConsoleChess.debugMessage("mouseExited");  
+            ConsoleChess.debugMessage("mouseExited");
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
-            ConsoleChess.debugMessage("mousePressed");  
+            ConsoleChess.debugMessage("mousePressed");
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            ConsoleChess.debugMessage("mouseReleased");  
+            ConsoleChess.debugMessage("mouseReleased");
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            ConsoleChess.debugMessage("mouseDragged");  
+            ConsoleChess.debugMessage("mouseDragged");
         }
 
         @Override
         public void mouseMoved(MouseEvent e) {
-            //ConsoleChess.debugMessage("mouseMoved");  
+            // ConsoleChess.debugMessage("mouseMoved");
             int mouseX = e.getX();
             int mouseY = e.getY();
-            
+
             int row = 7 - (mouseY / VIEW_HEIGHT);
             int col = mouseX / VIEW_WIDTH;
 
-//            System.out.println(mouseX + " " + mouseY);
-//            System.out.println(row + " " + col);
-            
+            // System.out.println(mouseX + " " + mouseY);
+            // System.out.println(row + " " + col);
+
             BoardLocation mouseLoc = BoardLocation.getLocFromRowAndColumn(row, col);
-            
+
             updateModelForLocation(mouseLoc);
-            
-            
+
+
         }
 
-        
+
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent event) {
         // TODO
@@ -108,73 +108,73 @@ public class ChessController implements java.awt.event.ActionListener {
                 addMove(theCommand, true);
                 break;
             case LOCATION: // Check available moves
-                //this.model.setAvailableDestinations(BoardLocation.valueOf(theCommand));
+                // this.model.setAvailableDestinations(BoardLocation.valueOf(theCommand));
                 break;
         }
 
     }
 
-//    public void addModel(ChessModel m) {
-//        this.model = m;
-//    }
-//
-//    public void addView(ChessView v) {
-//        this.view = v;
-//    }
-    
-    
+    // public void addModel(ChessModel m) {
+    // this.model = m;
+    // }
+    //
+    // public void addView(ChessView v) {
+    // this.view = v;
+    // }
+
+
     public void updateModelForLocation(BoardLocation loc) {
-        
-        //System.out.println("mouse at " + loc);
+
+        // System.out.println("mouse at " + loc);
         this.model.setCurrentModelState(loc);
-//
-//        GUIView gview = (GUIView) view;
-//        //gview.boardPanel.setAvailableDestinations(new HashSet<BoardLocation>());
-//        // update();
-//
-//
-//        boolean curTurnIsWhite = model.isWhiteTurn();
-////        System.out.println("-- " + pieceColorDisplayMap.get(curTurnIsWhite) + " Player's turn--");
-////        // System.out.println("Enter the which piece you would like to move?");
-//
-//        ArrayList<ChessMove> moves = model.getAvailableMoves();
-//        HashSet<BoardLocation> srcs = model.getAvailableSources();
-//
-//        gview.boardPanel.setAvailableSources(srcs);
+        //
+        // GUIView gview = (GUIView) view;
+        // //gview.boardPanel.setAvailableDestinations(new HashSet<BoardLocation>());
+        // // update();
+        //
+        //
+        // boolean curTurnIsWhite = model.isWhiteTurn();
+        // // System.out.println("-- " + pieceColorDisplayMap.get(curTurnIsWhite) + " Player's turn--");
+        // // // System.out.println("Enter the which piece you would like to move?");
+        //
+        // ArrayList<ChessMove> moves = model.getAvailableMoves();
+        // HashSet<BoardLocation> srcs = model.getAvailableSources();
+        //
+        // gview.boardPanel.setAvailableSources(srcs);
         view.update();
 
 
-//
-//        boolean validSource = false;
-//        BoardLocation loc = null;
-//        do {
-//            String locationString = readLine();
-//            loc = BoardLocation.valueOf(locationString.trim());
-//
-//            for (BoardLocation l : srcs) {
-//                if (l == loc) {
-//                    validSource = true;
-//                }
-//            }
-//            if (!validSource) {
-//                System.out.println("Location is not valid.  Enter a new location.");
-//            }
-//        } while (!validSource);
-//
-//        ActionEvent event = new ActionEvent(this, MoveType.LOCATION.ordinal(), loc.toString());
-//
-//        try {
-//            super.sendRequestToController(event);
-//        } catch (ChessException e) {
-//            System.out.println(e.getMessage());
-//        }
-//        return loc;
-//
-//        
-//        
+        //
+        // boolean validSource = false;
+        // BoardLocation loc = null;
+        // do {
+        // String locationString = readLine();
+        // loc = BoardLocation.valueOf(locationString.trim());
+        //
+        // for (BoardLocation l : srcs) {
+        // if (l == loc) {
+        // validSource = true;
+        // }
+        // }
+        // if (!validSource) {
+        // System.out.println("Location is not valid.  Enter a new location.");
+        // }
+        // } while (!validSource);
+        //
+        // ActionEvent event = new ActionEvent(this, MoveType.LOCATION.ordinal(), loc.toString());
+        //
+        // try {
+        // super.sendRequestToController(event);
+        // } catch (ChessException e) {
+        // System.out.println(e.getMessage());
+        // }
+        // return loc;
+        //
+        //
+        //
     }
-    
-    
+
+
 
     public void addMove(String moveString, boolean updateObservers) {
         this.model.addMove(moveString, updateObservers);
@@ -202,7 +202,7 @@ public class ChessController implements java.awt.event.ActionListener {
                     System.out.println(line);
                     try {
                         actionPerformed(new ActionEvent(this, MoveType.ADD.ordinal(), line));
-                        //addMove(line, !isNewBoard);
+                        // addMove(line, !isNewBoard);
                     } catch (ChessException e) {
                         this.model.setModelStatusMessage(e.getMessage());
                     }
@@ -226,69 +226,79 @@ public class ChessController implements java.awt.event.ActionListener {
 
         // Start the game Loop
         while (this.currentGameStatus == GameStatus.PLAYING) {
-            
-            
-            
-//            switch turn
 
-//            this.model.resetView();
-            // build the move list
-            // 
-            
-            
+            //this.model.setCurrentModelState(BoardLocation.none);
+            this.model.resetView();
 
+            HashSet<ChessMove> availableMoves = this.model.getAvailableMoves();
+//            for (ChessMove m : availableMoves) {
+//                System.out.println("blaksdkfakjdfkldsaf");
+//                System.out.println(m);
+//            }
 
-            // Get all the pieces for this player that have moves.
-            HashSet<BoardLocation> piecesThatCanMove = this.model.getLocationsThatCanMove();
-            HashSet<ChessMove> moves = new HashSet<ChessMove>();
-
-            boolean wasKingInCheck = this.model.isCurrentInCheck();
-            // if (this.model.isCurrentInCheck()) {
-            HashSet<ChessMove> movesThatCanGetOutOfCheck = new HashSet<ChessMove>();
-            // current player is in check, we need to get out of it
-            for (BoardLocation pieceThatCanMove : piecesThatCanMove) {
-                HashSet<BoardLocation> destinationsForThisPiece = this.model.getAvailableDestinationsFromLocation(pieceThatCanMove);
-
-                for (BoardLocation destination : destinationsForThisPiece) {
-
-                    String moveString = pieceThatCanMove + " " + destination;
-                    if (this.model.locationHasPiece(destination)) {
-                        moveString += "*";
-                    }
-                    ChessMove testMove = ChessFactory.CreateMove(moveString);
-                    try {
-                        testMove.setChangeTurnAfter(false);
-                        this.addMoveWithoutUpdate(testMove);
-                        this.model.isThisKingInCheck(this.model.isWhiteTurn());
-                        if (wasKingInCheck && !this.model.isOtherInCheck()) {
-                            movesThatCanGetOutOfCheck.add(testMove);
-                        }
-                        moves.add(testMove);
-                        this.model.undoMove();
-                    } catch (ChessException e) {
-                        System.out.println("ERROR: " + e.getMessage());
-                    }
-
-                }
-
+            if (availableMoves.size() == 0) {
+                this.currentGameStatus = this.model.isWhiteTurn() ? GameStatus.DARKWIN : GameStatus.LIGHTWIN;
             }
 
 
 
-            this.model.setAvailableMoves(moves);
-            if (wasKingInCheck) {
-
-                if (movesThatCanGetOutOfCheck.size() == 0) {
-                    this.currentGameStatus = this.model.isWhiteTurn() ? GameStatus.DARKWIN : GameStatus.LIGHTWIN;
-                    // System.out.println("Stalemate or checkmate");
-                }
-                for (ChessMove m : movesThatCanGetOutOfCheck) {
-                    System.out.println(m.getMoveString());
-
-                }
-
-                this.model.setAvailableMoves(movesThatCanGetOutOfCheck);
-            }
+            //
+            //
+            //
+            // // Get all the pieces for this player that have moves.
+            // HashSet<BoardLocation> piecesThatCanMove = this.model.getLocationsThatCanMove();
+            // HashSet<ChessMove> moves = new HashSet<ChessMove>();
+            //
+            // boolean wasKingInCheck = this.model.isCurrentInCheck();
+            // // if (this.model.isCurrentInCheck()) {
+            // HashSet<ChessMove> movesThatCanGetOutOfCheck = new HashSet<ChessMove>();
+            // // current player is in check, we need to get out of it
+            // for (BoardLocation pieceThatCanMove : piecesThatCanMove) {
+            // HashSet<BoardLocation> destinationsForThisPiece = this.model.getAvailableDestinationsFromLocation(pieceThatCanMove);
+            //
+            // for (BoardLocation destination : destinationsForThisPiece) {
+            //
+            // String moveString = pieceThatCanMove + " " + destination;
+            // if (this.model.locationHasPiece(destination)) {
+            // moveString += "*";
+            // }
+            // ChessMove testMove = ChessFactory.CreateMove(moveString);
+            // try {
+            // testMove.setChangeTurnAfter(false);
+            // this.addMoveWithoutUpdate(testMove);
+            // boolean isKingInCheckNow = this.model.isThisKingInCheck(this.model.isWhiteTurn());
+            // if (wasKingInCheck && !isKingInCheckNow) { //!this.model.isOtherInCheck()) {
+            // movesThatCanGetOutOfCheck.add(testMove);
+            // }
+            // moves.add(testMove);
+            // this.model.undoMove();
+            // } catch (ChessException e) {
+            // System.out.println("ERROR: " + e.getMessage());
+            // }
+            //
+            // }
+            //
+            // }
+            //
+            //
+            //
+            // // this.model.setAvailableMoves(moves);
+            // if (wasKingInCheck) {
+            //
+            // if (movesThatCanGetOutOfCheck.size() == 0) {
+            // this.currentGameStatus = this.model.isWhiteTurn() ? GameStatus.DARKWIN : GameStatus.LIGHTWIN;
+            // System.out.println("Stalemate or checkmate");
+            // }else {
+            // System.out.println("DLKJSAjflka");
+            // }
+            // System.out.println("king was in check");
+            // for (ChessMove m : movesThatCanGetOutOfCheck) {
+            // System.out.println(m.getMoveString());
+            //
+            // }
+            //
+            // this.model.setAvailableMoves(movesThatCanGetOutOfCheck);
+            // }
 
 
 
