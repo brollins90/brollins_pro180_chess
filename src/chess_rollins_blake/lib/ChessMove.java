@@ -2,7 +2,7 @@ package chess_rollins_blake.lib;
 
 import chess_rollins_blake.model.pieces.Piece;
 
-public class ChessMove {
+public class ChessMove implements Comparable<ChessMove> {
 
     // protected boolean capturedAPiece;
     protected BoardLocation destLoc;
@@ -66,5 +66,20 @@ public class ChessMove {
 
     public void setChangeTurnAfter(boolean b) {
         this.changeTurnAfter = b;
+    }
+
+    @Override
+    public int compareTo(ChessMove other) {
+        if (other == null) {
+            throw new NullPointerException();
+        }
+        if (this.srcLoc != other.srcLoc) {
+            return this.srcLoc.compareTo(other.srcLoc);
+        }
+        if (this.destLoc != other.destLoc) {
+            return this.destLoc.compareTo(other.destLoc);
+        }
+        
+        return 0;
     }
 }

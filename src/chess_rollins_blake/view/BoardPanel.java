@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import javax.imageio.ImageIO;
@@ -69,7 +68,7 @@ public class BoardPanel extends JPanel {
 
             int darkBackground = 1;
 
-            //super.paint(g);
+            // super.paint(g);
 
             int numberOfRows = this.model.getBoardRowSize();
             int numberOfCols = this.model.getBoardRowSize();

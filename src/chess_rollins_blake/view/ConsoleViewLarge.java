@@ -4,10 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Observable;
 import java.util.Scanner;
+import java.util.TreeSet;
 
 import chess_rollins_blake.controller.GameStatus;
 import chess_rollins_blake.exceptions.ChessException;
@@ -120,7 +120,7 @@ public class ConsoleViewLarge extends ChessView {
         System.out.println("Enter the which piece you would like to move?");
 
         HashSet<ChessMove> moves = this.model.getAvailableMoves();
-        HashSet<BoardLocation> srcs = new HashSet<BoardLocation>();
+        TreeSet<BoardLocation> srcs = new TreeSet<BoardLocation>();
         for (ChessMove m : moves) {
             srcs.add(m.getSrcLoc());
         }
@@ -135,13 +135,6 @@ public class ConsoleViewLarge extends ChessView {
             }
             i++;
         }
-
-        // for (int i = 0; i < srcs.size(); i++) {
-        // System.out.print(srcs..get(i).getSrcLoc().toString());
-        // if (i + 1 < srcs.size()) {
-        // System.out.print(",");
-        // }
-        // }
         System.out.println(")");
 
         boolean validSource = false;
@@ -185,8 +178,8 @@ public class ConsoleViewLarge extends ChessView {
                 movesFromSrc.add(m);
             }
         }
-
-
+        movesFromSrc.sort(null);
+        
         System.out.print("(");
         for (int i = 0; i < movesFromSrc.size(); i++) {
             System.out.print(movesFromSrc.get(i).getDestLoc().toString());
