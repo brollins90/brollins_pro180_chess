@@ -1,0 +1,4 @@
+Kostics Trap.txt	Kostic's Trap		Black win - Checkmate		http://www.johnpratt.com/items/chess/kostics.html
+Pratts Trap.txt		Pratt's Trap		Black win - Checkmate		http://www.johnpratt.com/items/chess/kostics_4n.html
+Donald Byrne vs Robert James Fischer.txt		
+fourMoveCheckMate.txt	4 Move Checkmate	Black win - Checkmate		
