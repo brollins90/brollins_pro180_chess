@@ -226,6 +226,16 @@ public class ChessController implements java.awt.event.ActionListener {
 
         // Start the game Loop
         while (this.currentGameStatus == GameStatus.PLAYING) {
+            
+            
+            
+//            switch turn
+
+//            this.model.resetView();
+            // build the move list
+            // 
+            
+            
 
 
             // Get all the pieces for this player that have moves.

@@ -17,6 +17,8 @@ import chess_rollins_blake.model.pieces.Piece;
 
 public class BoardPanel extends JPanel {
 
+    BoardLocation prevLoc = null;
+
     private static final long serialVersionUID = 1L;
 
     private Color SQUARE_COLOR_LIGHT = Color.WHITE;
@@ -32,22 +34,23 @@ public class BoardPanel extends JPanel {
     BufferedImage[][] images = new BufferedImage[2][6];
 
     HashSet<BoardLocation> availableSources;
-//    HashSet<BoardLocation> availableDestinations;
+    // HashSet<BoardLocation> availableDestinations;
 
     private ChessModel model;
 
     BoardPanel(ChessModel m) {
         this.model = m;
         availableSources = new HashSet<BoardLocation>();
-       // availableDestinations = new HashSet<BoardLocation>();
+        // availableDestinations = new HashSet<BoardLocation>();
 
         loadImages();
 
     }
-//
-//    public void setAvailableDestinations(HashSet<BoardLocation> dests) {
-//        this.availableDestinations = dests;
-//    }
+
+    //
+    // public void setAvailableDestinations(HashSet<BoardLocation> dests) {
+    // this.availableDestinations = dests;
+    // }
 
     public void setAvailableSources(HashSet<BoardLocation> sources) {
         this.availableSources = sources;
@@ -55,57 +58,62 @@ public class BoardPanel extends JPanel {
 
     @Override
     public void paint(Graphics g) {
-        
+
         // check the current location
         BoardLocation tempSource = this.model.getCurrentModelState();
-        HashSet<BoardLocation> tempDests = this.model.getAvailableDestinationsFromLocation(tempSource);
 
-        int darkBackground = 1;
+        if (tempSource != prevLoc) {
+            prevLoc = tempSource;
 
-        super.paint(g);
+            HashSet<BoardLocation> tempDests = this.model.getAvailableDestinationsFromLocation(tempSource);
 
-        int numberOfRows = this.model.getBoardRowSize();
-        int numberOfCols = this.model.getBoardRowSize();
-        for (int rowIndex = numberOfRows - 1; rowIndex > -1; rowIndex--) {
-            darkBackground++;
-            for (int colIndex = 0; colIndex < numberOfCols; colIndex++) {
+            int darkBackground = 1;
+
+            //super.paint(g);
+
+            int numberOfRows = this.model.getBoardRowSize();
+            int numberOfCols = this.model.getBoardRowSize();
+            for (int rowIndex = numberOfRows - 1; rowIndex > -1; rowIndex--) {
                 darkBackground++;
-                int currentX = colIndex * SQUARE_WIDTH;
-                int currentY = (numberOfRows - 1 - rowIndex) * SQUARE_HEIGHT;
+                for (int colIndex = 0; colIndex < numberOfCols; colIndex++) {
+                    darkBackground++;
+                    int currentX = colIndex * SQUARE_WIDTH;
+                    int currentY = (numberOfRows - 1 - rowIndex) * SQUARE_HEIGHT;
 
-                int currentPieceLocation = colIndex * numberOfRows + rowIndex;
-                BoardLocation currentLocation = BoardLocation.values()[currentPieceLocation];
-                Piece temp = this.model.getPiece(currentLocation);
-
-
-                // paint the square first
-                if (darkBackground % 2 == 0) {
-                    g.setColor(SQUARE_COLOR_DARK);
-                } else {
-                    g.setColor(SQUARE_COLOR_LIGHT);
-                }
-                
-                // color the source dests
-                if (this.availableSources.contains(currentLocation)) {
-                    g.setColor(SQUARE_HAS_MOVE);
-                }
-
-                // color the current darker
-                if (tempSource == currentLocation) {
-                    g.setColor(Color.ORANGE);
-                }
-                
-                // colot the dests
-                if (tempDests.contains(currentLocation)) {
-                    g.setColor(SQUARE_IS_DEST);
-                }
-
-                g.fillRect(currentX, currentY, SQUARE_WIDTH, SQUARE_HEIGHT);
+                    int currentPieceLocation = colIndex * numberOfRows + rowIndex;
+                    BoardLocation currentLocation = BoardLocation.values()[currentPieceLocation];
+                    Piece temp = this.model.getPiece(currentLocation);
 
 
-                if (temp != null) {
-                    g.drawImage(getIconFromTypeAndColor(temp.getType(), temp.isWhite()), currentX, currentY, null);
-                    // boardSquares[rowIndex][colIndex].setIcon(getIconFromTypeAndColor(temp.getType(), temp.isWhite()));
+                    // paint the square first
+                    if (darkBackground % 2 == 0) {
+                        g.setColor(SQUARE_COLOR_DARK);
+                    } else {
+                        g.setColor(SQUARE_COLOR_LIGHT);
+                    }
+
+                    // color the source dests
+                    if (this.availableSources.contains(currentLocation)) {
+                        g.setColor(SQUARE_HAS_MOVE);
+                    }
+
+                    // color the current darker
+                    if (tempSource == currentLocation) {
+                        g.setColor(Color.ORANGE);
+                    }
+
+                    // colot the dests
+                    if (tempDests.contains(currentLocation)) {
+                        g.setColor(SQUARE_IS_DEST);
+                    }
+
+                    g.fillRect(currentX, currentY, SQUARE_WIDTH, SQUARE_HEIGHT);
+
+
+                    if (temp != null) {
+                        g.drawImage(getIconFromTypeAndColor(temp.getType(), temp.isWhite()), currentX, currentY, null);
+                        // boardSquares[rowIndex][colIndex].setIcon(getIconFromTypeAndColor(temp.getType(), temp.isWhite()));
+                    }
                 }
             }
         }
