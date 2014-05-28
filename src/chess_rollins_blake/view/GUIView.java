@@ -1,19 +1,15 @@
 package chess_rollins_blake.view;
 
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Observable;
 import java.util.Scanner;
 
-import javax.imageio.ImageIO;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,26 +20,25 @@ import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
-import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.ChessModel;
-import chess_rollins_blake.model.pieces.Piece;
 
 public class GUIView extends ChessView {
 
     JButton[][] boardSquares = new JButton[8][8];
     JLabel messageLabel, whiteInCheckLabel, blackInCheckLabel;
-    BoardPanel boardPanel;
+    public BoardPanel boardPanel;
+    
 
     private Scanner scan;
 
-    public GUIView() {
-
+    public GUIView(ChessModel model) {
+        super(model);
         scan = new Scanner(System.in);
 
 
         JFrame frame = new JFrame();
         JPanel outerPanel = new JPanel();
-        this.boardPanel = new BoardPanel();
+        this.boardPanel = new BoardPanel(super.model);
         this.boardPanel.setPreferredSize(new Dimension(600, 600));
 
         outerPanel.add(boardPanel);
@@ -69,6 +64,9 @@ public class GUIView extends ChessView {
         // frame.pack();
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        //this.boardPanel.setModel(super.model);
+        
     }
 
     public void update(Observable obs, Object obj) {
@@ -96,7 +94,7 @@ public class GUIView extends ChessView {
 
     @Override
     public BoardLocation requestSourcePiece() {
-        boardPanel.setAvailableDestinations(new HashSet<BoardLocation>());
+        //boardPanel.setAvailableDestinations(new HashSet<BoardLocation>());
         // update();
 
 
@@ -104,7 +102,7 @@ public class GUIView extends ChessView {
         System.out.println("-- " + pieceColorDisplayMap.get(curTurnIsWhite) + " Player's turn--");
         // System.out.println("Enter the which piece you would like to move?");
 
-        ArrayList<ChessMove> moves = this.model.getAvailableMoves();
+        HashSet<ChessMove> moves = this.model.getAvailableMoves();
         HashSet<BoardLocation> srcs = new HashSet<BoardLocation>();
         for (ChessMove m : moves) {
             srcs.add(m.getSrcLoc());
@@ -153,8 +151,8 @@ public class GUIView extends ChessView {
 
         // System.out.println("Select destination from: ");
 
-        ArrayList<ChessMove> moves = this.model.getAvailableMoves();
-        ArrayList<ChessMove> movesFromSrc = new ArrayList<ChessMove>();
+        HashSet<ChessMove> moves = this.model.getAvailableMoves();
+        HashSet<ChessMove> movesFromSrc = new HashSet<ChessMove>();
         HashSet<BoardLocation> dests = new HashSet<BoardLocation>();
 
         for (ChessMove m : moves) {
@@ -165,7 +163,7 @@ public class GUIView extends ChessView {
         }
 
 
-        boardPanel.setAvailableDestinations(dests);
+//        boardPanel.setAvailableDestinations(dests);
         update();
 
 
@@ -205,15 +203,26 @@ public class GUIView extends ChessView {
         // TODO Auto-generated method stub
 
     }
-
-    @Override
-    public void setModel(ChessModel m) {
-        this.model = m;
-        this.boardPanel.setModel(this.model);
-    }
+//
+//    @Override
+//    public void setModel(ChessModel m) {
+//        this.model = m;
+//        this.boardPanel.setModel(this.model);
+//    }
 
     private String readLine() {
         return scan.nextLine();
     }
+
+    @Override
+    public void addBoardListener(MouseListener l) {
+        this.boardPanel.addMouseListener(l);
+    }
+
+    @Override
+    public void addBoardMotionListener(MouseMotionListener l) {
+        this.boardPanel.addMouseMotionListener(l);
+    }
+
 
 }

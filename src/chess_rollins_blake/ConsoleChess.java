@@ -1,11 +1,8 @@
 package chess_rollins_blake;
 
 import chess_rollins_blake.controller.ChessController;
-import chess_rollins_blake.controller.GameStatus;
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.model.ChessModel;
-import chess_rollins_blake.view.ChessView;
-import chess_rollins_blake.view.ConsoleViewLarge;
 import chess_rollins_blake.view.GUIView;
 
 /**
@@ -15,6 +12,14 @@ import chess_rollins_blake.view.GUIView;
  * 
  */
 public class ConsoleChess {
+
+    static boolean DEBUG_ON = true;
+
+    public static void debugMessage(String s) {
+        if (DEBUG_ON) {
+            System.out.println(s);
+        }
+    }
 
     /**
      * The first argument is the path / name of the file to start the game from.
@@ -46,16 +51,13 @@ public class ConsoleChess {
 
 
             ChessModel model = new ChessModel();
-            // ChessView view = new ConsoleView();
-            ChessView view = new ConsoleViewLarge();
-            //GUIView view = new GUIView();
+            // ChessView view = new ConsoleView(model);
+            // ChessView view = new ConsoleViewLarge(model);
+            GUIView view = new GUIView(model);
 
-            view.setModel(model);
             model.addObserver(view);
 
-            ChessController controller = new ChessController();
-            controller.addModel(model);
-            controller.addView(view);
+            ChessController controller = new ChessController(model, view);
 
             view.addController(controller);
 

@@ -53,11 +53,11 @@ public class ChessBoard {
         }
     }
 
-    public int getBoardSize() {
+    public int getBoardRowSize() {
         return BOARD_SIZE;
     }
 
-    public int size() {
+    public int getBoardSize() {
         return BOARD_SIZE * BOARD_SIZE;
     }
 }

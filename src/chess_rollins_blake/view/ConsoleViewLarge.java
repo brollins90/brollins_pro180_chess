@@ -1,8 +1,9 @@
 package chess_rollins_blake.view;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Observable;
 import java.util.Scanner;
@@ -12,15 +13,15 @@ import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
-import chess_rollins_blake.lib.PieceType;
+import chess_rollins_blake.model.ChessModel;
 import chess_rollins_blake.model.pieces.Piece;
 
 public class ConsoleViewLarge extends ChessView {
 
     private Scanner scan;
 
-    public ConsoleViewLarge() {
-
+    public ConsoleViewLarge(ChessModel model) {
+        super(model);
         scan = new Scanner(System.in);
 
         System.out.println("Welcome to the Console Chess.\n");
@@ -57,7 +58,7 @@ public class ConsoleViewLarge extends ChessView {
         System.out.println("");
 
     }
-    
+
     public void printGameStatus(GameStatus status) {
         System.out.println(gameStatusDisplayMap.get(status));
     }
@@ -73,8 +74,8 @@ public class ConsoleViewLarge extends ChessView {
         // Create the column numbers
         String retString = "";
         retString += "--|----A---------B---------C---------D---------E---------F---------G---------H----|--\n";
-        int numberOfRows = this.model.currentBoard.getBoardSize();
-        int numberOfCols = this.model.currentBoard.getBoardSize();
+        int numberOfRows = this.model.getBoardRowSize();
+        int numberOfCols = this.model.getBoardRowSize();
         for (int rowIndex = numberOfRows - 1; rowIndex > -1; rowIndex--) {
 
             // Create the row numbers
@@ -106,7 +107,7 @@ public class ConsoleViewLarge extends ChessView {
     }
 
 
-    
+
     @Override
     public BoardLocation requestSourcePiece() {
         printBoard();
@@ -117,7 +118,7 @@ public class ConsoleViewLarge extends ChessView {
         System.out.println("-- " + pieceColorDisplayMap.get(curTurnIsWhite) + " Player's turn--");
         System.out.println("Enter the which piece you would like to move?");
 
-        ArrayList<ChessMove> moves = this.model.getAvailableMoves();
+        HashSet<ChessMove> moves = this.model.getAvailableMoves();
         HashSet<BoardLocation> srcs = new HashSet<BoardLocation>();
         for (ChessMove m : moves) {
             srcs.add(m.getSrcLoc());
@@ -175,7 +176,7 @@ public class ConsoleViewLarge extends ChessView {
 
         System.out.println("Select destination from: ");
 
-        ArrayList<ChessMove> moves = this.model.getAvailableMoves();
+        HashSet<ChessMove> moves = this.model.getAvailableMoves();
         ArrayList<ChessMove> movesFromSrc = new ArrayList<ChessMove>();
 
         for (ChessMove m : moves) {
@@ -216,5 +217,20 @@ public class ConsoleViewLarge extends ChessView {
     private String readLine() {
         return scan.nextLine();
     }
+
+
+    @Override
+    public void addBoardListener(MouseListener l) {
+
+    }
+
+
+    @Override
+    public void addBoardMotionListener(MouseMotionListener l) {
+        // TODO Auto-generated method stub
+
+    }
+
+
 
 }

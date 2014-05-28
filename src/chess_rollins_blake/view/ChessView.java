@@ -2,11 +2,12 @@ package chess_rollins_blake.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
 import java.util.Observable;
 
 import chess_rollins_blake.controller.GameStatus;
-import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.ChessModel;
@@ -20,7 +21,8 @@ public abstract class ChessView implements java.util.Observer {
 
     protected ActionListener theController;
 
-    public ChessView() {
+    public ChessView(ChessModel model) {
+        this.model = model;
         pieceDisplayMap = new HashMap<>();
         pieceDisplayMap.put(PieceType.b, "Bishop ");
         pieceDisplayMap.put(PieceType.k, " King  ");
@@ -56,10 +58,10 @@ public abstract class ChessView implements java.util.Observer {
     public void addController(ActionListener c) {
         this.theController = c;
     }
-
-    public void setModel(ChessModel m) {
-        this.model = m;
-    }
+//
+//    public void setModel(ChessModel m) {
+//        this.model = m;
+//    }
 
 //    public abstract void requestInput();
 
@@ -68,6 +70,8 @@ public abstract class ChessView implements java.util.Observer {
         theController.actionPerformed(e);
     }
 
+    public abstract void addBoardListener(MouseListener l);
+    public abstract void addBoardMotionListener(MouseMotionListener l);
     public abstract void printGameStatus(GameStatus status);
     public abstract BoardLocation requestSourcePiece();
     public abstract BoardLocation requestDestinationPiece(BoardLocation srcLoc);
