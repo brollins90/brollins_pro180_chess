@@ -106,7 +106,7 @@ public class ConsoleViewLarge extends ChessView {
     }
 
 
-
+    
     @Override
     public BoardLocation requestSourcePiece() {
         printBoard();

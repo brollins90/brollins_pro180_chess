@@ -47,8 +47,8 @@ public class ConsoleChess {
 
             ChessModel model = new ChessModel();
             // ChessView view = new ConsoleView();
-            // ChessView view = new ConsoleViewLarge();
-            GUIView view = new GUIView();
+            ChessView view = new ConsoleViewLarge();
+            //GUIView view = new GUIView();
 
             view.setModel(model);
             model.addObserver(view);

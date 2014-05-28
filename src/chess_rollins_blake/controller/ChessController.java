@@ -34,13 +34,14 @@ public class ChessController implements java.awt.event.ActionListener {
         String theCommand = event.getActionCommand();
         switch (MoveType.values()[event.getID()]) {
             case ADD:
+                addMove(theCommand, false);
                 break;
             case MOVE:
             case CAPTURE:
                 addMove(theCommand, true);
                 break;
             case LOCATION: // Check available moves
-                // this.model.setAvailableDestinations(BoardLocation.valueOf(theCommand));
+                //this.model.setAvailableDestinations(BoardLocation.valueOf(theCommand));
                 break;
         }
 
@@ -77,9 +78,10 @@ public class ChessController implements java.awt.event.ActionListener {
 
                 String line = "";
                 while ((line = br.readLine()) != null) {
-                    // System.out.println(line);
+                    System.out.println(line);
                     try {
-                        addMove(line, !isNewBoard);
+                        actionPerformed(new ActionEvent(this, MoveType.ADD.ordinal(), line));
+                        //addMove(line, !isNewBoard);
                     } catch (ChessException e) {
                         this.model.setModelStatusMessage(e.getMessage());
                     }
