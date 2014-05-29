@@ -33,7 +33,8 @@ public class ConsoleChess {
         // args[0] = "Donald Byrne vs Robert James Fischer.txt";
         // args[0] = "Garry Kasparov vs Deep Blue_1996.02.10_r1.txt";
         //args[0] = "fourMoveCheckMate.txt";
-        args[0] = "fourMoveCheckMate.txt";
+        args[0] = "Pratts Trap.txt";
+        //args[0] = "Kostics Trap.txt";
         ConsoleChess c = new ConsoleChess();
         c.playChess(args, true);
     }

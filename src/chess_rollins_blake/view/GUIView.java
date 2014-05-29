@@ -20,6 +20,7 @@ import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
+import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.ChessModel;
 
 public class GUIView extends ChessView {
@@ -69,6 +70,7 @@ public class GUIView extends ChessView {
         
     }
 
+    @Override
     public void update(Observable obs, Object obj) {
         if (obj instanceof String) {
             this.messageLabel.setText((String) obj);
@@ -90,6 +92,7 @@ public class GUIView extends ChessView {
 
     public void updateBoard() {
         this.boardPanel.updateUI();
+        this.boardPanel.repaint();
     }
 
     @Override
@@ -196,6 +199,12 @@ public class GUIView extends ChessView {
         }
         return loc;
 
+    }
+
+    @Override
+    public PieceType requestPawnPromotion() {
+        // TODO Auto-generated method stub
+        return PieceType.q;
     }
 
     @Override

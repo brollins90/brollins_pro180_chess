@@ -76,4 +76,6 @@ public abstract class ChessView implements java.util.Observer {
     public abstract BoardLocation requestSourcePiece();
     public abstract BoardLocation requestDestinationPiece(BoardLocation srcLoc);
     //public abstract void requestContinue();
+
+    public abstract PieceType requestPawnPromotion(); 
 }

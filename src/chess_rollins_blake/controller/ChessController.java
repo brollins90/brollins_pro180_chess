@@ -15,8 +15,10 @@ import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
+import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.ChessFactory;
 import chess_rollins_blake.model.ChessModel;
+import chess_rollins_blake.model.pieces.Pawn;
 import chess_rollins_blake.model.pieces.Piece;
 import chess_rollins_blake.view.ChessView;
 
@@ -114,70 +116,18 @@ public class ChessController implements java.awt.event.ActionListener {
 
     }
 
-    // public void addModel(ChessModel m) {
-    // this.model = m;
-    // }
-    //
-    // public void addView(ChessView v) {
-    // this.view = v;
-    // }
-
 
     public void updateModelForLocation(BoardLocation loc) {
-
-        // System.out.println("mouse at " + loc);
         this.model.setCurrentModelStateLocation(loc);
-        //
-        // GUIView gview = (GUIView) view;
-        // //gview.boardPanel.setAvailableDestinations(new HashSet<BoardLocation>());
-        // // update();
-        //
-        //
-        // boolean curTurnIsWhite = model.isWhiteTurn();
-        // // System.out.println("-- " + pieceColorDisplayMap.get(curTurnIsWhite) + " Player's turn--");
-        // // // System.out.println("Enter the which piece you would like to move?");
-        //
-        // ArrayList<ChessMove> moves = model.getAvailableMoves();
-        // HashSet<BoardLocation> srcs = model.getAvailableSources();
-        //
-        // gview.boardPanel.setAvailableSources(srcs);
         view.update();
-
-
-        //
-        // boolean validSource = false;
-        // BoardLocation loc = null;
-        // do {
-        // String locationString = readLine();
-        // loc = BoardLocation.valueOf(locationString.trim());
-        //
-        // for (BoardLocation l : srcs) {
-        // if (l == loc) {
-        // validSource = true;
-        // }
-        // }
-        // if (!validSource) {
-        // System.out.println("Location is not valid.  Enter a new location.");
-        // }
-        // } while (!validSource);
-        //
-        // ActionEvent event = new ActionEvent(this, MoveType.LOCATION.ordinal(), loc.toString());
-        //
-        // try {
-        // super.sendRequestToController(event);
-        // } catch (ChessException e) {
-        // System.out.println(e.getMessage());
-        // }
-        // return loc;
-        //
-        //
-        //
     }
-
-
 
     public void addMove(String moveString, boolean updateObservers) {
         this.model.addMove(moveString, updateObservers);
+    }
+
+    public void addMove(ChessMove move, boolean updateObservers) {
+        this.model.addMove(move, updateObservers);
     }
 
     public void addMoveWithoutUpdate(ChessMove m) {
@@ -227,19 +177,16 @@ public class ChessController implements java.awt.event.ActionListener {
         // Start the game Loop
         while (this.currentGameStatus == GameStatus.PLAYING) {
 
-            //this.model.setCurrentModelState(BoardLocation.none);
             this.model.resetView();
 
             HashSet<ChessMove> availableMoves = this.model.getAvailableMoves();
-//            for (ChessMove m : availableMoves) {
-//                System.out.println("blaksdkfakjdfkldsaf");
-//                System.out.println(m);
-//            }
 
+            // if there are no moves, then the game is over
             if (availableMoves.size() == 0) {
                 this.currentGameStatus = this.model.isWhiteTurn() ? GameStatus.DARKWIN : GameStatus.LIGHTWIN;
             }
-
+            
+            // I dont like this logic, but I also dont want to use a break when the game is over
             if (this.currentGameStatus == GameStatus.PLAYING) {
 
                 BoardLocation src = null;
@@ -259,9 +206,30 @@ public class ChessController implements java.awt.event.ActionListener {
                     moveString += "*";
                 }
 
+                Piece srcPiece = this.model.getPiece(src);
                 ChessMove thisMove = ChessFactory.CreateMove(moveString);
-                this.addMove(moveString, true);
+                
+                
+                
+                
+                // Check for pawn promotion
+                //Piece newDestPiece = this.model.getPiece(dest);
+                if (srcPiece instanceof Pawn) {
+                    if (((Pawn) srcPiece).isInEigthRow(dest)) {
+                        PieceType pawnPromotionType = this.view.requestPawnPromotion();
+                        thisMove.setChangeTurnAfter(false);
+                        //"a1 qda1"
+                        char ldColor = (srcPiece.isWhite()) ? 'l' : 'd';
+                        String promotionString = thisMove.getDestLoc().toString() + " " + pawnPromotionType.toString() + ldColor + thisMove.getDestLoc().toString();
+                        thisMove.setSubmove(ChessFactory.CreateMove(promotionString));
+                        
+                    }
+                }
+                
 
+                this.addMove(thisMove, true);
+
+                
             }
             // this.view.requestInput();
         }

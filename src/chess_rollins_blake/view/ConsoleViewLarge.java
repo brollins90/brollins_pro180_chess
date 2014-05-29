@@ -14,6 +14,7 @@ import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
+import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.ChessModel;
 import chess_rollins_blake.model.pieces.Piece;
 
@@ -234,6 +235,12 @@ public class ConsoleViewLarge extends ChessView {
             }
         }
         return loc;
+    }
+
+    @Override
+    public PieceType requestPawnPromotion() {
+        System.out.println("YAY PAWN PROMOTION!!! You get a queen.");
+        return PieceType.q;
     }
 
 

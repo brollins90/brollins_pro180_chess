@@ -61,7 +61,7 @@ public class BoardPanel extends JPanel {
         // check the current location
         BoardLocation tempSource = this.model.getCurrentModelStateLocation();
 
-        if (tempSource != prevLoc) {
+//        if (tempSource != prevLoc) {
             prevLoc = tempSource;
 
             HashSet<BoardLocation> tempDests = this.model.getAvailableDestinationsFromLocation(tempSource);
@@ -115,7 +115,7 @@ public class BoardPanel extends JPanel {
                     }
                 }
             }
-        }
+        //}
     }
 
     //

@@ -15,6 +15,7 @@ import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
 import chess_rollins_blake.lib.MovingMove;
 import chess_rollins_blake.lib.PieceType;
+import chess_rollins_blake.lib.PromotionMove;
 import chess_rollins_blake.model.pieces.King;
 import chess_rollins_blake.model.pieces.Piece;
 
@@ -378,18 +379,26 @@ public class ChessModel extends java.util.Observable {
      */
     public void executeMove(ChessMove currentMove) {
 
-        if (currentMove.getType() == MoveType.ADD) {
-            this.currentBoard.add(currentMove.getDestLoc(), currentMove.getPiece());
-
-        } else if (currentMove.getType() == MoveType.CAPTURE) {
-            CaptureMove currentAsCapture = (CaptureMove) currentMove;
-            Piece capturedPiece = this.currentBoard.capturePiece(currentAsCapture.getDestLoc());
-            currentAsCapture.setPieceCaptured(capturedPiece);
-            currentBoard.move(currentMove.getSrcLoc(), currentMove.getDestLoc());
-
-        } else if (currentMove.getType() == MoveType.MOVE) {
-            this.currentBoard.move(currentMove.getSrcLoc(), currentMove.getDestLoc());
+        switch (currentMove.getType()) {
+            case ADD:
+                this.currentBoard.add(currentMove.getDestLoc(), currentMove.getPiece());
+                break;
+            case CAPTURE:
+                CaptureMove currentAsCapture = (CaptureMove) currentMove;
+                Piece capturedPiece = this.currentBoard.capturePiece(currentAsCapture.getDestLoc());
+                currentAsCapture.setPieceCaptured(capturedPiece);
+                currentBoard.move(currentMove.getSrcLoc(), currentMove.getDestLoc());
+                break;
+            case LOCATION:
+                break;
+            case MOVE:
+                this.currentBoard.move(currentMove.getSrcLoc(), currentMove.getDestLoc());
+                break;
+            case PROMOTION:
+                this.currentBoard.promote(currentMove.getSrcLoc(), currentMove.getPiece());
+                break;                
         }
+        
         if (currentMove.getSubMove() != null) {
             executeMove(currentMove.getSubMove());
             // switchTurn();
@@ -454,12 +463,12 @@ public class ChessModel extends java.util.Observable {
             undo.setSubmove(ChessFactory.CreateMove(readdString));
         } else if (m instanceof MovingMove) {
             undo = ChessFactory.CreateMove(m.getDestLoc() + " " + m.getSrcLoc());
+        } else if (m instanceof PromotionMove) {
+            //TODO
+            // undo a promotion move
         }
         undo.setChangeTurnAfter(false);
         executeMove(undo);
-
-
-
         movesRedo.push(m);
 
         return true;

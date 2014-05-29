@@ -43,4 +43,11 @@ public class Pawn extends Piece {
         return isValid;
     }
 
+    public boolean isInEigthRow(BoardLocation src) {       
+
+        int pawnEndRow = (super.isWhite()) ? 7 : 0;
+        int pawnCurRow = src.getRow();
+        return pawnCurRow == pawnEndRow;
+    }
+
 }

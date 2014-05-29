@@ -11,6 +11,7 @@ import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
 import chess_rollins_blake.lib.MovingMove;
 import chess_rollins_blake.lib.PieceType;
+import chess_rollins_blake.lib.PromotionMove;
 import chess_rollins_blake.model.pieces.Bishop;
 import chess_rollins_blake.model.pieces.King;
 import chess_rollins_blake.model.pieces.Knight;
@@ -47,6 +48,12 @@ public class ChessFactory {
             @Override
             public ChessMove create(String moveString) {
                 return new MovingMove(moveString);
+            }
+        });
+        moveMap.put(MoveType.PROMOTION, new MoveCreator() {
+            @Override
+            public ChessMove create(String moveString) {
+                return new PromotionMove(moveString);
             }
         });
     }
@@ -113,6 +120,7 @@ public class ChessFactory {
         Pattern MOVE_REGEX = Pattern.compile("[a-h][1-8] [a-h][1-8]\\*?");
         Pattern MOVE2_REGEX = Pattern.compile("[a-h][1-8] [a-h][1-8] [a-h][1-8] [a-h][1-8]");
         Pattern LOCATION_REGEX = Pattern.compile("[a-h][1-8]");
+        Pattern PROMOTION_REGEX = Pattern.compile("[a-h][1-8] [kqrbnp][ld][a-h][1-8]");
         Matcher m;
 
         // Check the Add regex
@@ -137,6 +145,12 @@ public class ChessFactory {
         m = LOCATION_REGEX.matcher(moveString);
         if (m.matches()) {
             returnType = MoveType.LOCATION;
+        }
+
+        // Check if it is a valid promotion move
+        m = PROMOTION_REGEX.matcher(moveString);
+        if (m.matches()) {
+            returnType = MoveType.PROMOTION;
         }
 
         // None of them are valid to return null
