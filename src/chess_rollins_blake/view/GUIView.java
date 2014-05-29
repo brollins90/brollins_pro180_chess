@@ -1,11 +1,11 @@
 package chess_rollins_blake.view;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Observable;
 import java.util.Scanner;
@@ -39,11 +39,22 @@ public class GUIView extends ChessView {
 
         JFrame frame = new JFrame();
         JPanel outerPanel = new JPanel();
+//        JPanel outerPanel = new JPanel(new GridBagLayout());
+//        GridBagConstraints c = new GridBagConstraints();
         this.boardPanel = new BoardPanel(super.model);
         this.boardPanel.setPreferredSize(new Dimension(600, 600));
-
+        
+        //c.fill = GridBagConstraints.HORIZONTAL;
+//        c.gridx = 0;
+//        c.gridy = 0;
+//        c.gridwidth = 3;
         outerPanel.add(boardPanel);
-
+        
+//        c.fill = GridBagConstraints.HORIZONTAL;
+//        c.gridx = 4;
+//        c.gridy = 0;
+//        outerPanel.add(new JPanel(), c);
+        
         // White in check
         whiteInCheckLabel = new JLabel();
         outerPanel.add(whiteInCheckLabel);
@@ -209,7 +220,7 @@ public class GUIView extends ChessView {
 
     @Override
     public void printGameStatus(GameStatus status) {
-        // TODO Auto-generated method stub
+        messageLabel.setText(status.toString());
 
     }
 //

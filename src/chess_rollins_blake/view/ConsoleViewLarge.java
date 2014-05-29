@@ -3,7 +3,6 @@ package chess_rollins_blake.view;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Observable;
 import java.util.Scanner;
@@ -182,7 +181,7 @@ public class ConsoleViewLarge extends ChessView {
 
         System.out.println("Select destination from: ");
 
-        HashSet<ChessMove> moves = this.model.getAvailableMoves();
+        //HashSet<ChessMove> moves = this.model.getAvailableMoves();
         //ArrayList<ChessMove> movesFromSrc = new ArrayList<ChessMove>();
         TreeSet<BoardLocation> dests = this.model.getDestsFromMoveCache(srcLoc);
 //        for (ChessMove m : moves) {

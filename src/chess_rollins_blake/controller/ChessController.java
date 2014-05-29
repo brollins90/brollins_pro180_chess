@@ -105,12 +105,14 @@ public class ChessController implements java.awt.event.ActionListener {
             case ADD:
                 addMove(theCommand, false);
                 break;
-            case MOVE:
             case CAPTURE:
+            case MOVE:
                 addMove(theCommand, true);
                 break;
             case LOCATION: // Check available moves
                 // this.model.setAvailableDestinations(BoardLocation.valueOf(theCommand));
+                break;
+            case PROMOTION:
                 break;
         }
 
@@ -141,7 +143,7 @@ public class ChessController implements java.awt.event.ActionListener {
     public void loadFromFile(String filePath) {
 
         if (filePath != null) {
-            boolean isNewBoard = (filePath.equals("newBoard.txt")) ? true : false;
+            //boolean isNewBoard = (filePath.equals("newBoard.txt")) ? true : false;
             BufferedReader br = null;
             try {
                 String path = filePath;
@@ -230,6 +232,8 @@ public class ChessController implements java.awt.event.ActionListener {
                 this.addMove(thisMove, true);
 
                 
+            } else {
+                System.out.println("sakjdfadkjsfjdsa");
             }
             // this.view.requestInput();
         }

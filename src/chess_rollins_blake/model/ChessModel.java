@@ -6,7 +6,6 @@ import java.util.Stack;
 import java.util.TreeSet;
 
 import chess_rollins_blake.ConsoleChess;
-import chess_rollins_blake.controller.GameStatus;
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.exceptions.InvalidMoveException;
 import chess_rollins_blake.lib.BoardLocation;
@@ -16,7 +15,6 @@ import chess_rollins_blake.lib.MoveType;
 import chess_rollins_blake.lib.MovingMove;
 import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.lib.PromotionMove;
-import chess_rollins_blake.model.pieces.King;
 import chess_rollins_blake.model.pieces.Piece;
 
 public class ChessModel extends java.util.Observable {
@@ -47,9 +45,9 @@ public class ChessModel extends java.util.Observable {
         this.movesRedo = new Stack<>();
         this.statusMessage = "";
         this.currentlyWhitesTurn = true;
-        this.whiteKingInCheck = false;
-        this.blackKingInCheck = false;
         resetView();
+        this.whiteKingInCheck = isThisKingInCheck(true);
+        this.blackKingInCheck = isThisKingInCheck(false);
     }
     public HashSet<ChessMove> getAvailableMoves() {
         if (this.availableMovesCache == null) {
@@ -100,11 +98,15 @@ public class ChessModel extends java.util.Observable {
                 try {
                     testMove.setChangeTurnAfter(false);
                     this.addMoveWithoutUpdate(testMove);
-                    boolean isKingInCheckNow = this.isThisKingInCheck(this.isWhiteTurn());
-                    if (wasKingInCheck && !isKingInCheckNow) { // !this.model.isOtherInCheck()) {
+                    boolean kingIsInCheckNow = this.isThisKingInCheck(this.isWhiteTurn());
+                    if (wasKingInCheck && !kingIsInCheckNow) { // !this.model.isOtherInCheck()) {
                         movesThatCanGetOutOfCheck.add(testMove);
                     }
-                    moves.add(testMove);
+                    if (!wasKingInCheck && kingIsInCheckNow) {
+                        // Bad move
+                    } else {
+                        moves.add(testMove);
+                    }
                     this.undoMove();
                 } catch (ChessException e) {
                     System.out.println("ERROR: " + e.getMessage());
@@ -308,7 +310,7 @@ public class ChessModel extends java.util.Observable {
         ConsoleChess.debugMessage("ChessModel.getAvailableDestinationsFromLocation()");
         HashSet<BoardLocation> dests = new HashSet<BoardLocation>();
         if (loc != BoardLocation.none) {
-            Piece p = this.getPiece(loc);
+            //Piece p = this.getPiece(loc);
 
             // TODO iterator stuff
             for (int i = 0; i < this.currentBoard.getBoardSize(); i++) {
