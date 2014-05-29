@@ -75,7 +75,7 @@ public class ConsoleViewLarge extends ChessView {
         // Create the column numbers
 
         BoardLocation tempSource = this.model.getCurrentModelStateLocation();
-        HashSet<BoardLocation> tempDests = this.model.getAvailableDestinationsFromLocation(tempSource);
+        HashSet<BoardLocation> tempDests = this.model.getAvailableDestinationsFromLocationInMoveCache(tempSource);
 
         String retString = "";
         retString += "--|----A---------B---------C---------D---------E---------F---------G---------H----|--\n";

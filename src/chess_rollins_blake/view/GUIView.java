@@ -28,33 +28,34 @@ public class GUIView extends ChessView {
     JButton[][] boardSquares = new JButton[8][8];
     JLabel messageLabel, whiteInCheckLabel, blackInCheckLabel;
     public BoardPanel boardPanel;
-    
+    BoardLocation previousModelStateLocation;
+
 
     private Scanner scan;
 
     public GUIView(ChessModel model) {
         super(model);
         scan = new Scanner(System.in);
-
+        previousModelStateLocation = BoardLocation.none;
 
         JFrame frame = new JFrame();
         JPanel outerPanel = new JPanel();
-//        JPanel outerPanel = new JPanel(new GridBagLayout());
-//        GridBagConstraints c = new GridBagConstraints();
+        // JPanel outerPanel = new JPanel(new GridBagLayout());
+        // GridBagConstraints c = new GridBagConstraints();
         this.boardPanel = new BoardPanel(super.model);
         this.boardPanel.setPreferredSize(new Dimension(600, 600));
-        
-        //c.fill = GridBagConstraints.HORIZONTAL;
-//        c.gridx = 0;
-//        c.gridy = 0;
-//        c.gridwidth = 3;
+
+        // c.fill = GridBagConstraints.HORIZONTAL;
+        // c.gridx = 0;
+        // c.gridy = 0;
+        // c.gridwidth = 3;
         outerPanel.add(boardPanel);
-        
-//        c.fill = GridBagConstraints.HORIZONTAL;
-//        c.gridx = 4;
-//        c.gridy = 0;
-//        outerPanel.add(new JPanel(), c);
-        
+
+        // c.fill = GridBagConstraints.HORIZONTAL;
+        // c.gridx = 4;
+        // c.gridy = 0;
+        // outerPanel.add(new JPanel(), c);
+
         // White in check
         whiteInCheckLabel = new JLabel();
         outerPanel.add(whiteInCheckLabel);
@@ -76,19 +77,23 @@ public class GUIView extends ChessView {
         // frame.pack();
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        //this.boardPanel.setModel(super.model);
-        
+
+        // this.boardPanel.setModel(super.model);
+
     }
 
     @Override
     public void update(Observable obs, Object obj) {
+//        BoardLocation currentModelStateLocation = this.model.getCurrentModelStateLocation();
         if (obj instanceof String) {
             this.messageLabel.setText((String) obj);
         } else {
             this.messageLabel.setText("ERROR: Invalid message.");
         }
-        updateBoard();
+//        if (previousModelStateLocation != currentModelStateLocation) {
+//            previousModelStateLocation = currentModelStateLocation;
+            updateBoard();
+//        }
         if (this.model.isBlackKingInCheck()) {
             blackInCheckLabel.setText("Black King is in check!");
         } else {
@@ -108,7 +113,7 @@ public class GUIView extends ChessView {
 
     @Override
     public BoardLocation requestSourcePiece() {
-        //boardPanel.setAvailableDestinations(new HashSet<BoardLocation>());
+        // boardPanel.setAvailableDestinations(new HashSet<BoardLocation>());
         // update();
 
 
@@ -122,7 +127,7 @@ public class GUIView extends ChessView {
             srcs.add(m.getSrcLoc());
         }
 
-        boardPanel.setAvailableSources(srcs);
+//        boardPanel.setAvailableSources(srcs);
         update();
 
 
@@ -177,7 +182,7 @@ public class GUIView extends ChessView {
         }
 
 
-//        boardPanel.setAvailableDestinations(dests);
+        // boardPanel.setAvailableDestinations(dests);
         update();
 
 
@@ -197,7 +202,7 @@ public class GUIView extends ChessView {
             try {
                 loc = BoardLocation.valueOf(tempCommand.trim());
             } catch (IllegalArgumentException e) {
-                
+
             }
             for (ChessMove m : movesFromSrc) {
                 if (m.getDestLoc() == loc) {
@@ -223,12 +228,13 @@ public class GUIView extends ChessView {
         messageLabel.setText(status.toString());
 
     }
-//
-//    @Override
-//    public void setModel(ChessModel m) {
-//        this.model = m;
-//        this.boardPanel.setModel(this.model);
-//    }
+
+    //
+    // @Override
+    // public void setModel(ChessModel m) {
+    // this.model = m;
+    // this.boardPanel.setModel(this.model);
+    // }
 
     private String readLine() {
         return scan.nextLine();

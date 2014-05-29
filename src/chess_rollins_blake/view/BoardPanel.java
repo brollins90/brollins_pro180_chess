@@ -32,14 +32,14 @@ public class BoardPanel extends JPanel {
 
     BufferedImage[][] images = new BufferedImage[2][6];
 
-    HashSet<BoardLocation> availableSources;
+//    HashSet<BoardLocation> availableSources;
     // HashSet<BoardLocation> availableDestinations;
 
     private ChessModel model;
 
     BoardPanel(ChessModel m) {
         this.model = m;
-        availableSources = new HashSet<BoardLocation>();
+        //availableSources = new HashSet<BoardLocation>();
         // availableDestinations = new HashSet<BoardLocation>();
 
         loadImages();
@@ -51,9 +51,9 @@ public class BoardPanel extends JPanel {
     // this.availableDestinations = dests;
     // }
 
-    public void setAvailableSources(HashSet<BoardLocation> sources) {
-        this.availableSources = sources;
-    }
+//    public void setAvailableSources(HashSet<BoardLocation> sources) {
+//        this.availableSources = sources;
+//    }
 
     @Override
     public void paint(Graphics g) {
@@ -63,8 +63,9 @@ public class BoardPanel extends JPanel {
 
 //        if (tempSource != prevLoc) {
             prevLoc = tempSource;
-
-            HashSet<BoardLocation> tempDests = this.model.getAvailableDestinationsFromLocation(tempSource);
+            
+            HashSet<BoardLocation> tempSources = this.model.getAvailableSources();
+            HashSet<BoardLocation> tempDests = this.model.getAvailableDestinationsFromLocationInMoveCache(tempSource);
 
             int darkBackground = 1;
 
@@ -92,12 +93,14 @@ public class BoardPanel extends JPanel {
                     }
 
                     // color the source dests
-                    if (this.availableSources.contains(currentLocation)) {
+                    if (tempSources.contains(currentLocation)) {
                         g.setColor(SQUARE_HAS_MOVE);
                     }
 
                     // color the current darker
                     if (tempSource == currentLocation) {
+//                        Color currentColor = g.getColor();
+//                        g.setColor(new Color(currentColor.getRed(),currentColor.getGreen(),currentColor.getBlue() - 100));
                         g.setColor(Color.ORANGE);
                     }
 

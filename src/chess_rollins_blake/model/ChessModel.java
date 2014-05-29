@@ -25,7 +25,7 @@ public class ChessModel extends java.util.Observable {
     protected String statusMessage;
     protected boolean currentlyWhitesTurn;
 
-    protected BoardLocation currentModelStateLocation = BoardLocation.none;
+    protected BoardLocation currentModelStateLocation = BoardLocation.a1;
     protected HashSet<ChessMove> availableMovesCache;
     protected HashSet<BoardLocation> availableSourcesCache;
 
@@ -49,6 +49,7 @@ public class ChessModel extends java.util.Observable {
         this.whiteKingInCheck = isThisKingInCheck(true);
         this.blackKingInCheck = isThisKingInCheck(false);
     }
+
     public HashSet<ChessMove> getAvailableMoves() {
         if (this.availableMovesCache == null) {
             populateAvailableMoveCache();
@@ -56,9 +57,12 @@ public class ChessModel extends java.util.Observable {
         return this.availableMovesCache;
     }
 
-//    public HashSet<BoardLocation> getAvailableSources() {
-//        return this.availableSourcesCache;
-//    }
+     public HashSet<BoardLocation> getAvailableSources() {
+     if (this.availableSourcesCache == null) {
+         populateAvailableSourcesCache();
+     }
+     return this.availableSourcesCache;
+     }
 
     public BoardLocation getCurrentModelStateLocation() {
         return this.currentModelStateLocation;
@@ -75,7 +79,19 @@ public class ChessModel extends java.util.Observable {
         return destinations;
     }
 
+    public void populateAvailableSourcesCache() {
+        HashSet<BoardLocation> sources = new HashSet<BoardLocation>();
+
+        for (ChessMove m : this.availableMovesCache) {
+           sources.add(m.getSrcLoc());
+            
+        }
+        this.availableSourcesCache = sources;
+    }
+
     private void populateAvailableMoveCache() {
+
+        this.availableSourcesCache = null;
 
         // Get all the pieces for this player that have moves.
         HashSet<BoardLocation> piecesThatCanMove = this.getLocationsThatCanMove();
@@ -102,6 +118,7 @@ public class ChessModel extends java.util.Observable {
                     if (wasKingInCheck && !kingIsInCheckNow) { // !this.model.isOtherInCheck()) {
                         movesThatCanGetOutOfCheck.add(testMove);
                     }
+                    
                     if (!wasKingInCheck && kingIsInCheckNow) {
                         // Bad move
                     } else {
@@ -109,12 +126,14 @@ public class ChessModel extends java.util.Observable {
                     }
                     this.undoMove();
                 } catch (ChessException e) {
-                    System.out.println("ERROR: " + e.getMessage());
+                    // System.out.println("ERROR: " + e.getMessage());
                 }
             }
         }
         // Set the Collection based on whether or not the king was previously in check
         this.availableMovesCache = (wasKingInCheck) ? movesThatCanGetOutOfCheck : moves;
+        
+        populateAvailableSourcesCache();
 
     }
 
@@ -127,12 +146,13 @@ public class ChessModel extends java.util.Observable {
 
     public void setCurrentModelStateLocation(BoardLocation loc) {
         if (this.currentModelStateLocation != loc) {
+            System.out.println("going1");
             this.currentModelStateLocation = loc;
-            resetView();
+            //resetView();
         }
     }
-    
-    
+
+
 
     /**
      * Adds a piece to the list
@@ -282,7 +302,7 @@ public class ChessModel extends java.util.Observable {
 
 
 
-    public HashSet<BoardLocation> getLocationsThatCanMove() {
+    private HashSet<BoardLocation> getLocationsThatCanMove() {
         ConsoleChess.debugMessage("ChessModel.getLocationsThatCanMove()");
 
         HashSet<BoardLocation> locsThatCanMove = new HashSet<BoardLocation>();
@@ -305,12 +325,21 @@ public class ChessModel extends java.util.Observable {
         return locsThatCanMove;
     }
 
+    public HashSet<BoardLocation> getAvailableDestinationsFromLocationInMoveCache(BoardLocation loc) {
+        HashSet<BoardLocation> dests = new HashSet<BoardLocation>();
+        for (ChessMove m : this.availableMovesCache) {
+            if (loc == m.getSrcLoc()) {
+                dests.add(m.getDestLoc());
+            }
+        }
+        return dests;
+    }
 
-    public HashSet<BoardLocation> getAvailableDestinationsFromLocation(BoardLocation loc) {
+    private HashSet<BoardLocation> getAvailableDestinationsFromLocation(BoardLocation loc) {
         ConsoleChess.debugMessage("ChessModel.getAvailableDestinationsFromLocation()");
         HashSet<BoardLocation> dests = new HashSet<BoardLocation>();
         if (loc != BoardLocation.none) {
-            //Piece p = this.getPiece(loc);
+            // Piece p = this.getPiece(loc);
 
             // TODO iterator stuff
             for (int i = 0; i < this.currentBoard.getBoardSize(); i++) {
@@ -398,9 +427,9 @@ public class ChessModel extends java.util.Observable {
                 break;
             case PROMOTION:
                 this.currentBoard.promote(currentMove.getSrcLoc(), currentMove.getPiece());
-                break;                
+                break;
         }
-        
+
         if (currentMove.getSubMove() != null) {
             executeMove(currentMove.getSubMove());
             // switchTurn();
@@ -446,7 +475,7 @@ public class ChessModel extends java.util.Observable {
     }
 
     private void switchTurn() {
-        System.out.println("SWITCHING TURNS: new turn is " + !this.currentlyWhitesTurn);
+        // System.out.println("SWITCHING TURNS: new turn is " + !this.currentlyWhitesTurn);
         this.currentlyWhitesTurn = !currentlyWhitesTurn;
     }
 
@@ -466,7 +495,7 @@ public class ChessModel extends java.util.Observable {
         } else if (m instanceof MovingMove) {
             undo = ChessFactory.CreateMove(m.getDestLoc() + " " + m.getSrcLoc());
         } else if (m instanceof PromotionMove) {
-            //TODO
+            // TODO
             // undo a promotion move
         }
         undo.setChangeTurnAfter(false);
@@ -553,6 +582,7 @@ public class ChessModel extends java.util.Observable {
         }
 
         if (isValid && (m.getType() == MoveType.CAPTURE) && !this.currentBoard.get(m.getSrcLoc()).isValidMovement(m.getSrcLoc(), m.getDestLoc(), true)) {
+            // System.out.println(m.getType() + " " + m.getMessage() + " " + m.getMoveString());
             isValid = false;
             errorMessage += "ERROR: " + m.getMoveString() + " - The capture was not valid.\n";
         }

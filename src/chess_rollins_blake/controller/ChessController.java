@@ -21,6 +21,7 @@ import chess_rollins_blake.model.ChessModel;
 import chess_rollins_blake.model.pieces.Pawn;
 import chess_rollins_blake.model.pieces.Piece;
 import chess_rollins_blake.view.ChessView;
+import chess_rollins_blake.view.GUIView;
 
 public class ChessController implements java.awt.event.ActionListener {
 
@@ -31,11 +32,13 @@ public class ChessController implements java.awt.event.ActionListener {
     protected ChessModel model;
     protected ChessView view;
     protected GameStatus currentGameStatus;
+    protected BoardLocation previousModelStateLocation;
 
     public ChessController(ChessModel model, ChessView view) {
         this.model = model;
         this.view = view;
 
+        previousModelStateLocation = BoardLocation.none;
         this.view.addBoardListener(new LocationListener());
         this.view.addBoardMotionListener(new LocationListener());
 
@@ -87,7 +90,12 @@ public class ChessController implements java.awt.event.ActionListener {
 
             BoardLocation mouseLoc = BoardLocation.getLocFromRowAndColumn(row, col);
 
-            updateModelForLocation(mouseLoc);
+            System.out.println("prev: " + previousModelStateLocation);
+            System.out.println("mouseLoc: " + mouseLoc);
+            if (previousModelStateLocation != mouseLoc) {
+                previousModelStateLocation = mouseLoc;
+                updateModelForLocation(mouseLoc);
+            }
 
 
         }
@@ -120,6 +128,7 @@ public class ChessController implements java.awt.event.ActionListener {
 
 
     public void updateModelForLocation(BoardLocation loc) {
+        System.out.println("Updating board for new location: " + loc);
         this.model.setCurrentModelStateLocation(loc);
         view.update();
     }
@@ -143,7 +152,7 @@ public class ChessController implements java.awt.event.ActionListener {
     public void loadFromFile(String filePath) {
 
         if (filePath != null) {
-            //boolean isNewBoard = (filePath.equals("newBoard.txt")) ? true : false;
+            // boolean isNewBoard = (filePath.equals("newBoard.txt")) ? true : false;
             BufferedReader br = null;
             try {
                 String path = filePath;
@@ -175,67 +184,82 @@ public class ChessController implements java.awt.event.ActionListener {
     public void playChess() {
 
         this.currentGameStatus = GameStatus.PLAYING;
+        
+        this.model.resetView();
 
         // Start the game Loop
-        while (this.currentGameStatus == GameStatus.PLAYING) {
+        if (this.view instanceof GUIView) {
 
-            this.model.resetView();
 
-            HashSet<ChessMove> availableMoves = this.model.getAvailableMoves();
 
-            // if there are no moves, then the game is over
-            if (availableMoves.size() == 0) {
-                this.currentGameStatus = this.model.isWhiteTurn() ? GameStatus.DARKWIN : GameStatus.LIGHTWIN;
-            }
-            
-            // I dont like this logic, but I also dont want to use a break when the game is over
-            if (this.currentGameStatus == GameStatus.PLAYING) {
+        } else {
+            while (this.currentGameStatus == GameStatus.PLAYING) {
 
-                BoardLocation src = null;
-                while (src == null) {
-                    src = this.view.requestSourcePiece();
-                }
-                updateModelForLocation(src);
 
-                BoardLocation dest = null;
-                while (dest == null) {
-                    dest = this.view.requestDestinationPiece(src);
+                HashSet<ChessMove> availableMoves = this.model.getAvailableMoves();
+
+                // if there are no moves, then the game is over
+                if (availableMoves.size() == 0) {
+                    this.currentGameStatus = this.model.isWhiteTurn() ? GameStatus.DARKWIN : GameStatus.LIGHTWIN;
                 }
 
-                String moveString = src + " " + dest;
-                Piece destPiece = this.model.getPiece(dest);
-                if (destPiece != null && destPiece.isWhite() != this.model.isWhiteTurn()) {
-                    moveString += "*";
-                }
+                // I dont like this logic, but I also dont want to use a break when the game is over
 
-                Piece srcPiece = this.model.getPiece(src);
-                ChessMove thisMove = ChessFactory.CreateMove(moveString);
-                
-                
-                
-                
-                // Check for pawn promotion
-                //Piece newDestPiece = this.model.getPiece(dest);
-                if (srcPiece instanceof Pawn) {
-                    if (((Pawn) srcPiece).isInEigthRow(dest)) {
-                        PieceType pawnPromotionType = this.view.requestPawnPromotion();
-                        thisMove.setChangeTurnAfter(false);
-                        //"a1 qda1"
-                        char ldColor = (srcPiece.isWhite()) ? 'l' : 'd';
-                        String promotionString = thisMove.getDestLoc().toString() + " " + pawnPromotionType.toString() + ldColor + thisMove.getDestLoc().toString();
-                        thisMove.setSubmove(ChessFactory.CreateMove(promotionString));
-                        
+                if (this.currentGameStatus == GameStatus.PLAYING) {
+                    if (this.view instanceof GUIView) {
+                        // try {
+                        // Thread.currentThread().wait();
+                        // } catch (InterruptedException e) {
+                        // // TODO Auto-generated catch block
+                        // e.printStackTrace();
+                        // }
+                    } else {
+
+                        BoardLocation src = null;
+                        while (src == null) {
+                            src = this.view.requestSourcePiece();
+                        }
+                        updateModelForLocation(src);
+
+                        BoardLocation dest = null;
+                        while (dest == null) {
+                            dest = this.view.requestDestinationPiece(src);
+                        }
+
+                        String moveString = src + " " + dest;
+                        Piece destPiece = this.model.getPiece(dest);
+                        if (destPiece != null && destPiece.isWhite() != this.model.isWhiteTurn()) {
+                            moveString += "*";
+                        }
+
+                        Piece srcPiece = this.model.getPiece(src);
+                        ChessMove thisMove = ChessFactory.CreateMove(moveString);
+
+
+
+                        // Check for pawn promotion
+                        // Piece newDestPiece = this.model.getPiece(dest);
+                        if (srcPiece instanceof Pawn) {
+                            if (((Pawn) srcPiece).isInEigthRow(dest)) {
+                                PieceType pawnPromotionType = this.view.requestPawnPromotion();
+                                thisMove.setChangeTurnAfter(false);
+                                // "a1 qda1"
+                                char ldColor = (srcPiece.isWhite()) ? 'l' : 'd';
+                                String promotionString = thisMove.getDestLoc().toString() + " " + pawnPromotionType.toString() + ldColor + thisMove.getDestLoc().toString();
+                                thisMove.setSubmove(ChessFactory.CreateMove(promotionString));
+
+                            }
+                        }
+
+
+                        this.addMove(thisMove, true);
+
                     }
+                } else {
+                    System.out.println("sakjdfadkjsfjdsa");
                 }
-                
-
-                this.addMove(thisMove, true);
-
-                
-            } else {
-                System.out.println("sakjdfadkjsfjdsa");
+                // this.view.requestInput();
             }
-            // this.view.requestInput();
         }
 
         this.view.printGameStatus(currentGameStatus);
