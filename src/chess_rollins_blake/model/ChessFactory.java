@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import chess_rollins_blake.ConsoleChess;
 import chess_rollins_blake.exceptions.InvalidMoveException;
 import chess_rollins_blake.lib.AddMove;
 import chess_rollins_blake.lib.CaptureMove;
@@ -99,10 +100,12 @@ public class ChessFactory {
     }
 
     public static ChessMove CreateMove(MoveType type, String moveString) {
+        ConsoleChess.debugMessage("ChessFactory.ChessMove(" + type + "," + moveString + ")");
         return moveMap.get(type).create(moveString);
     }
     
     public static ChessMove CreateMove(String moveString) {
+        ConsoleChess.debugMessage("ChessFactory.ChessMove(" + moveString + ")");
         return moveMap.get(ValidateMoveString(moveString)).create(moveString);
     }
 

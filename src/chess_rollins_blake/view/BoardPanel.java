@@ -95,6 +95,7 @@ public class BoardPanel extends JPanel {
                     // color the source dests
                     if (tempSources.contains(currentLocation)) {
                         g.setColor(SQUARE_HAS_MOVE);
+                        //g.setColor(g.getColor().darker());
                     }
 
                     // color the current darker

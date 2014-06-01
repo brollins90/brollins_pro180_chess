@@ -34,6 +34,7 @@ public class ChessController implements java.awt.event.ActionListener {
     protected GameStatus currentGameStatus;
     protected BoardLocation previousModelStateLocation;
 
+
     public ChessController(ChessModel model, ChessView view) {
         this.model = model;
         this.view = view;
@@ -48,56 +49,96 @@ public class ChessController implements java.awt.event.ActionListener {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            ConsoleChess.debugMessage("mouseClicked");
+
+            BoardLocation mouseLoc = getMouseLoc(e);
+
+            if (!model.getCurrentTurnSourceSet()) {
+                if (model.getAvailableSources().contains(mouseLoc)) {
+                    model.setCurrentTurnSourceSet();
+                } else {
+                    // System.out.println("cur mouse loc is NOT in the list of srcs");
+                }
+            } else {
+                // set the dest and perform the action
+                if (model.getAvailableDestinationsFromLocationInMoveCache(previousModelStateLocation).contains(mouseLoc)) {
+                    String moveString = previousModelStateLocation + " " + mouseLoc;
+
+                    boolean currentTurn = model.isWhiteTurn();
+                    HashSet<BoardLocation> otherTeamsPieces = model.getPlayersPieces(!currentTurn);
+
+                    if (otherTeamsPieces.contains(mouseLoc)) {
+                        moveString += "*";
+                    }
+
+                    addMove(moveString, true);
+
+                    // Check for game over
+                    if (model.getAvailableMoves().size() == 0) {
+                        System.out.println("GAME OVER");
+                    }
+
+
+                } else {
+                    // System.out.println("cur mouse loc is NOT in the list of dests");
+                }
+            }
+
         }
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            ConsoleChess.debugMessage("mouseEntered");
+            // ConsoleChess.debugMessage("mouseEntered");
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-            ConsoleChess.debugMessage("mouseExited");
+            // ConsoleChess.debugMessage("mouseExited");
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
-            ConsoleChess.debugMessage("mousePressed");
+            // ConsoleChess.debugMessage("mousePressed");
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            ConsoleChess.debugMessage("mouseReleased");
+            // ConsoleChess.debugMessage("mouseReleased");
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            ConsoleChess.debugMessage("mouseDragged");
+            // / ConsoleChess.debugMessage("mouseDragged");
         }
 
         @Override
         public void mouseMoved(MouseEvent e) {
             // ConsoleChess.debugMessage("mouseMoved");
-            int mouseX = e.getX();
-            int mouseY = e.getY();
 
-            int row = 7 - (mouseY / VIEW_HEIGHT);
-            int col = mouseX / VIEW_WIDTH;
+            BoardLocation mouseLoc = getMouseLoc(e);
 
-            // System.out.println(mouseX + " " + mouseY);
-            // System.out.println(row + " " + col);
-
-            BoardLocation mouseLoc = BoardLocation.getLocFromRowAndColumn(row, col);
-
-            System.out.println("prev: " + previousModelStateLocation);
-            System.out.println("mouseLoc: " + mouseLoc);
-            if (previousModelStateLocation != mouseLoc) {
+            // System.out.println("prev: " + previousModelStateLocation);
+            // System.out.println("mouseLoc: " + mouseLoc);
+            if (previousModelStateLocation != mouseLoc && !model.getCurrentTurnSourceSet()) {
                 previousModelStateLocation = mouseLoc;
                 updateModelForLocation(mouseLoc);
             }
 
 
+        }
+
+        private BoardLocation getMouseLoc(MouseEvent e) {
+
+            int mouseX = e.getX();
+            int mouseY = e.getY();
+
+            // System.out.println(mouseX + " " + mouseY);
+
+            int row = 7 - (mouseY / VIEW_HEIGHT);
+            int col = mouseX / VIEW_WIDTH;
+
+            // System.out.println(row + " " + col);
+
+            return BoardLocation.getLocFromRowAndColumn(row, col);
         }
 
 
@@ -128,28 +169,33 @@ public class ChessController implements java.awt.event.ActionListener {
 
 
     public void updateModelForLocation(BoardLocation loc) {
-        System.out.println("Updating board for new location: " + loc);
+        ConsoleChess.debugMessage("ChessController.updateModelForLocation(" + loc + ")");
         this.model.setCurrentModelStateLocation(loc);
         view.update();
     }
 
     public void addMove(String moveString, boolean updateObservers) {
+        ConsoleChess.debugMessage("ChessController.addMove(" + moveString + "," + updateObservers + ")");
         this.model.addMove(moveString, updateObservers);
     }
 
     public void addMove(ChessMove move, boolean updateObservers) {
+        ConsoleChess.debugMessage("ChessController.addMove(" + move.getMoveString() + "," + updateObservers + ")");
         this.model.addMove(move, updateObservers);
     }
 
     public void addMoveWithoutUpdate(ChessMove m) {
+        ConsoleChess.debugMessage("ChessController.addMoveWithoutUpdate(" + m.getMoveString() + ")");
         this.model.addMoveWithoutUpdate(m);
     }
 
     public void addMoveWithoutUpdate(String m) {
+        ConsoleChess.debugMessage("ChessController.addMoveWithoutUpdate(" + m + ")");
         this.model.addMoveWithoutUpdate(m);
     }
 
     public void loadFromFile(String filePath) {
+        ConsoleChess.debugMessage("ChessController.loadFromFile(" + filePath + ")");
 
         if (filePath != null) {
             // boolean isNewBoard = (filePath.equals("newBoard.txt")) ? true : false;
@@ -160,7 +206,7 @@ public class ChessController implements java.awt.event.ActionListener {
 
                 String line = "";
                 while ((line = br.readLine()) != null) {
-                    System.out.println(line);
+                    ConsoleChess.debugMessage("line: " + line);
                     try {
                         actionPerformed(new ActionEvent(this, MoveType.ADD.ordinal(), line));
                         // addMove(line, !isNewBoard);
@@ -171,8 +217,11 @@ public class ChessController implements java.awt.event.ActionListener {
                 br.close();
 
             } catch (FileNotFoundException e) {
+
+                ConsoleChess.debugMessage("file not found: " + e.getMessage());
                 throw new ChessException("Unable to open the file at: " + filePath);
             } catch (IOException e) {
+                ConsoleChess.debugMessage("io exception: " + e.getMessage());
                 throw new ChessException("IOException when trying to read the file at: " + filePath);
             }
         } else {
@@ -182,9 +231,10 @@ public class ChessController implements java.awt.event.ActionListener {
     }
 
     public void playChess() {
+        ConsoleChess.debugMessage("ChessController.playChess()");
 
         this.currentGameStatus = GameStatus.PLAYING;
-        
+
         this.model.resetView();
 
         // Start the game Loop

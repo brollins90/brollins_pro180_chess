@@ -1,5 +1,10 @@
 package chess_rollins_blake;
 
+import java.io.BufferedOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+
 import chess_rollins_blake.controller.ChessController;
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.model.ChessModel;
@@ -13,11 +18,28 @@ import chess_rollins_blake.view.GUIView;
  */
 public class ConsoleChess {
 
-    static boolean DEBUG_ON = true;
+    static boolean DEBUG_ON = false;
+    static boolean DEBUG_TO_FILE = false;
+    static PrintStream ps;
 
     public static void debugMessage(String s) {
         if (DEBUG_ON) {
+            s = Thread.currentThread().getName() + "--" + s;
             System.out.println(s);
+            if (DEBUG_TO_FILE) {
+                ps.append(s + "\n");
+            }
+        }
+    }
+
+    public ConsoleChess() {
+        if (DEBUG_TO_FILE) {
+            try {
+                ps = new PrintStream(new BufferedOutputStream(new FileOutputStream("C:\\_\\debug.txt")));
+            } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 
@@ -32,9 +54,9 @@ public class ConsoleChess {
         // args[0] = "Donald Byrne vs Robert James Fischer.txt";
         // args[0] = "Garry Kasparov vs Deep Blue_1996.02.10_r1.txt";
         args[0] = "chess08.txt";
-        //testPawnPromotion
-        //args[0] = "Pratts Trap.txt";
-        //args[0] = "Kostics Trap.txt";
+        // testPawnPromotion
+        // args[0] = "Pratts Trap.txt";
+        // args[0] = "Kostics Trap.txt";
         ConsoleChess c = new ConsoleChess();
         c.playChess(args, true);
     }
@@ -55,7 +77,7 @@ public class ConsoleChess {
 
             ChessModel model = new ChessModel();
             // ChessView view = new ConsoleView(model);
-            //ChessView view = new ConsoleViewLarge(model);
+            // ChessView view = new ConsoleViewLarge(model);
             GUIView view = new GUIView(model);
 
             model.addObserver(view);

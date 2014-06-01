@@ -8,6 +8,7 @@ import java.util.TreeSet;
 import chess_rollins_blake.ConsoleChess;
 import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.exceptions.InvalidMoveException;
+import chess_rollins_blake.lib.AddMove;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.CaptureMove;
 import chess_rollins_blake.lib.ChessMove;
@@ -15,6 +16,7 @@ import chess_rollins_blake.lib.MoveType;
 import chess_rollins_blake.lib.MovingMove;
 import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.lib.PromotionMove;
+import chess_rollins_blake.model.pieces.King;
 import chess_rollins_blake.model.pieces.Piece;
 
 public class ChessModel extends java.util.Observable {
@@ -28,6 +30,9 @@ public class ChessModel extends java.util.Observable {
     protected BoardLocation currentModelStateLocation = BoardLocation.a1;
     protected HashSet<ChessMove> availableMovesCache;
     protected HashSet<BoardLocation> availableSourcesCache;
+    protected HashSet<BoardLocation> blackPieceLocations;
+    protected HashSet<BoardLocation> whitePieceLocations;
+    protected boolean currentTurnSourceSet;
 
     protected boolean whiteKingInCheck;
     protected boolean blackKingInCheck;
@@ -40,6 +45,7 @@ public class ChessModel extends java.util.Observable {
      * Creates a ChessModel
      */
     public ChessModel() {
+        ConsoleChess.debugMessage("ChessModel.ChessModel()");
         this.currentBoard = new ChessBoard();
         this.movesExecuted = new Stack<>();
         this.movesRedo = new Stack<>();
@@ -50,25 +56,32 @@ public class ChessModel extends java.util.Observable {
         this.blackKingInCheck = isThisKingInCheck(false);
     }
 
-    public HashSet<ChessMove> getAvailableMoves() {
+    public synchronized HashSet<ChessMove> getAvailableMoves() {
+        ConsoleChess.debugMessage("ChessModel.getAvailableMoves()");
         if (this.availableMovesCache == null) {
             populateAvailableMoveCache();
         }
         return this.availableMovesCache;
     }
 
-     public HashSet<BoardLocation> getAvailableSources() {
-     if (this.availableSourcesCache == null) {
-         populateAvailableSourcesCache();
-     }
-     return this.availableSourcesCache;
-     }
+    public synchronized HashSet<BoardLocation> getAvailableSources() {
+        ConsoleChess.debugMessage("ChessModel.getAvailableSources()");
+        // if (this.availableMovesCache == null) {
+        populateAvailableMoveCache();
+        // }
+        // if (this.availableSourcesCache == null) {
+        populateAvailableSourcesCache();
+        // }
+        return this.availableSourcesCache;
+    }
 
-    public BoardLocation getCurrentModelStateLocation() {
+    public synchronized BoardLocation getCurrentModelStateLocation() {
+        ConsoleChess.debugMessage("ChessModel.getCurrentModelStateLocation()");
         return this.currentModelStateLocation;
     }
 
-    public TreeSet<BoardLocation> getDestsFromMoveCache(BoardLocation sourceLocation) {
+    public synchronized TreeSet<BoardLocation> getDestsFromMoveCache(BoardLocation sourceLocation) {
+        ConsoleChess.debugMessage("ChessModel.getDestsFromMoveCache(" + sourceLocation + ")");
         TreeSet<BoardLocation> destinations = new TreeSet<BoardLocation>();
 
         for (ChessMove m : this.availableMovesCache) {
@@ -79,18 +92,19 @@ public class ChessModel extends java.util.Observable {
         return destinations;
     }
 
-    public void populateAvailableSourcesCache() {
+    public synchronized void populateAvailableSourcesCache() {
+        ConsoleChess.debugMessage("ChessModel.populateAvailableSourcesCache()");
         HashSet<BoardLocation> sources = new HashSet<BoardLocation>();
 
         for (ChessMove m : this.availableMovesCache) {
-           sources.add(m.getSrcLoc());
-            
+            sources.add(m.getSrcLoc());
+
         }
         this.availableSourcesCache = sources;
     }
 
-    private void populateAvailableMoveCache() {
-
+    private synchronized void populateAvailableMoveCache() {
+        ConsoleChess.debugMessage("ChessModel.populateAvailableMoveCache()");
         this.availableSourcesCache = null;
 
         // Get all the pieces for this player that have moves.
@@ -110,6 +124,7 @@ public class ChessModel extends java.util.Observable {
                 if (this.locationHasPiece(destination)) {
                     moveString += "*";
                 }
+                ConsoleChess.debugMessage("\t" + moveString);
                 ChessMove testMove = ChessFactory.CreateMove(moveString);
                 try {
                     testMove.setChangeTurnAfter(false);
@@ -118,7 +133,7 @@ public class ChessModel extends java.util.Observable {
                     if (wasKingInCheck && !kingIsInCheckNow) { // !this.model.isOtherInCheck()) {
                         movesThatCanGetOutOfCheck.add(testMove);
                     }
-                    
+
                     if (!wasKingInCheck && kingIsInCheckNow) {
                         // Bad move
                     } else {
@@ -126,29 +141,47 @@ public class ChessModel extends java.util.Observable {
                     }
                     this.undoMove();
                 } catch (ChessException e) {
-                    // System.out.println("ERROR: " + e.getMessage());
+                    ConsoleChess.debugMessage("ERROR: " + e.getMessage());
                 }
             }
         }
         // Set the Collection based on whether or not the king was previously in check
         this.availableMovesCache = (wasKingInCheck) ? movesThatCanGetOutOfCheck : moves;
-        
+
         populateAvailableSourcesCache();
 
     }
 
-    public void resetView() {
+    public synchronized void resetView() {
+        ConsoleChess.debugMessage("ChessModel.resetView()");
         this.currentModelStateLocation = BoardLocation.none;
         this.availableMovesCache = null;
         this.availableSourcesCache = null;
+
+        blackPieceLocations = null;
+        whitePieceLocations = null;
+
+        this.currentTurnSourceSet = false;
+
         populateAvailableMoveCache();
     }
 
-    public void setCurrentModelStateLocation(BoardLocation loc) {
+    public synchronized boolean getCurrentTurnSourceSet() {
+        ConsoleChess.debugMessage("ChessModel.getCurrentTurnSourceSet()");
+        return this.currentTurnSourceSet;
+    }
+
+    public synchronized void setCurrentTurnSourceSet() {
+        ConsoleChess.debugMessage("ChessModel.setCurrentTurnSourceSet()");
+        this.currentTurnSourceSet = true;
+    }
+
+    public synchronized void setCurrentModelStateLocation(BoardLocation loc) {
+        ConsoleChess.debugMessage("ChessModel.setCurrentModelStateLocation(" + loc + ")");
         if (this.currentModelStateLocation != loc) {
-            System.out.println("going1");
+            // System.out.println("going1");
             this.currentModelStateLocation = loc;
-            //resetView();
+            // resetView();
         }
     }
 
@@ -161,7 +194,7 @@ public class ChessModel extends java.util.Observable {
      * @param p The Piece
      * @return If it was successfully added
      */
-    public void addPiece(BoardLocation loc, Piece p) {
+    public synchronized void addPiece(BoardLocation loc, Piece p) {
         ConsoleChess.debugMessage("ChessModel.addPiece()");
         this.currentBoard.add(loc, p);
     }
@@ -172,7 +205,7 @@ public class ChessModel extends java.util.Observable {
      * @param player If the player is White
      * @return The Location of the input player's king
      */
-    private BoardLocation getKingLoc(boolean player) {
+    private synchronized BoardLocation getKingLoc(boolean player) {
         ConsoleChess.debugMessage("ChessModel.getKingLoc()");
 
         if (player) {
@@ -208,10 +241,23 @@ public class ChessModel extends java.util.Observable {
      * @param player If the player is White
      * @return a Collection of all the Locations that contain Pieces for the specified player
      */
-    public ArrayList<BoardLocation> getPlayersPieces(boolean player) {
+    public synchronized HashSet<BoardLocation> getPlayersPieces(boolean player) {
         ConsoleChess.debugMessage("ChessModel.getPlayersPieces()");
 
-        ArrayList<BoardLocation> pieces = new ArrayList<BoardLocation>();
+
+        if (player) {
+            if (this.whitePieceLocations != null) {
+                ConsoleChess.debugMessage("\tGot Players Pieces from cache!");
+                return this.whitePieceLocations;
+            }
+        } else {
+            if (this.blackPieceLocations != null) {
+                ConsoleChess.debugMessage("\tGot Players Pieces from cache!");
+                return this.blackPieceLocations;
+            }
+        }
+
+        HashSet<BoardLocation> pieces = new HashSet<BoardLocation>();
 
         for (int i = 0; i < currentBoard.getBoardSize(); i++) {
             BoardLocation currentLocation = BoardLocation.values()[i];
@@ -220,6 +266,12 @@ public class ChessModel extends java.util.Observable {
                 pieces.add(currentLocation);
             }
         }
+        if (player) {
+            this.whitePieceLocations = pieces;
+        } else {
+            this.blackPieceLocations = pieces;
+        }
+        ConsoleChess.debugMessage("\tupdated the Players Pieces cache!");
         return pieces;
     }
 
@@ -265,12 +317,12 @@ public class ChessModel extends java.util.Observable {
      * @param player The player that we want to to see if is in check
      * @return if the input player's king is in check
      */
-    public boolean isThisKingInCheck(boolean player) {
+    public synchronized boolean isThisKingInCheck(boolean player) {
         ConsoleChess.debugMessage("ChessModel.isThisKingInCheck()");
 
         boolean kingIsInCheck = false;
         BoardLocation kingLoc = getKingLoc(player);
-        ArrayList<BoardLocation> otherColorPieces = getPlayersPieces(!player);
+        HashSet<BoardLocation> otherColorPieces = getPlayersPieces(!player);
 
         if (kingLoc != null) {
             for (BoardLocation l : otherColorPieces) {
@@ -288,21 +340,21 @@ public class ChessModel extends java.util.Observable {
      * 
      * @return if the current turn is White
      */
-    public boolean isWhiteTurn() {
+    public synchronized boolean isWhiteTurn() {
         return this.currentlyWhitesTurn;
     }
 
-    public int getBoardRowSize() {
+    public synchronized int getBoardRowSize() {
         return this.currentBoard.getBoardRowSize();
     }
 
-    public int getBoardSize() {
+    public synchronized int getBoardSize() {
         return this.currentBoard.getBoardSize();
     }
 
 
 
-    private HashSet<BoardLocation> getLocationsThatCanMove() {
+    private synchronized HashSet<BoardLocation> getLocationsThatCanMove() {
         ConsoleChess.debugMessage("ChessModel.getLocationsThatCanMove()");
 
         HashSet<BoardLocation> locsThatCanMove = new HashSet<BoardLocation>();
@@ -325,7 +377,7 @@ public class ChessModel extends java.util.Observable {
         return locsThatCanMove;
     }
 
-    public HashSet<BoardLocation> getAvailableDestinationsFromLocationInMoveCache(BoardLocation loc) {
+    public synchronized HashSet<BoardLocation> getAvailableDestinationsFromLocationInMoveCache(BoardLocation loc) {
         HashSet<BoardLocation> dests = new HashSet<BoardLocation>();
         for (ChessMove m : this.availableMovesCache) {
             if (loc == m.getSrcLoc()) {
@@ -335,7 +387,7 @@ public class ChessModel extends java.util.Observable {
         return dests;
     }
 
-    private HashSet<BoardLocation> getAvailableDestinationsFromLocation(BoardLocation loc) {
+    private synchronized HashSet<BoardLocation> getAvailableDestinationsFromLocation(BoardLocation loc) {
         ConsoleChess.debugMessage("ChessModel.getAvailableDestinationsFromLocation()");
         HashSet<BoardLocation> dests = new HashSet<BoardLocation>();
         if (loc != BoardLocation.none) {
@@ -357,20 +409,28 @@ public class ChessModel extends java.util.Observable {
 
 
 
-    public void addMoveWithoutUpdate(ChessMove m) {
+    public synchronized void addMoveWithoutUpdate(ChessMove m) {
+        ConsoleChess.debugMessage("ChessModel.addMoveWithoutUpdate(" + m.getMoveString() + ")");
         addMove(m, false);
     }
 
-    public void addMoveWithoutUpdate(String m) {
+    public synchronized void addMoveWithoutUpdate(String m) {
+        ConsoleChess.debugMessage("ChessModel.addMoveWithoutUpdate(" + m + ")");
         addMove(m, false);
     }
 
-    public void addMove(ChessMove m, boolean updateObservers) {
+    public synchronized void addMove(ChessMove m, boolean updateObservers) {
+        ConsoleChess.debugMessage("ChessModel.addMove(" + m.getMoveString() + "," + updateObservers + ")");
         if (isMoveValid(m, updateObservers)) {
+            ConsoleChess.debugMessage("\tmove: " + m.getMoveString() + " is valid");
             movesExecuted.push(m);
+            ConsoleChess.debugMessage("\tmove pushed");
             try {
+                ConsoleChess.debugMessage("\tattempting execution");
                 executeMove(m);
+                ConsoleChess.debugMessage("\texecuted");
             } catch (ChessException e) {
+                ConsoleChess.debugMessage("\tcaught: " + e.getMessage());
                 movesExecuted.pop();
             } finally {
                 if (updateObservers) {
@@ -379,6 +439,8 @@ public class ChessModel extends java.util.Observable {
 
             }
         } else {
+            ConsoleChess.debugMessage("\tmove is not valid");
+            ConsoleChess.debugMessage("\tTHROWING EXCEPTION: " + m.getMessage());
             throw new InvalidMoveException(m.getMessage());
         }
     }
@@ -389,7 +451,8 @@ public class ChessModel extends java.util.Observable {
      * @param moveString The String representation of the ChessMove
      * @return If the Move was successfully added
      */
-    public void addMove(String moveString, boolean updateObservers) {
+    public synchronized void addMove(String moveString, boolean updateObservers) {
+        ConsoleChess.debugMessage("ChessModel.addMoveWithoutUpdate(" + moveString + "," + updateObservers + ")");
         MoveType movesType = ChessFactory.ValidateMoveString(moveString);
         if (movesType == null) {
             throw new InvalidMoveException(moveString + " - \nThe move syntax was not valid for '" + moveString + "'");
@@ -408,7 +471,9 @@ public class ChessModel extends java.util.Observable {
      * @param currentMove The Move to execute
      * @return If the move was successfully executed
      */
-    public void executeMove(ChessMove currentMove) {
+    public synchronized void executeMove(ChessMove currentMove) {
+        ConsoleChess.debugMessage("ChessModel.executeMove(" + currentMove.getMoveString() + ")");
+
 
         switch (currentMove.getType()) {
             case ADD:
@@ -453,7 +518,8 @@ public class ChessModel extends java.util.Observable {
      * @param loc The location on the board
      * @return The piece at the location or null if the location is empty
      */
-    public Piece getPiece(BoardLocation loc) {
+    public synchronized Piece getPiece(BoardLocation loc) {
+        ConsoleChess.debugMessage("ChessModel.getPiece(" + loc + ")");
         return currentBoard.get(loc);
     }
 
@@ -462,7 +528,8 @@ public class ChessModel extends java.util.Observable {
      * 
      * @param newMessage The message to send
      */
-    public void setModelStatusMessage(String newMessage) {
+    public synchronized void setModelStatusMessage(String newMessage) {
+        ConsoleChess.debugMessage("ChessModel.setModelStatusMessage(" + newMessage + ")");
         // this.message = newMessage;
         setChanged();
         notifyObservers(newMessage);
@@ -470,20 +537,28 @@ public class ChessModel extends java.util.Observable {
 
 
 
-    public String getMessage() {
+    public synchronized String getMessage() {
+        ConsoleChess.debugMessage("ChessModel.getMessage()");
         return this.statusMessage;
     }
 
-    private void switchTurn() {
-        // System.out.println("SWITCHING TURNS: new turn is " + !this.currentlyWhitesTurn);
+    private synchronized void switchTurn() {
+        ConsoleChess.debugMessage("ChessModel.switchTurn()");
+        ConsoleChess.debugMessage("\tSWITCHING TURNS: new turn is " + !this.currentlyWhitesTurn);
         this.currentlyWhitesTurn = !currentlyWhitesTurn;
+        this.blackPieceLocations = getPlayersPieces(false);
+        this.whitePieceLocations = getPlayersPieces(true);
+        resetView();
+
     }
 
-    public boolean undoMove() {
+    public synchronized boolean undoMove() {
+        ConsoleChess.debugMessage("ChessModel.undoMove()");
         ChessMove m = movesExecuted.pop();
 
         ChessMove undo = null;
         if (m instanceof CaptureMove) {
+            ConsoleChess.debugMessage("\tundoing a capture move");
             undo = ChessFactory.CreateMove(m.getDestLoc() + " " + m.getSrcLoc());
             CaptureMove c = (CaptureMove) m;
             Piece capturedPiece = c.getCapturedPiece();
@@ -493,10 +568,16 @@ public class ChessModel extends java.util.Observable {
             readdString += m.getDestLoc();
             undo.setSubmove(ChessFactory.CreateMove(readdString));
         } else if (m instanceof MovingMove) {
+            ConsoleChess.debugMessage("\tundoing a moving move");
             undo = ChessFactory.CreateMove(m.getDestLoc() + " " + m.getSrcLoc());
         } else if (m instanceof PromotionMove) {
+            ConsoleChess.debugMessage("\tundoing a promotion move");
             // TODO
             // undo a promotion move
+        } else if (m instanceof AddMove) {
+            ConsoleChess.debugMessage("\tundoing an add move");
+            // TODO
+            ConsoleChess.debugMessage("\tundo an add ????");
         }
         undo.setChangeTurnAfter(false);
         executeMove(undo);
@@ -513,11 +594,13 @@ public class ChessModel extends java.util.Observable {
     // return true;
     // }
 
-    public boolean locationHasPiece(BoardLocation loc) {
+    public synchronized boolean locationHasPiece(BoardLocation loc) {
+        ConsoleChess.debugMessage("ChessModel.locationHasPiece(" + loc +")");
         return this.currentBoard.get(loc) != null;
     }
 
-    private boolean isMoveValid(ChessMove m, boolean turnCheck) {
+    private synchronized boolean isMoveValid(ChessMove m, boolean turnCheck) {
+        ConsoleChess.debugMessage("ChessModel.isMoveValid(" + m.getMoveString() + "," + turnCheck +")");
         boolean isValid = true;
         String errorMessage = "";
 
@@ -555,26 +638,26 @@ public class ChessModel extends java.util.Observable {
             errorMessage += "ERROR: " + m.getMoveString() + " - The destination is the same color, cannot Capture.\n";
         }
 
-        // // Check for a submove, normally used when castling
-        // if (isValid && (m.getType() == MoveType.MOVE) && m.getSubMove() != null) {
-        //
-        // // If it is a king
-        // if (this.currentBoard.get(m.getSrcLoc()).getType() == PieceType.k) {
-        // King currentPiece = (King) this.currentBoard.get(m.getSrcLoc());
-        //
-        // // could be a valid castling move, YAY
-        // if (currentPiece.isValidCastlingMove(m.getSrcLoc(), m.getDestLoc())) {
-        //
-        // } else {
-        // isValid = false;
-        // errorMessage += "ERROR: " + m.getMoveString() + " - the move was not a valid castling move, or my test logic is wrong....\n";
-        // }
-        // } else {
-        // isValid = false;
-        // errorMessage += "ERROR: " + m.getMoveString() + " - I am not sure how I would get here.\n";
-        //
-        // }
-        // }
+        // Check for a submove, normally used when castling
+        if (isValid && (m.getType() == MoveType.MOVE) && m.getSubMove() != null) {
+
+            // If it is a king
+            if (this.currentBoard.get(m.getSrcLoc()).getType() == PieceType.k) {
+                King currentPiece = (King) this.currentBoard.get(m.getSrcLoc());
+
+                // could be a valid castling move, YAY
+                if (currentPiece.isValidCastlingMove(m.getSrcLoc(), m.getDestLoc())) {
+                    ConsoleChess.debugMessage("\tYAY WE GUNNA CASTLE");
+                } else {
+                    isValid = false;
+                    errorMessage += "ERROR: " + m.getMoveString() + " - the move was not a valid castling move, or my test logic is wrong....\n";
+                }
+            } else {
+                isValid = false;
+                errorMessage += "ERROR: " + m.getMoveString() + " - I am not sure how I would get here.\n";
+
+            }
+        }
 
         if (isValid && (m.getType() == MoveType.MOVE) && !this.currentBoard.get(m.getSrcLoc()).isValidMovement(m.getSrcLoc(), m.getDestLoc(), false)) {
             isValid = false;
@@ -611,7 +694,8 @@ public class ChessModel extends java.util.Observable {
         return isValid;
     }
 
-    public ArrayList<BoardLocation> getLocationsBetween(BoardLocation src, BoardLocation dest) {
+    public synchronized ArrayList<BoardLocation> getLocationsBetween(BoardLocation src, BoardLocation dest) {
+        ConsoleChess.debugMessage("ChessModel.getLocationsBetween(" + src + "," + dest + ")");
         ArrayList<BoardLocation> locs = new ArrayList<>();
 
         if (src != dest) {
