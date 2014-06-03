@@ -17,6 +17,7 @@ import chess_rollins_blake.lib.MovingMove;
 import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.lib.PromotionMove;
 import chess_rollins_blake.model.pieces.King;
+import chess_rollins_blake.model.pieces.Pawn;
 import chess_rollins_blake.model.pieces.Piece;
 
 public class ChessModel extends java.util.Observable {
@@ -641,7 +642,7 @@ public class ChessModel extends java.util.Observable {
         // Check for a submove, normally used when castling
         if (isValid && (m.getType() == MoveType.MOVE) && m.getSubMove() != null) {
 
-            // If it is a king
+            // If it is a king   then probably a castleing move
             if (this.currentBoard.get(m.getSrcLoc()).getType() == PieceType.k) {
                 King currentPiece = (King) this.currentBoard.get(m.getSrcLoc());
 
@@ -652,6 +653,19 @@ public class ChessModel extends java.util.Observable {
                     isValid = false;
                     errorMessage += "ERROR: " + m.getMoveString() + " - the move was not a valid castling move, or my test logic is wrong....\n";
                 }
+            } else if (this.currentBoard.get(m.getSrcLoc()).getType() == PieceType.p) {
+                
+//                // iDK if there is actually any logic to do here
+//                Pawn currentPiece = (Pawn) this.currentBoard.get(m.getSrcLoc());
+//
+//                // could be a valid castling move, YAY
+//                if (currentPiece.isValidCastlingMove(m.getSrcLoc(), m.getDestLoc())) {
+//                    ConsoleChess.debugMessage("\tYAY WE GUNNA CASTLE");
+//                } else {
+//                    isValid = false;
+//                    errorMessage += "ERROR: " + m.getMoveString() + " - the move was not a valid castling move, or my test logic is wrong....\n";
+//                }
+                
             } else {
                 isValid = false;
                 errorMessage += "ERROR: " + m.getMoveString() + " - I am not sure how I would get here.\n";

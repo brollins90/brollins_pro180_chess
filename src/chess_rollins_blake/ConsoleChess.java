@@ -53,8 +53,8 @@ public class ConsoleChess {
         args = new String[1];
         // args[0] = "Donald Byrne vs Robert James Fischer.txt";
         // args[0] = "Garry Kasparov vs Deep Blue_1996.02.10_r1.txt";
+        //args[0] = "James Adams Congdom vs Eugene Delmar.txt";
         args[0] = "chess08.txt";
-        // testPawnPromotion
         // args[0] = "Pratts Trap.txt";
         // args[0] = "Kostics Trap.txt";
         ConsoleChess c = new ConsoleChess();

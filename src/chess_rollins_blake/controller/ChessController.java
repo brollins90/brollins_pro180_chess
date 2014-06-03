@@ -15,7 +15,9 @@ import chess_rollins_blake.exceptions.ChessException;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.ChessMove;
 import chess_rollins_blake.lib.MoveType;
+import chess_rollins_blake.lib.MovingMove;
 import chess_rollins_blake.lib.PieceType;
+import chess_rollins_blake.lib.PromotionMove;
 import chess_rollins_blake.model.ChessFactory;
 import chess_rollins_blake.model.ChessModel;
 import chess_rollins_blake.model.pieces.Pawn;
@@ -27,7 +29,6 @@ public class ChessController implements java.awt.event.ActionListener {
 
     int VIEW_WIDTH = 75;
     int VIEW_HEIGHT = 75;
-
 
     protected ChessModel model;
     protected ChessView view;
@@ -42,7 +43,6 @@ public class ChessController implements java.awt.event.ActionListener {
         previousModelStateLocation = BoardLocation.none;
         this.view.addBoardListener(new LocationListener());
         this.view.addBoardMotionListener(new LocationListener());
-
     }
 
     class LocationListener implements MouseListener, MouseMotionListener {
@@ -70,7 +70,38 @@ public class ChessController implements java.awt.event.ActionListener {
                         moveString += "*";
                     }
 
-                    addMove(moveString, true);
+
+                    Piece srcPiece = model.getPiece(previousModelStateLocation);
+                    ChessMove thisMove = ChessFactory.CreateMove(moveString);
+
+
+                    if (srcPiece instanceof Pawn) {
+                        if (((Pawn) srcPiece).isInEigthRow(mouseLoc)) {
+                            PieceType pawnPromotionType = view.requestPawnPromotion();
+                            thisMove.setChangeTurnAfter(false);
+                            // "a1 qda1"
+                            char ldColor = (srcPiece.isWhite()) ? 'l' : 'd';
+                            String promotionString = thisMove.getDestLoc().toString() + " " + pawnPromotionType.toString() + ldColor + thisMove.getDestLoc().toString();
+                            thisMove.setSubmove(ChessFactory.CreateMove(promotionString));
+
+                        }
+                    }
+                    
+                    
+                    addMove(thisMove, true);
+                    
+                    String outString = moveString;
+                    if (thisMove.getSubMove() != null) {
+                        if (thisMove.getSubMove() instanceof MovingMove) {
+                            // castling so print it out
+                            outString += " " + thisMove.getSubMove().getMoveString();
+                        } else if (thisMove.getSubMove() instanceof PromotionMove) {
+                            // promotion, dont print cause it is made up
+//                            outString += " " + thisMove.getSubMove().getMoveString();
+                        }
+                    }
+                    
+                    System.out.println(outString);
 
                     // Check for game over
                     if (model.getAvailableMoves().size() == 0) {
@@ -86,44 +117,28 @@ public class ChessController implements java.awt.event.ActionListener {
         }
 
         @Override
-        public void mouseEntered(MouseEvent e) {
-            // ConsoleChess.debugMessage("mouseEntered");
-        }
+        public void mouseEntered(MouseEvent e) {}
 
         @Override
-        public void mouseExited(MouseEvent e) {
-            // ConsoleChess.debugMessage("mouseExited");
-        }
+        public void mouseExited(MouseEvent e) {}
 
         @Override
-        public void mousePressed(MouseEvent e) {
-            // ConsoleChess.debugMessage("mousePressed");
-        }
+        public void mousePressed(MouseEvent e) {}
 
         @Override
-        public void mouseReleased(MouseEvent e) {
-            // ConsoleChess.debugMessage("mouseReleased");
-        }
+        public void mouseReleased(MouseEvent e) {}
 
         @Override
-        public void mouseDragged(MouseEvent e) {
-            // / ConsoleChess.debugMessage("mouseDragged");
-        }
+        public void mouseDragged(MouseEvent e) {}
 
         @Override
         public void mouseMoved(MouseEvent e) {
-            // ConsoleChess.debugMessage("mouseMoved");
-
             BoardLocation mouseLoc = getMouseLoc(e);
 
-            // System.out.println("prev: " + previousModelStateLocation);
-            // System.out.println("mouseLoc: " + mouseLoc);
             if (previousModelStateLocation != mouseLoc && !model.getCurrentTurnSourceSet()) {
                 previousModelStateLocation = mouseLoc;
                 updateModelForLocation(mouseLoc);
             }
-
-
         }
 
         private BoardLocation getMouseLoc(MouseEvent e) {
@@ -131,17 +146,11 @@ public class ChessController implements java.awt.event.ActionListener {
             int mouseX = e.getX();
             int mouseY = e.getY();
 
-            // System.out.println(mouseX + " " + mouseY);
-
             int row = 7 - (mouseY / VIEW_HEIGHT);
             int col = mouseX / VIEW_WIDTH;
 
-            // System.out.println(row + " " + col);
-
             return BoardLocation.getLocFromRowAndColumn(row, col);
         }
-
-
     }
 
     @Override
@@ -164,9 +173,7 @@ public class ChessController implements java.awt.event.ActionListener {
             case PROMOTION:
                 break;
         }
-
     }
-
 
     public void updateModelForLocation(BoardLocation loc) {
         ConsoleChess.debugMessage("ChessController.updateModelForLocation(" + loc + ")");
@@ -239,30 +246,18 @@ public class ChessController implements java.awt.event.ActionListener {
 
         // Start the game Loop
         if (this.view instanceof GUIView) {
-            
+
             while (this.currentGameStatus == GameStatus.PLAYING) {
+                //HashSet<ChessMove> availableMoves = this.model.getAvailableMoves();
+                
                 if (this.model.getAvailableMoves().size() == 0) {
-                    this.currentGameStatus = this.model.isWhiteTurn() ? GameStatus.DARKWIN : GameStatus.LIGHTWIN;
+                    this.currentGameStatus = (!model.isCurrentInCheck()) ? GameStatus.STALEMATE : (this.model.isWhiteTurn()) ? GameStatus.DARKWIN : GameStatus.LIGHTWIN;
                 }
-                this.view.update(null,currentGameStatus);
-            }
-
-
-        } else {
-            while (this.currentGameStatus == GameStatus.PLAYING) {
-
-
-                HashSet<ChessMove> availableMoves = this.model.getAvailableMoves();
-
-                // if there are no moves, then the game is over
-                if (availableMoves.size() == 0) {
-                    this.currentGameStatus = this.model.isWhiteTurn() ? GameStatus.DARKWIN : GameStatus.LIGHTWIN;
-                }
-
-                // I dont like this logic, but I also dont want to use a break when the game is over
-
-                if (this.currentGameStatus == GameStatus.PLAYING) {
-                    
+                
+                if (this.view instanceof GUIView) {
+                    this.view.update(null, currentGameStatus);
+                
+                } else {
 
                     BoardLocation src = null;
                     while (src == null) {
@@ -303,11 +298,8 @@ public class ChessController implements java.awt.event.ActionListener {
 
                     this.addMove(thisMove, true);
 
-                    
-                } else {
-                    System.out.println("sakjdfadkjsfjdsa");
+
                 }
-                // this.view.requestInput();
             }
         }
 

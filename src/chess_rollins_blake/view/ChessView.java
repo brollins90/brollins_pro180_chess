@@ -37,9 +37,9 @@ public abstract class ChessView implements java.util.Observer {
 
         gameStatusDisplayMap = new HashMap<GameStatus, String>();
         gameStatusDisplayMap.put(GameStatus.DARKFORFEIT, pieceColorDisplayMap.get(true) + " player wins because " + pieceColorDisplayMap.get(false) + " player forfeit.");
-        gameStatusDisplayMap.put(GameStatus.DARKWIN, "Checkmate.\n" + pieceColorDisplayMap.get(false) + " player wins.");
+        gameStatusDisplayMap.put(GameStatus.DARKWIN, "Checkmate.  " + pieceColorDisplayMap.get(false) + " player wins.");
         gameStatusDisplayMap.put(GameStatus.LIGHTFORFEIT, pieceColorDisplayMap.get(false) + " player wins because " + pieceColorDisplayMap.get(true) + " player forfeit.");
-        gameStatusDisplayMap.put(GameStatus.LIGHTWIN, "Checkmate.\n" + pieceColorDisplayMap.get(true) + " player wins.");
+        gameStatusDisplayMap.put(GameStatus.LIGHTWIN, "Checkmate.  " + pieceColorDisplayMap.get(true) + " player wins.");
         gameStatusDisplayMap.put(GameStatus.PLAYING, "Game is in progress.");
         gameStatusDisplayMap.put(GameStatus.STALEMATE, "Tie, Stalemate");
 

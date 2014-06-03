@@ -35,12 +35,12 @@ public class GUIView extends ChessView {
         currentGameStatus = GameStatus.PLAYING;
         previousModelStateLocation = BoardLocation.none;
 
-        
+
         // Create the Frame
         frame = new JFrame();
         JPanel outerPanel = new JPanel(new BorderLayout());
         JPanel upperPanel = new JPanel(new GridLayout(1, 2));
-        
+
         // Create the top panel
         // White in check
         whiteInCheckLabel = new JLabel(null, null, JLabel.CENTER);
@@ -54,7 +54,7 @@ public class GUIView extends ChessView {
         upperPanel.add(blackInCheckLabel);
         outerPanel.add(upperPanel, BorderLayout.NORTH);
 
-        
+
         // Create the middle panel
         JPanel midPanel = new JPanel();
         this.boardPanel = new BoardPanel(super.model);
@@ -63,7 +63,7 @@ public class GUIView extends ChessView {
         midPanel.add(boardPanel);
         outerPanel.add(midPanel);
 
-        
+
         // Create the bottom panel
         JPanel lowerPanel = new JPanel(new GridLayout(2, 1));
         // Status
@@ -77,8 +77,8 @@ public class GUIView extends ChessView {
         messageLabel.setHorizontalTextPosition(JLabel.CENTER);
         lowerPanel.add(messageLabel);
         outerPanel.add(lowerPanel, BorderLayout.SOUTH);
-        
-        
+
+
         frame.add(outerPanel);
         frame.setSize(840, 800);
         frame.setVisible(true);
@@ -91,33 +91,35 @@ public class GUIView extends ChessView {
         if (obj instanceof GameStatus) {
             this.currentGameStatus = (GameStatus) obj;
             if (currentGameStatus != GameStatus.PLAYING) {
-        
-                String messageString = "";
 
-                if (currentGameStatus == GameStatus.DARKWIN) {
-                    messageString += "Black Player wins.";
-                } else if (currentGameStatus == GameStatus.DARKFORFEIT) {
-                    messageString += "White Player wins, Black forfeit";
-                } else if (currentGameStatus == GameStatus.LIGHTWIN) {
-                    messageString += "White Player wins.";
-                } else if (currentGameStatus == GameStatus.LIGHTFORFEIT) {
-                    messageString += "Black Player wins, White forfeit";
-                } else if (currentGameStatus == GameStatus.STALEMATE) {
-                    messageString += "Stalemate";
-                }
+                messageLabel.setText(super.gameStatusDisplayMap.get(currentGameStatus));
                 messageLabel.setFont(new Font("Serif", Font.BOLD, 20));
-                messageLabel.setText(messageString);
+                // String messageString = "";
+                //
+                // if (currentGameStatus == GameStatus.DARKWIN) {
+                // messageString += "Black Player wins.";
+                // } else if (currentGameStatus == GameStatus.DARKFORFEIT) {
+                // messageString += "White Player wins, Black forfeit";
+                // } else if (currentGameStatus == GameStatus.LIGHTWIN) {
+                // messageString += "White Player wins.";
+                // } else if (currentGameStatus == GameStatus.LIGHTFORFEIT) {
+                // messageString += "Black Player wins, White forfeit";
+                // } else if (currentGameStatus == GameStatus.STALEMATE) {
+                // messageString += "Stalemate";
+                // }
+                // messageLabel.setFont(new Font("Serif", Font.BOLD, 20));
+                // messageLabel.setText(messageString);
             }
 
         } else if (obj instanceof String) {
             this.messageLabel.setText((String) obj);
         }
-        
+
         if (currentGameStatus == GameStatus.PLAYING) {
             this.boardPanel.updateUI();
             this.boardPanel.repaint();
         }
-        
+
         if (this.model.isBlackKingInCheck()) {
             blackInCheckLabel.setText("Black King is in check!");
             blackInCheckLabel.setFont(new Font("Serif", Font.BOLD, 20));
