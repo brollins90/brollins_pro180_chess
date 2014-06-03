@@ -9,7 +9,6 @@ import java.util.HashSet;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import chess_rollins_blake.controller.GameStatus;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.ChessModel;
@@ -17,142 +16,79 @@ import chess_rollins_blake.model.pieces.Piece;
 
 public class BoardPanel extends JPanel {
 
-    BoardLocation prevLoc = null;
-
     private static final long serialVersionUID = 1L;
 
     private Color SQUARE_COLOR_LIGHT = Color.WHITE;
     private Color SQUARE_COLOR_DARK = Color.GRAY;
     private Color SQUARE_HAS_MOVE = Color.GREEN;
     private Color SQUARE_IS_DEST = Color.BLUE;
+    private Color SQUARE_CURRENT = Color.ORANGE;
 
     private int SQUARE_HEIGHT = 75;
     private int SQUARE_WIDTH = 75;
 
-    protected BoardLocation currentTempSource;
-
-    BufferedImage[][] images = new BufferedImage[2][6];
-
-    // HashSet<BoardLocation> availableSources;
-    // HashSet<BoardLocation> availableDestinations;
-
+    private BufferedImage[][] images = new BufferedImage[2][6];
     private ChessModel model;
 
     BoardPanel(ChessModel m) {
-//        currentGameStatus = GameStatus.PLAYING;
         this.model = m;
-        // availableSources = new HashSet<BoardLocation>();
-        // availableDestinations = new HashSet<BoardLocation>();
-
         loadImages();
-
     }
-
-    //
-    // public void setAvailableDestinations(HashSet<BoardLocation> dests) {
-    // this.availableDestinations = dests;
-    // }
-
-    // public void setAvailableSources(HashSet<BoardLocation> sources) {
-    // this.availableSources = sources;
-    // }
 
     @Override
     public void paint(Graphics g) {
 
-//        if (currentGameStatus == GameStatus.PLAYING) {
-            // check the current location
-            BoardLocation tempSource = this.model.getCurrentModelStateLocation();
+        BoardLocation tempSource = this.model.getCurrentModelStateLocation();
 
-            // if (tempSource != prevLoc) {
-            prevLoc = tempSource;
+        HashSet<BoardLocation> tempSources = this.model.getAvailableSources();
+        HashSet<BoardLocation> tempDests = this.model.getAvailableDestinationsFromLocationInMoveCache(tempSource);
 
-            HashSet<BoardLocation> tempSources = this.model.getAvailableSources();
-            HashSet<BoardLocation> tempDests = this.model.getAvailableDestinationsFromLocationInMoveCache(tempSource);
+        int darkBackground = 1;
 
-            int darkBackground = 1;
-
-            // super.paint(g);
-
-            int numberOfRows = this.model.getBoardRowSize();
-            int numberOfCols = this.model.getBoardRowSize();
-            for (int rowIndex = numberOfRows - 1; rowIndex > -1; rowIndex--) {
+        int numberOfRows = this.model.getBoardRowSize();
+        int numberOfCols = this.model.getBoardRowSize();
+        for (int rowIndex = numberOfRows - 1; rowIndex > -1; rowIndex--) {
+            darkBackground++;
+            for (int colIndex = 0; colIndex < numberOfCols; colIndex++) {
                 darkBackground++;
-                for (int colIndex = 0; colIndex < numberOfCols; colIndex++) {
-                    darkBackground++;
-                    int currentX = colIndex * SQUARE_WIDTH;
-                    int currentY = (numberOfRows - 1 - rowIndex) * SQUARE_HEIGHT;
+                int currentX = colIndex * SQUARE_WIDTH;
+                int currentY = (numberOfRows - 1 - rowIndex) * SQUARE_HEIGHT;
 
-                    int currentPieceLocation = colIndex * numberOfRows + rowIndex;
-                    BoardLocation currentLocation = BoardLocation.values()[currentPieceLocation];
-                    Piece temp = this.model.getPiece(currentLocation);
+                int currentPieceLocation = colIndex * numberOfRows + rowIndex;
+                BoardLocation currentLocation = BoardLocation.values()[currentPieceLocation];
+                Piece temp = this.model.getPiece(currentLocation);
 
 
-                    // paint the square first
-                    if (darkBackground % 2 == 0) {
-                        g.setColor(SQUARE_COLOR_DARK);
-                    } else {
-                        g.setColor(SQUARE_COLOR_LIGHT);
-                    }
+                // paint the square first
+                if (darkBackground % 2 == 0) {
+                    g.setColor(SQUARE_COLOR_DARK);
+                } else {
+                    g.setColor(SQUARE_COLOR_LIGHT);
+                }
 
-                    // color the source dests
-                    if (tempSources.contains(currentLocation)) {
-                        g.setColor(SQUARE_HAS_MOVE);
-                        // g.setColor(g.getColor().darker());
-                    }
+                // color the source dests
+                if (tempSources.contains(currentLocation)) {
+                    g.setColor(SQUARE_HAS_MOVE);
+                }
 
-                    // color the current darker
-                    if (tempSource == currentLocation) {
-                        // Color currentColor = g.getColor();
-                        // g.setColor(new Color(currentColor.getRed(),currentColor.getGreen(),currentColor.getBlue() - 100));
-                        g.setColor(Color.ORANGE);
-                    }
+                // color the current darker
+                if (tempSource == currentLocation) {
+                    g.setColor(SQUARE_CURRENT);
+                }
 
-                    // colot the dests
-                    if (tempDests.contains(currentLocation)) {
-                        g.setColor(SQUARE_IS_DEST);
-                    }
+                // colot the dests
+                if (tempDests.contains(currentLocation)) {
+                    g.setColor(SQUARE_IS_DEST);
+                }
 
-                    g.fillRect(currentX, currentY, SQUARE_WIDTH, SQUARE_HEIGHT);
+                g.fillRect(currentX, currentY, SQUARE_WIDTH, SQUARE_HEIGHT);
 
-
-                    if (temp != null) {
-                        g.drawImage(getIconFromTypeAndColor(temp.getType(), temp.isWhite()), currentX, currentY, null);
-                        // boardSquares[rowIndex][colIndex].setIcon(getIconFromTypeAndColor(temp.getType(), temp.isWhite()));
-                    }
+                if (temp != null) {
+                    g.drawImage(getIconFromTypeAndColor(temp.getType(), temp.isWhite()), currentX, currentY, null);
                 }
             }
-//        } else /* if (currentGameStatus == GameStatus.DARKWIN || currentGameStatus == GameStatus.LIGHTFORFEIT) */{
-//            g.setColor(Color.red);
-//            g.fillRect(0, 0, this.getWidth(), this.getHeight());
-//
-//            String messageString = "";
-//
-//            if (currentGameStatus == GameStatus.DARKWIN) {
-//                messageString += "Black Player wins.";
-//            } else if (currentGameStatus == GameStatus.DARKFORFEIT) {
-//                messageString += "White Player wins, Black forfeit";
-//            } else if (currentGameStatus == GameStatus.LIGHTWIN) {
-//                messageString += "White Player wins.";
-//            } else if (currentGameStatus == GameStatus.LIGHTFORFEIT) {
-//                messageString += "Black Player wins, White forfeit";
-//            } else if (currentGameStatus == GameStatus.STALEMATE) {
-//                messageString += "Stalemate";
-//            }
-//
-////            g.setColor(Color.black);
-////            g.drawString(messageString, 200, 200);
-//            
-//            messageLabel.setText(messageString);
-
-//        }
-        // }
+        }
     }
-
-    //
-    // public void setModel(ChessModel m) {
-    // this.m = m;
-    // }
 
     private BufferedImage getIconFromTypeAndColor(PieceType t, boolean c) {
         BufferedImage retVal = null;
@@ -178,10 +114,7 @@ public class BoardPanel extends JPanel {
                 retVal = images[colorInt][5];
                 break;
         }
-
-
         return retVal;
-
     }
 
     private void loadImages() {
@@ -193,25 +126,16 @@ public class BoardPanel extends JPanel {
             int colNum = 6;
 
             for (int i = 0; i < rowNum; i++) {
-                // System.out.println("i: " + i);
                 for (int j = 0; j < colNum; j++) {
-                    // System.out.println("j: " + j);
                     int x = j * colWidth;
                     int y = i * rowHeight;
                     int w = colWidth;
                     int h = rowHeight;
-                    // System.out.println("x: " + x + ",y: " + y + ",w: " + w + ",h: " + h);
                     images[i][j] = bImage.getSubimage(x, y, w, h);
                 }
             }
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-//    public void setGameStatus(GameStatus cur) {
-//        this.currentGameStatus = cur;
-//    }
 }
