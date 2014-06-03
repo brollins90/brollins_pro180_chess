@@ -239,7 +239,13 @@ public class ChessController implements java.awt.event.ActionListener {
 
         // Start the game Loop
         if (this.view instanceof GUIView) {
-
+            
+            while (this.currentGameStatus == GameStatus.PLAYING) {
+                if (this.model.getAvailableMoves().size() == 0) {
+                    this.currentGameStatus = this.model.isWhiteTurn() ? GameStatus.DARKWIN : GameStatus.LIGHTWIN;
+                }
+                this.view.update(null,currentGameStatus);
+            }
 
 
         } else {
@@ -256,55 +262,48 @@ public class ChessController implements java.awt.event.ActionListener {
                 // I dont like this logic, but I also dont want to use a break when the game is over
 
                 if (this.currentGameStatus == GameStatus.PLAYING) {
-                    if (this.view instanceof GUIView) {
-                        // try {
-                        // Thread.currentThread().wait();
-                        // } catch (InterruptedException e) {
-                        // // TODO Auto-generated catch block
-                        // e.printStackTrace();
-                        // }
-                    } else {
+                    
 
-                        BoardLocation src = null;
-                        while (src == null) {
-                            src = this.view.requestSourcePiece();
-                        }
-                        updateModelForLocation(src);
-
-                        BoardLocation dest = null;
-                        while (dest == null) {
-                            dest = this.view.requestDestinationPiece(src);
-                        }
-
-                        String moveString = src + " " + dest;
-                        Piece destPiece = this.model.getPiece(dest);
-                        if (destPiece != null && destPiece.isWhite() != this.model.isWhiteTurn()) {
-                            moveString += "*";
-                        }
-
-                        Piece srcPiece = this.model.getPiece(src);
-                        ChessMove thisMove = ChessFactory.CreateMove(moveString);
-
-
-
-                        // Check for pawn promotion
-                        // Piece newDestPiece = this.model.getPiece(dest);
-                        if (srcPiece instanceof Pawn) {
-                            if (((Pawn) srcPiece).isInEigthRow(dest)) {
-                                PieceType pawnPromotionType = this.view.requestPawnPromotion();
-                                thisMove.setChangeTurnAfter(false);
-                                // "a1 qda1"
-                                char ldColor = (srcPiece.isWhite()) ? 'l' : 'd';
-                                String promotionString = thisMove.getDestLoc().toString() + " " + pawnPromotionType.toString() + ldColor + thisMove.getDestLoc().toString();
-                                thisMove.setSubmove(ChessFactory.CreateMove(promotionString));
-
-                            }
-                        }
-
-
-                        this.addMove(thisMove, true);
-
+                    BoardLocation src = null;
+                    while (src == null) {
+                        src = this.view.requestSourcePiece();
                     }
+                    updateModelForLocation(src);
+
+                    BoardLocation dest = null;
+                    while (dest == null) {
+                        dest = this.view.requestDestinationPiece(src);
+                    }
+
+                    String moveString = src + " " + dest;
+                    Piece destPiece = this.model.getPiece(dest);
+                    if (destPiece != null && destPiece.isWhite() != this.model.isWhiteTurn()) {
+                        moveString += "*";
+                    }
+
+                    Piece srcPiece = this.model.getPiece(src);
+                    ChessMove thisMove = ChessFactory.CreateMove(moveString);
+
+
+
+                    // Check for pawn promotion
+                    // Piece newDestPiece = this.model.getPiece(dest);
+                    if (srcPiece instanceof Pawn) {
+                        if (((Pawn) srcPiece).isInEigthRow(dest)) {
+                            PieceType pawnPromotionType = this.view.requestPawnPromotion();
+                            thisMove.setChangeTurnAfter(false);
+                            // "a1 qda1"
+                            char ldColor = (srcPiece.isWhite()) ? 'l' : 'd';
+                            String promotionString = thisMove.getDestLoc().toString() + " " + pawnPromotionType.toString() + ldColor + thisMove.getDestLoc().toString();
+                            thisMove.setSubmove(ChessFactory.CreateMove(promotionString));
+
+                        }
+                    }
+
+
+                    this.addMove(thisMove, true);
+
+                    
                 } else {
                     System.out.println("sakjdfadkjsfjdsa");
                 }

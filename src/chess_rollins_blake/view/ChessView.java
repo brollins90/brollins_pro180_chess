@@ -46,7 +46,7 @@ public abstract class ChessView implements java.util.Observer {
     }
 
     public void update() {
-        update(this.model, "");
+        update(this.model, null);
     }
 
     @Override

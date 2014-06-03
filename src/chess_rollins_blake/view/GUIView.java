@@ -1,8 +1,9 @@
 package chess_rollins_blake.view;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -13,6 +14,7 @@ import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 
 import chess_rollins_blake.controller.GameStatus;
@@ -26,48 +28,70 @@ import chess_rollins_blake.model.ChessModel;
 public class GUIView extends ChessView {
 
     JButton[][] boardSquares = new JButton[8][8];
-    JLabel messageLabel, whiteInCheckLabel, blackInCheckLabel;
+    JLabel messageLabel, whiteInCheckLabel, blackInCheckLabel, turnLabel;
     public BoardPanel boardPanel;
+    protected JList moveList;
     BoardLocation previousModelStateLocation;
+    JFrame frame;
+    private GameStatus currentGameStatus;
 
 
     private Scanner scan;
 
     public GUIView(ChessModel model) {
         super(model);
+        currentGameStatus = GameStatus.PLAYING;
         scan = new Scanner(System.in);
         previousModelStateLocation = BoardLocation.none;
 
-        JFrame frame = new JFrame();
-        JPanel outerPanel = new JPanel();
-        // JPanel outerPanel = new JPanel(new GridBagLayout());
-        // GridBagConstraints c = new GridBagConstraints();
+        frame = new JFrame();
+        JPanel outerPanel = new JPanel(new BorderLayout());
+
+        JPanel upperPanel = new JPanel(new GridLayout(1, 3));
+        // White in check
+        whiteInCheckLabel = new JLabel(null, null, JLabel.CENTER);
+        whiteInCheckLabel.setFont(new Font("Serif", Font.PLAIN, 20));
+        whiteInCheckLabel.setHorizontalTextPosition(JLabel.CENTER);
+        upperPanel.add(whiteInCheckLabel);
+
+        upperPanel.add(new JLabel(null, null, JLabel.CENTER));
+        // Black in check
+        blackInCheckLabel = new JLabel(null, null, JLabel.CENTER);
+        blackInCheckLabel.setFont(new Font("Serif", Font.PLAIN, 20));
+        blackInCheckLabel.setHorizontalTextPosition(JLabel.CENTER);
+        upperPanel.add(blackInCheckLabel);
+        outerPanel.add(upperPanel, BorderLayout.NORTH);
+
+
+        JPanel midPanel = new JPanel();
         this.boardPanel = new BoardPanel(super.model);
         this.boardPanel.setPreferredSize(new Dimension(600, 600));
 
-        // c.fill = GridBagConstraints.HORIZONTAL;
-        // c.gridx = 0;
-        // c.gridy = 0;
-        // c.gridwidth = 3;
-        outerPanel.add(boardPanel);
+        midPanel.add(boardPanel);
+        outerPanel.add(midPanel);
+
+
+
+        JPanel lowerPanel = new JPanel(new GridLayout(2, 1));
+        // Status
+        turnLabel = new JLabel(null, null, JLabel.CENTER);
+        turnLabel.setFont(new Font("Serif", Font.PLAIN, 20));
+        turnLabel.setHorizontalTextPosition(JLabel.CENTER);
+        lowerPanel.add(turnLabel);
+        // Status
+        messageLabel = new JLabel(null, null, JLabel.CENTER);
+        messageLabel.setFont(new Font("Serif", Font.PLAIN, 20));
+        messageLabel.setHorizontalTextPosition(JLabel.CENTER);
+        lowerPanel.add(messageLabel);
+        outerPanel.add(lowerPanel, BorderLayout.SOUTH);
+        // this.moveList = new JList<ChessMove>();
+        // upperPanel.add(moveList);
+        // outerPanel.add(upperPanel);
 
         // c.fill = GridBagConstraints.HORIZONTAL;
         // c.gridx = 4;
         // c.gridy = 0;
         // outerPanel.add(new JPanel(), c);
-
-        // White in check
-        whiteInCheckLabel = new JLabel();
-        outerPanel.add(whiteInCheckLabel);
-
-        // Status
-        messageLabel = new JLabel();
-        messageLabel.setText("POOP");
-        outerPanel.add(messageLabel);
-
-        // Black in check
-        blackInCheckLabel = new JLabel();
-        outerPanel.add(blackInCheckLabel);
 
 
         frame.add(outerPanel);
@@ -84,26 +108,64 @@ public class GUIView extends ChessView {
 
     @Override
     public void update(Observable obs, Object obj) {
-//        BoardLocation currentModelStateLocation = this.model.getCurrentModelStateLocation();
-        if (obj instanceof String) {
+        // BoardLocation currentModelStateLocation = this.model.getCurrentModelStateLocation();
+        if (obj instanceof GameStatus) {
+            this.currentGameStatus = (GameStatus) obj;
+            if (currentGameStatus != GameStatus.PLAYING) {
+                System.out.println("observed not playing");
+                // this.boardPanel.setGameStatus(currentGameStatus);
+
+                String messageString = "";
+
+                if (currentGameStatus == GameStatus.DARKWIN) {
+                    messageString += "Black Player wins.";
+                } else if (currentGameStatus == GameStatus.DARKFORFEIT) {
+                    messageString += "White Player wins, Black forfeit";
+                } else if (currentGameStatus == GameStatus.LIGHTWIN) {
+                    messageString += "White Player wins.";
+                } else if (currentGameStatus == GameStatus.LIGHTFORFEIT) {
+                    messageString += "Black Player wins, White forfeit";
+                } else if (currentGameStatus == GameStatus.STALEMATE) {
+                    messageString += "Stalemate";
+                }
+
+                // g.setColor(Color.black);
+                // g.drawString(messageString, 200, 200);
+                messageLabel.setFont(new Font("Serif", Font.BOLD, 20));
+                messageLabel.setText(messageString);
+            }
+
+        } else if (obj instanceof String) {
             this.messageLabel.setText((String) obj);
         } else {
-            this.messageLabel.setText("ERROR: Invalid message.");
+            // this.messageLabel.setText("ERROR: Invalid message.");
         }
-//        if (previousModelStateLocation != currentModelStateLocation) {
-//            previousModelStateLocation = currentModelStateLocation;
+        if (currentGameStatus == GameStatus.PLAYING) {
             updateBoard();
-//        }
+        }
+        // }
         if (this.model.isBlackKingInCheck()) {
             blackInCheckLabel.setText("Black King is in check!");
+            blackInCheckLabel.setFont(new Font("Serif", Font.BOLD, 20));
         } else {
             blackInCheckLabel.setText("Black King is not in check!");
+            blackInCheckLabel.setFont(new Font("Serif", Font.PLAIN, 20));
         }
         if (this.model.isWhiteKingInCheck()) {
             whiteInCheckLabel.setText("White King is in check!");
+            whiteInCheckLabel.setFont(new Font("Serif", Font.BOLD, 20));
         } else {
             whiteInCheckLabel.setText("White King not is in check!");
+            whiteInCheckLabel.setFont(new Font("Serif", Font.PLAIN, 20));
         }
+        
+        if (this.model.isWhiteTurn()) {
+            turnLabel.setText("White Turn");
+        } else {
+            turnLabel.setText("Black Turn");
+        }
+
+        // this.moveList
     }
 
     public void updateBoard() {
@@ -127,7 +189,7 @@ public class GUIView extends ChessView {
             srcs.add(m.getSrcLoc());
         }
 
-//        boardPanel.setAvailableSources(srcs);
+        // boardPanel.setAvailableSources(srcs);
         update();
 
 

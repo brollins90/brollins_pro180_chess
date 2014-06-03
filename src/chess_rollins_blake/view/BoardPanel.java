@@ -9,6 +9,7 @@ import java.util.HashSet;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import chess_rollins_blake.controller.GameStatus;
 import chess_rollins_blake.lib.BoardLocation;
 import chess_rollins_blake.lib.PieceType;
 import chess_rollins_blake.model.ChessModel;
@@ -32,14 +33,15 @@ public class BoardPanel extends JPanel {
 
     BufferedImage[][] images = new BufferedImage[2][6];
 
-//    HashSet<BoardLocation> availableSources;
+    // HashSet<BoardLocation> availableSources;
     // HashSet<BoardLocation> availableDestinations;
 
     private ChessModel model;
 
     BoardPanel(ChessModel m) {
+//        currentGameStatus = GameStatus.PLAYING;
         this.model = m;
-        //availableSources = new HashSet<BoardLocation>();
+        // availableSources = new HashSet<BoardLocation>();
         // availableDestinations = new HashSet<BoardLocation>();
 
         loadImages();
@@ -51,19 +53,20 @@ public class BoardPanel extends JPanel {
     // this.availableDestinations = dests;
     // }
 
-//    public void setAvailableSources(HashSet<BoardLocation> sources) {
-//        this.availableSources = sources;
-//    }
+    // public void setAvailableSources(HashSet<BoardLocation> sources) {
+    // this.availableSources = sources;
+    // }
 
     @Override
     public void paint(Graphics g) {
 
-        // check the current location
-        BoardLocation tempSource = this.model.getCurrentModelStateLocation();
+//        if (currentGameStatus == GameStatus.PLAYING) {
+            // check the current location
+            BoardLocation tempSource = this.model.getCurrentModelStateLocation();
 
-//        if (tempSource != prevLoc) {
+            // if (tempSource != prevLoc) {
             prevLoc = tempSource;
-            
+
             HashSet<BoardLocation> tempSources = this.model.getAvailableSources();
             HashSet<BoardLocation> tempDests = this.model.getAvailableDestinationsFromLocationInMoveCache(tempSource);
 
@@ -95,13 +98,13 @@ public class BoardPanel extends JPanel {
                     // color the source dests
                     if (tempSources.contains(currentLocation)) {
                         g.setColor(SQUARE_HAS_MOVE);
-                        //g.setColor(g.getColor().darker());
+                        // g.setColor(g.getColor().darker());
                     }
 
                     // color the current darker
                     if (tempSource == currentLocation) {
-//                        Color currentColor = g.getColor();
-//                        g.setColor(new Color(currentColor.getRed(),currentColor.getGreen(),currentColor.getBlue() - 100));
+                        // Color currentColor = g.getColor();
+                        // g.setColor(new Color(currentColor.getRed(),currentColor.getGreen(),currentColor.getBlue() - 100));
                         g.setColor(Color.ORANGE);
                     }
 
@@ -119,7 +122,31 @@ public class BoardPanel extends JPanel {
                     }
                 }
             }
-        //}
+//        } else /* if (currentGameStatus == GameStatus.DARKWIN || currentGameStatus == GameStatus.LIGHTFORFEIT) */{
+//            g.setColor(Color.red);
+//            g.fillRect(0, 0, this.getWidth(), this.getHeight());
+//
+//            String messageString = "";
+//
+//            if (currentGameStatus == GameStatus.DARKWIN) {
+//                messageString += "Black Player wins.";
+//            } else if (currentGameStatus == GameStatus.DARKFORFEIT) {
+//                messageString += "White Player wins, Black forfeit";
+//            } else if (currentGameStatus == GameStatus.LIGHTWIN) {
+//                messageString += "White Player wins.";
+//            } else if (currentGameStatus == GameStatus.LIGHTFORFEIT) {
+//                messageString += "Black Player wins, White forfeit";
+//            } else if (currentGameStatus == GameStatus.STALEMATE) {
+//                messageString += "Stalemate";
+//            }
+//
+////            g.setColor(Color.black);
+////            g.drawString(messageString, 200, 200);
+//            
+//            messageLabel.setText(messageString);
+
+//        }
+        // }
     }
 
     //
@@ -183,4 +210,8 @@ public class BoardPanel extends JPanel {
             e.printStackTrace();
         }
     }
+
+//    public void setGameStatus(GameStatus cur) {
+//        this.currentGameStatus = cur;
+//    }
 }
