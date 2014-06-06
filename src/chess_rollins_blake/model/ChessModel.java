@@ -333,6 +333,10 @@ public class ChessModel extends java.util.Observable {
                 }
             }
         }
+        if (kingIsInCheck) {
+            King k = (King) currentBoard.get(kingLoc);
+            k.setBeenInCheck();
+        }
         return kingIsInCheck;
     }
 

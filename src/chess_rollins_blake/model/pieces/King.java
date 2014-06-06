@@ -5,12 +5,12 @@ import chess_rollins_blake.lib.PieceType;
 
 public class King extends Piece {
 
-    private boolean hasBeenInCheck;
+    private boolean beenInCheck;
 
     public King(boolean isWhite) {
         super(isWhite);
         super.type = PieceType.k;
-        this.hasBeenInCheck = false;
+        this.beenInCheck = false;
     }
 
     @Override
@@ -39,11 +39,19 @@ public class King extends Piece {
 
         return isValid;
     }
+    
+    public boolean hasBeenInCheck() {
+        return this.beenInCheck;
+    }
+    
+    public void setBeenInCheck(){
+        this.beenInCheck = true;
+    }
 
     public boolean isValidCastlingMove(BoardLocation src, BoardLocation dest) {
         boolean isValid = false;
 
-        if (!hasBeenInCheck) {
+        if (!beenInCheck) {
 
             if (isWhite()) {
                 // Check if in start loc
